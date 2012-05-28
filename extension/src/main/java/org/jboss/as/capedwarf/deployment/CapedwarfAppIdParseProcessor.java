@@ -22,16 +22,11 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import org.jboss.as.server.deployment.Attachments;
-import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
-import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.as.server.deployment.module.ResourceRoot;
 import org.jboss.vfs.VirtualFile;
 
 /**
@@ -39,18 +34,12 @@ import org.jboss.vfs.VirtualFile;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfAppIdParseProcessor extends CapedwarfDeploymentUnitProcessor {
-    private static final String APPENGINE_WEB_XML = "WEB-INF/appengine-web.xml";
+public class CapedwarfAppIdParseProcessor extends CapedwarfAppEngineWebXmlParseProcessor {
     private static final String APPLICATION = "<application>";
 
     private Set<String> apps = new ConcurrentSkipListSet<String>();
 
-    protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-        DeploymentUnit unit = phaseContext.getDeploymentUnit();
-        ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
-        VirtualFile root = deploymentRoot.getRoot();
-        VirtualFile xml = root.getChild(APPENGINE_WEB_XML);
-
+    protected void doParseAppEngineWebXml(DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
         String appId = parseAppId(xml);
 
         if (apps.add(appId) == false)
@@ -59,34 +48,30 @@ public class CapedwarfAppIdParseProcessor extends CapedwarfDeploymentUnitProcess
         CapedwarfDeploymentMarker.setAppId(unit, appId);
     }
 
-    protected String parseAppId(VirtualFile xml) throws DeploymentUnitProcessingException {
+    protected String parseAppId(VirtualFile xml) throws Exception {
+        InputStream is = xml.openStream();
         try {
-            InputStream is = xml.openStream();
-            try {
-                StringBuilder builder = new StringBuilder();
-                int x;
-                boolean isAppId = false;
-                StringBuilder appId = new StringBuilder();
-                while ((x = is.read()) != -1) {
-                    char ch = (char) x;
-                    if (isAppId) {
-                        if (ch == '<')
-                            break;
-                        else
-                            appId.append(ch);
-                    } else {
-                        builder.append(ch);
-                    }
-                    if (isAppId == false && builder.toString().endsWith(APPLICATION)) {
-                        isAppId = true;
-                    }
+            StringBuilder builder = new StringBuilder();
+            int x;
+            boolean isAppId = false;
+            StringBuilder appId = new StringBuilder();
+            while ((x = is.read()) != -1) {
+                char ch = (char) x;
+                if (isAppId) {
+                    if (ch == '<')
+                        break;
+                    else
+                        appId.append(ch);
+                } else {
+                    builder.append(ch);
                 }
-                return appId.toString();
-            } finally {
-                is.close();
+                if (isAppId == false && builder.toString().endsWith(APPLICATION)) {
+                    isAppId = true;
+                }
             }
-        } catch (IOException e) {
-            throw new DeploymentUnitProcessingException(e);
+            return appId.toString();
+        } finally {
+            safeClose(is);
         }
     }
 
