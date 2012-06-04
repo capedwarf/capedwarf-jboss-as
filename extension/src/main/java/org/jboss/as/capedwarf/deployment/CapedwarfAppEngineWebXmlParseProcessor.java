@@ -46,13 +46,13 @@ public abstract class CapedwarfAppEngineWebXmlParseProcessor extends CapedwarfDe
         VirtualFile xml = root.getChild(APPENGINE_WEB_XML);
 
         try {
-            doParseAppEngineWebXml(unit, root, xml);
+            doParseAppEngineWebXml(phaseContext, unit, root, xml);
         } catch (Exception e) {
             throw new DeploymentUnitProcessingException(e);
         }
     }
 
-    protected abstract void doParseAppEngineWebXml(DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception;
+    protected abstract void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception;
 
     protected static void safeClose(Closeable closeable) {
         if (closeable != null) {

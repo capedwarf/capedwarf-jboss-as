@@ -24,6 +24,8 @@ package org.jboss.as.capedwarf.api;
 
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.naming.deployment.JndiName;
+import org.jboss.as.server.deployment.AttachmentKey;
+import org.jboss.msc.service.ServiceName;
 
 /**
  * Constants.
@@ -38,4 +40,6 @@ public final class Constants {
     public static final String CHANNEL_JNDI = JndiName.of("java:jboss").append(CAPEDWARF).append("indexing").append("channel").getAbsoluteName();
     // Bind info
     public static final ContextNames.BindInfo CHANNEL_BIND_INFO = ContextNames.bindInfoFor(CHANNEL_JNDI);
+    // Log handler service name attachment key
+    public static final AttachmentKey<ServiceName> LOG_HANDLER_KEY = AttachmentKey.create(ServiceName.class);
 }

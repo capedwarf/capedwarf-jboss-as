@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.vfs.VirtualFile;
 
@@ -39,7 +40,7 @@ public class CapedwarfAppIdParseProcessor extends CapedwarfAppEngineWebXmlParseP
 
     private Set<String> apps = new ConcurrentSkipListSet<String>();
 
-    protected void doParseAppEngineWebXml(DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
+    protected void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
         String appId = parseAppId(xml);
 
         if (apps.add(appId) == false)

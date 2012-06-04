@@ -24,15 +24,26 @@ package org.jboss.as.capedwarf.deployment;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.logging.Handler;
 
+import org.jboss.as.capedwarf.api.Constants;
+import org.jboss.as.capedwarf.services.TCCLService;
 import org.jboss.as.logging.LoggingConfigurationProcessor;
 import org.jboss.as.logging.LoggingExtension;
+import org.jboss.as.logging.loggers.LoggerHandlerService;
+import org.jboss.as.logging.util.LogServices;
 import org.jboss.as.server.deployment.Attachments;
+import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.logmanager.ContextClassLoaderLogContextSelector;
 import org.jboss.logmanager.LogContext;
+import org.jboss.logmanager.Logger;
 import org.jboss.logmanager.PropertyConfigurator;
 import org.jboss.modules.Module;
+import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceTarget;
 import org.jboss.vfs.VirtualFile;
 
 /**
@@ -59,7 +70,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         return contextSelector;
     }
 
-    protected void doParseAppEngineWebXml(DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
+    protected void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
         final Module module = unit.getAttachment(Attachments.MODULE);
         if (module != null) {
             // Always set this - for CapeDwarf subsystem to control logging,
@@ -77,12 +88,27 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
                     } finally {
                         safeClose(stream);
                     }
-                    getContextSelector().registerLogContext(module.getClassLoader(), logContext);
+                    final ClassLoader classLoader = module.getClassLoader();
+                    getContextSelector().registerLogContext(classLoader, logContext);
+                    addHandler(context.getServiceTarget(), classLoader, unit);
                 } else {
                     log.warn("No such logging config file exists: " + path);
                 }
             }
         }
+    }
+
+    protected void addHandler(final ServiceTarget serviceTarget, final ClassLoader classLoader, final DeploymentUnit unit) {
+        final String capedwarfLogger = Constants.CAPEDWARF.toUpperCase();
+        final ServiceName chsName = LogServices.handlerName(capedwarfLogger);
+        final String rootLogger = "ROOT";
+        final LoggerHandlerService lhs = new LoggerHandlerService(rootLogger);
+        final TCCLService<Logger> tccls = new TCCLService<Logger>(lhs, classLoader);
+        final ServiceName lhsName = LogServices.loggerHandlerName(rootLogger, capedwarfLogger).append(unit.getName());
+        final ServiceBuilder<Logger> lhsBuilder = serviceTarget.addService(lhsName, tccls);
+        lhsBuilder.addDependency(chsName, Handler.class, lhs.getHandlerInjector());
+        lhsBuilder.setInitialMode(ServiceController.Mode.ON_DEMAND).install();
+        unit.putAttachment(Constants.LOG_HANDLER_KEY, lhsName);
     }
 
     protected String parseLoggingConfigPath(VirtualFile xml) throws Exception {
