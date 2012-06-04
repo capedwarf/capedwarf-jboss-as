@@ -24,6 +24,8 @@ package org.jboss.as.capedwarf.deployment;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Handler;
 
 import org.jboss.as.capedwarf.api.Constants;
@@ -52,6 +54,8 @@ import org.jboss.vfs.VirtualFile;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlParseProcessor {
+    private static final String LOGGER = "logger";
+    private static final String USE_PARENT_HANDLERS = ".useParentHandlers";
     private static final String LOGGING = "\"java.util.logging.config.file\"";
 
     private ContextClassLoaderLogContextSelector contextSelector;
@@ -82,12 +86,32 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             if (path.length() > 0) {
                 VirtualFile config = root.getChild(path);
                 if (config.exists()) {
-                    InputStream stream = config.openStream();
+                    final Properties properties = new Properties();
+                    final InputStream stream = config.openStream();
                     try {
-                        new PropertyConfigurator(logContext).configure(stream);
+                        properties.load(stream);
                     } finally {
                         safeClose(stream);
                     }
+                    final Properties fixed = new Properties();
+                    if (properties.containsKey(USE_PARENT_HANDLERS) == false) {
+                        fixed.setProperty(LOGGER + USE_PARENT_HANDLERS, Boolean.TRUE.toString());
+                    }
+                    for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+                        String key = entry.getKey().toString();
+                        if (key.length() == 0) continue;
+                        if (key.startsWith(LOGGER) == false) {
+                            final StringBuilder builder = new StringBuilder(key);
+                            if (builder.charAt(0) != '.') {
+                                builder.insert(0, '.');
+                            }
+                            builder.insert(0, LOGGER);
+                            key = builder.toString();
+                        }
+                        Object value = entry.getValue();
+                        fixed.put(key, value);
+                    }
+                    new PropertyConfigurator(logContext).configure(fixed);
                     final ClassLoader classLoader = module.getClassLoader();
                     getContextSelector().registerLogContext(classLoader, logContext);
                     addHandler(context.getServiceTarget(), classLoader, unit);
