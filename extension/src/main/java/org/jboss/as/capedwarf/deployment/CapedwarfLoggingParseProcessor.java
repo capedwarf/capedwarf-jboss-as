@@ -54,7 +54,9 @@ import org.jboss.vfs.VirtualFile;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlParseProcessor {
+    private static final char DOT = '.';
     private static final String LOGGER = "logger";
+    private static final String LOGGER_DOT = LOGGER + DOT;
     private static final String USE_PARENT_HANDLERS = ".useParentHandlers";
     private static final String LOGGING = "\"java.util.logging.config.file\"";
 
@@ -100,12 +102,13 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
                     for (Map.Entry<Object, Object> entry : properties.entrySet()) {
                         String key = entry.getKey().toString();
                         if (key.length() == 0) continue;
-                        if (key.startsWith(LOGGER) == false) {
+                        if (key.startsWith(LOGGER_DOT) == false) {
                             final StringBuilder builder = new StringBuilder(key);
-                            if (builder.charAt(0) != '.') {
-                                builder.insert(0, '.');
+                            if (builder.charAt(0) != DOT) {
+                                builder.insert(0, LOGGER_DOT);
+                            } else {
+                                builder.insert(0, LOGGER);
                             }
-                            builder.insert(0, LOGGER);
                             key = builder.toString();
                         }
                         Object value = entry.getValue();
