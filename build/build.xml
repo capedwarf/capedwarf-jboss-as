@@ -71,6 +71,7 @@
 
        <module-def name="org.apache.lucene">
             <maven-resource group="org.apache.lucene" artifact="lucene-core"/>
+            <maven-resource group="org.apache.lucene" artifact="lucene-analyzers"/>
         </module-def>
 
 
