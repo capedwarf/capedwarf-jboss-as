@@ -167,7 +167,7 @@
             </thread-pools>
             <iiop enable-by-default="false" use-qualified-name="false"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:infinispan:1.3">
+        <subsystem xmlns="urn:jboss:domain:infinispan:1.4">
             <cache-container name="cluster" aliases="ha-partition" default-cache="default">
                 <transport lock-timeout="60000"/>
                 <replicated-cache name="default" mode="SYNC" batching="true">
@@ -220,15 +220,15 @@
             <cache-container name="capedwarf" default-cache="default">
                 <transport lock-timeout="60000"/>
                 <!-- distributed-cache name="default" owners="2" mode="ASYNC" indexing="LOCAL" -->
-                <distributed-cache name="default" mode="ASYNC" indexing="LOCAL">
+                <distributed-cache name="default" mode="ASYNC">
                     <transaction mode="NON_XA"/>
                     <eviction strategy="NONE"/>
                     <file-store preload="true" purge="false"/>
-                    <indexing-properties>
+                    <indexing index="LOCAL">
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">java:jboss/infinispan/container/HibernateSearch</property>
                         <property name="hibernate.search.default.worker.backend">jgroups</property>
-                    </indexing-properties>
+                    </indexing>
                 </distributed-cache>
                 <replicated-cache name="data" mode="ASYNC">
                     <transaction mode="NON_XA"/>
@@ -249,15 +249,15 @@
                     <eviction strategy="NONE"/>
                     <file-store preload="true" purge="false"/>
                 </distributed-cache>
-                <distributed-cache name="tasks" mode="ASYNC" indexing="LOCAL">
+                <distributed-cache name="tasks" mode="ASYNC" >
                     <transaction mode="NON_XA"/>
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="true" purge="false"/>
-                    <indexing-properties>
+                    <indexing index="LOCAL">
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">java:jboss/infinispan/container/HibernateSearch</property>
                         <property name="hibernate.search.default.worker.backend">jgroups</property>
-                    </indexing-properties>
+                    </indexing>
                 </distributed-cache>
             </cache-container>
             <cache-container name="HibernateSearch" default-cache="LuceneIndexesMetadata">

@@ -66,6 +66,7 @@
                                 <ant antfile="build.xml" inheritRefs="true">
                                     <target name="all"/>
                                 </ant>
+
                             </target>
                         </configuration>
                     </execution>
