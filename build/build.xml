@@ -72,6 +72,7 @@
        <module-def name="org.apache.lucene">
             <maven-resource group="org.apache.lucene" artifact="lucene-core"/>
             <maven-resource group="org.apache.lucene" artifact="lucene-analyzers"/>
+            <maven-resource group="org.apache.lucene" artifact="lucene-memory"/>
         </module-def>
 
 
@@ -139,8 +140,9 @@
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-mail"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-memcache"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-oauth"/>
-            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-tasks"/>
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-prospectivesearch"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-search"/>
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-tasks"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-urlfetch"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-users"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-xmpp"/>

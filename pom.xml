@@ -75,7 +75,7 @@
         <version.javax.jws.jsr181-api>1.0-MR1</version.javax.jws.jsr181-api>
         <version.javax.mail>1.4.4</version.javax.mail>
         <version.javax.validation>1.0.0.GA</version.javax.validation>
-        <version.org.hibernate.search>4.2.0-SNAPSHOT</version.org.hibernate.search>
+        <version.org.hibernate.search>4.2.0.Beta1</version.org.hibernate.search>
         <version.org.datanucleus>3.0.4</version.org.datanucleus>
         <version.org.datanucleus.appengine>2.0.0</version.org.datanucleus.appengine>
         <version.org.datanucleus.cache>3.1.0</version.org.datanucleus.cache>
@@ -83,7 +83,7 @@
         <version.junit>4.10</version.junit>
         <version.org.apache.lucene>3.6.0</version.org.apache.lucene>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>1.0.1.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>
-        <version.org.infinispan>5.2.0-SNAPSHOT</version.org.infinispan>
+        <version.org.infinispan>5.2.0.ALPHA1</version.org.infinispan>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
 
         <version.org.jboss.jandex>1.0.3.Final</version.org.jboss.jandex>
@@ -339,6 +339,12 @@
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers</artifactId>
+                <version>${version.org.apache.lucene}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-memory</artifactId>
                 <version>${version.org.apache.lucene}</version>
             </dependency>
 
@@ -690,6 +696,12 @@
             <dependency>
                 <groupId>org.jboss.capedwarf.blue</groupId>
                 <artifactId>capedwarf-oauth</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-prospectivesearch</artifactId>
                 <version>${version.org.jboss.capedwarf}</version>
             </dependency>
 

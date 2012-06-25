@@ -258,6 +258,10 @@
 
         </dependency>
 
+        <dependency>
+            <groupId>org.jboss.capedwarf.blue</groupId>
+            <artifactId>capedwarf-prospectivesearch</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.jboss.capedwarf.blue</groupId>
@@ -305,6 +309,10 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-memory</artifactId>
         </dependency>
 
 
