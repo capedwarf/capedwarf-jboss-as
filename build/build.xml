@@ -26,7 +26,7 @@
 
     <property name="output.dir" value="target/capedwarf-release"/>
 
-    <target name="base" depends="clean-target, modules-minimalistic, copy-files"/>
+    <target name="base" depends="clean-target, copy-files"/>
 
     <target name="copy-files">
         <copy todir="${output.dir}">
@@ -36,24 +36,7 @@
         </copy>
     </target>
 
-
-
-
-    <target name="modules-minimalistic">
-
-
-        <!--
-          ~ Minimalistic list of modules to assemble.
-          ~
-          ~ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-          ~ +++++++   KEEP THIS LIST ALPHABETICAL BY MODULE NAME!   +++++++
-          ~ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-          -->
-
-
-    </target>
-
-    <target name="modules" depends="modules-minimalistic">
+    <target name="modules" >
 
         <module-def name="com.google.appengine">
             <maven-resource group="com.google.appengine" artifact="appengine-api-1.0-sdk" />
@@ -175,5 +158,15 @@
         <delete file="maven-ant-tasks.jar"/>
     </target>
 
-    <target name="all" depends="base, modules"/>
+    <target name="all" depends="base, modules, as-integrate"/>
+
+    <target name="as-integrate" depends="modules" description="Integrate capedwarf into existing AS7 instalation">
+       <echo message="jboss dir is: ${jboss.dir}" />
+       <fail unless="jboss.dir" description="Jboss AS7 must be defined" message="property jboss.dir must be set" />
+
+        <copy todir="${jboss.dir}" verbose="true">
+            <fileset dir="${output.dir}" />
+        </copy>
+
+    </target>
 </project>
