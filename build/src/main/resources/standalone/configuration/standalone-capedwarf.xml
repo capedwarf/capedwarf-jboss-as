@@ -259,6 +259,26 @@
                         <property name="hibernate.search.default.worker.backend">jgroups</property>
                     </indexing>
                 </distributed-cache>
+                <distributed-cache name="search" mode="ASYNC" >
+                    <transaction mode="NON_XA"/>
+                    <eviction strategy="LIRS" max-entries="10000"/>
+                    <file-store preload="true" purge="false"/>
+                    <indexing index="LOCAL">
+                        <property name="hibernate.search.default.directory_provider">infinispan</property>
+                        <property name="hibernate.search.infinispan.cachemanager_jndiname">java:jboss/infinispan/container/HibernateSearch</property>
+                        <property name="hibernate.search.default.worker.backend">jgroups</property>
+                    </indexing>
+                </distributed-cache>
+                <distributed-cache name="prospective_search" mode="ASYNC" >
+                    <transaction mode="NON_XA"/>
+                    <eviction strategy="LIRS" max-entries="10000"/>
+                    <file-store preload="true" purge="false"/>
+                    <indexing index="LOCAL">
+                        <property name="hibernate.search.default.directory_provider">infinispan</property>
+                        <property name="hibernate.search.infinispan.cachemanager_jndiname">java:jboss/infinispan/container/HibernateSearch</property>
+                        <property name="hibernate.search.default.worker.backend">jgroups</property>
+                    </indexing>
+                </distributed-cache>
             </cache-container>
             <cache-container name="HibernateSearch" default-cache="LuceneIndexesMetadata">
                 <transport lock-timeout="60000"/>
