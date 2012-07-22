@@ -22,6 +22,14 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Random;
+
 import org.jboss.as.jpa.config.Configuration;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.AttachmentList;
@@ -31,14 +39,6 @@ import org.jboss.vfs.TempDir;
 import org.jboss.vfs.VFS;
 import org.jboss.vfs.VFSUtils;
 import org.jboss.vfs.VirtualFile;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Random;
 
 /**
  * Fix CapeDwarf persistence.xml usage.
@@ -54,7 +54,11 @@ public class CapedwarfPersistenceModificationProcessor extends CapedwarfPersiste
     static final String DATANUCLEUS_PROVIDER = Configuration.PROVIDER_CLASS_DATANUCLEUS;
     static final String DATANUCLEUS_GAE_PROVIDER = Configuration.PROVIDER_CLASS_DATANUCLEUS_GAE;
     static final String PROPERTIES = "<properties>";
-    static final String LOAD_AT_RUNTIME = "<property name=\"datanucleus.metadata.allowLoadAtRuntime\" value=\"true\"/>";
+    static final String LOAD_AT_RUNTIME_KEY = "datanucleus.metadata.allowLoadAtRuntime";
+    static final String LOAD_AT_RUNTIME = "<property name=\"" + LOAD_AT_RUNTIME_KEY + "\" value=\"true\"/>\n";
+    static final String METADATA_SCANNER_KEY = "datanucleus.metadata.scanner";
+    static final String METADATA_SCANNER_CLASS = "org.jboss.capedwarf.datastore.datancleus.JndiMetaDataScanner"; // TODO - configurable?
+    static final String METADATA_SCANNER = "<property name=\"" + METADATA_SCANNER_KEY + "\" value=\"" + METADATA_SCANNER_CLASS + "\"/>\n";
 
     static final AttachmentKey<AttachmentList<Closeable>> ASSEMBLY_HANDLE = AttachmentKey.createList(Closeable.class);
     static final Random rng = new Random();
@@ -103,7 +107,9 @@ public class CapedwarfPersistenceModificationProcessor extends CapedwarfPersiste
                 if (p < 0) break;
 
                 final int offset = p + PROPERTIES.length();
+                // TODO -- check if explicitly set
                 builder.insert(offset, LOAD_AT_RUNTIME);
+                builder.insert(offset, METADATA_SCANNER);
             }
             content = builder.toString();
             return new ByteArrayInputStream(content.getBytes());

@@ -38,8 +38,10 @@ public final class Constants {
     public static final String[] CACHES = {"default", "data", "metadata", "memcache", "dist", "tasks"};
     // JNDI names
     public static final String CHANNEL_JNDI = JndiName.of("java:jboss").append(CAPEDWARF).append("indexing").append("channel").getAbsoluteName();
+    public static final String EXECUTOR_JNDI = JndiName.of("java:jboss").append("threads").append("executor").append(CAPEDWARF).getAbsoluteName();
     // Bind info
     public static final ContextNames.BindInfo CHANNEL_BIND_INFO = ContextNames.bindInfoFor(CHANNEL_JNDI);
+    public static final ContextNames.BindInfo EXECUTOR_BIND_INFO = ContextNames.bindInfoFor(EXECUTOR_JNDI);
     // Log handler service name attachment key
     public static final AttachmentKey<ServiceName> LOG_HANDLER_KEY = AttachmentKey.create(ServiceName.class);
 }
