@@ -55,7 +55,7 @@ public abstract class CapedwarfWebModificationDeploymentProcessor extends Capedw
         if (webMetaData != null)
             doDeploy(unit, webMetaData, Type.SHARED);
 
-        JBossWebMetaData jBossWebMetaData = warMetaData.getJbossWebMetaData();
+        JBossWebMetaData jBossWebMetaData = warMetaData.getJBossWebMetaData();
         if (webMetaData != null)
             doDeploy(unit, jBossWebMetaData, Type.JBOSS);
 

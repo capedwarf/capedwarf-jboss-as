@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.jboss.as.jpa.config.Configuration;
 import org.jboss.as.jpa.config.PersistenceUnitMetadataHolder;
-import org.jboss.as.jpa.processor.JpaAttachments;
 import org.jboss.as.jpa.spi.PersistenceUnitMetadata;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -51,8 +50,6 @@ public class CapedwarfJPAProcessor extends CapedwarfPersistenceProcessor {
                     CapedwarfDeploymentMarker.addPersistenceProvider(unit, providerClass);
 
                     if (Configuration.PROVIDER_CLASS_DATANUCLEUS.equals(providerClass) || Configuration.PROVIDER_CLASS_DATANUCLEUS_GAE.equals(providerClass)) {
-                        unit.addToAttachmentList(JpaAttachments.IGNORED_PU_SERVICES, pumd.getPersistenceUnitName());
-
                         final ModuleSpecification moduleSpecification = unit.getAttachment(Attachments.MODULE_SPECIFICATION);
                         moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.datanucleus.DataNucleusTransformer");
                     }
