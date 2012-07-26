@@ -183,6 +183,8 @@ public class CapedwarfEntityProcessor extends CapedwarfDeploymentUnitProcessor {
                 .addDependency(bindInfo.getParentContextServiceName(), ServiceBasedNamingStore.class, binder.getNamingStoreInjector())
                 .setInitialMode(ServiceController.Mode.ACTIVE);
         binderBuilder.install();
+        // attach to unit
+        CapedwarfDeploymentMarker.setEntities(unit, entityClasses);
     }
 
     private static void addTargetClasses(CompositeIndex index, DotName annotation, Set<String> set) {

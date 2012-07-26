@@ -42,6 +42,7 @@ import org.jboss.as.capedwarf.deployment.CapedwarfJPAProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfLoggingParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfMuxIdProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfPersistenceModificationProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfPostModuleJPAProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWebCleanupProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWebComponentsDeploymentProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWeldParseProcessor;
@@ -140,6 +141,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_LOGGING_CONFIG - 1, new CapedwarfLoggingParseProcessor()); // just before AS logging configuration
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 10, new CapedwarfCDIExtensionProcessor()); // after Weld portable extensions lookup
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 20, new CapedwarfEntityProcessor()); // adjust as needed
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 30, new CapedwarfPostModuleJPAProcessor()); // after entity processor
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_MODULE_JNDI_BINDINGS - 2, new CapedwarfDependenciesProcessor()); // after logging
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_MODULE_JNDI_BINDINGS - 1, new CapedwarfMuxIdProcessor()); // adjust order as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_MODULE_JNDI_BINDINGS + 1, new CapedwarfCleanupProcessor(consumerService)); // adjust order as needed

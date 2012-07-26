@@ -41,6 +41,7 @@ public class CapedwarfDeploymentMarker {
     private boolean cdiApp;
     private String appId;
     private Set<String> persistenceProviders;
+    private Set<String> entities;
 
     private CapedwarfDeploymentMarker() {
     }
@@ -168,5 +169,29 @@ public class CapedwarfDeploymentMarker {
             }
         }
         return Collections.emptySet();
+    }
+
+    /**
+     * Set JPA entities.
+     *
+     * @param unit     the deployment unit
+     * @param entities the JPA entities
+     */
+    public static void setEntities(DeploymentUnit unit, Set<String> entities) {
+        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        if (marker != null) {
+            marker.entities = entities;
+        }
+    }
+
+    /**
+     * Get JPA entities.
+     *
+     * @param unit the deployment unit
+     * @return JPA entities
+     */
+    public static Set<String> getEntities(DeploymentUnit unit) {
+        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        return (marker != null) ? marker.entities : null;
     }
 }
