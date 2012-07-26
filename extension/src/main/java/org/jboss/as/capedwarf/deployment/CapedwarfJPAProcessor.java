@@ -23,6 +23,7 @@
 package org.jboss.as.capedwarf.deployment;
 
 import java.util.List;
+import java.util.Properties;
 
 import org.jboss.as.jpa.config.Configuration;
 import org.jboss.as.jpa.config.PersistenceUnitMetadataHolder;
@@ -52,6 +53,11 @@ public class CapedwarfJPAProcessor extends CapedwarfPersistenceProcessor {
                     if (Configuration.PROVIDER_CLASS_DATANUCLEUS.equals(providerClass) || Configuration.PROVIDER_CLASS_DATANUCLEUS_GAE.equals(providerClass)) {
                         final ModuleSpecification moduleSpecification = unit.getAttachment(Attachments.MODULE_SPECIFICATION);
                         moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.datanucleus.DataNucleusTransformer");
+                        // do not start PU service, should we do it for all PUs, not just DNs?
+                        final Properties properties = pumd.getProperties();
+                        if (properties.containsKey(Configuration.JPA_CONTAINER_MANAGED) == false) {
+                            properties.put(Configuration.JPA_CONTAINER_MANAGED, Boolean.FALSE.toString());
+                        }
                     }
                 }
             }
