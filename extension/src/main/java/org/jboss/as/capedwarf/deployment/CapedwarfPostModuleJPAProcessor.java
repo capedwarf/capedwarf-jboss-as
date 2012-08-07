@@ -52,16 +52,16 @@ public class CapedwarfPostModuleJPAProcessor extends CapedwarfPersistenceProcess
                 final Set<String> entities = CapedwarfDeploymentMarker.getEntities(unit);
                 for (PersistenceUnitMetadata pumd : pus) {
                     final String providerClass = pumd.getPersistenceProviderClassName();
-
-                    if (Configuration.PROVIDER_CLASS_DATANUCLEUS.equals(providerClass) || Configuration.PROVIDER_CLASS_DATANUCLEUS_GAE.equals(providerClass)) {
+                    // afaik, P_C_DN_GAE marks old 1.x, 2.x GAE DN
+                    if (Configuration.PROVIDER_CLASS_DATANUCLEUS.equals(providerClass)) {
                         final Properties properties = pumd.getProperties();
                         if (properties.containsKey(METADATA_SCANNER_KEY) == false) {
                             try {
                                 final Constructor ctor = cl.loadClass(METADATA_SCANNER_CLASS).getConstructor(Set.class);
                                 final Object scanner = ctor.newInstance(entities);
                                 properties.put(METADATA_SCANNER_KEY, scanner);
-                            } catch (Exception e) {
-                                throw new IllegalArgumentException("Cannot create metadata scanner.", e);
+                            } catch (Throwable t) {
+                                log.warn("Cannot create metadata scanner, only supported from DataNucleus 3.1.x.", t);
                             }
                         }
                     }
