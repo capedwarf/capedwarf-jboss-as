@@ -43,6 +43,9 @@ public class CapedwarfAppIdParseProcessor extends CapedwarfAppEngineWebXmlParseP
     protected void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
         String appId = parseAppId(xml);
 
+        if (appId == null || appId.length() == 0)
+            throw new IllegalArgumentException("App id is null or empty!");
+
         if (apps.add(appId) == false)
             throw new IllegalArgumentException("App id already exists: " + appId);
 
