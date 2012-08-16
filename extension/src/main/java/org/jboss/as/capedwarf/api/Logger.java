@@ -23,8 +23,6 @@
 package org.jboss.as.capedwarf.api;
 
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -34,10 +32,8 @@ import java.util.logging.LogRecord;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class Logger extends Handler {
-    // handling re-entry on threads
+    // handling re-entry on same thread
     private static final ThreadLocal<Boolean> marker = new ThreadLocal<Boolean>();
-    // handling app re-entry
-    private static final Map<String, Boolean> apps = new ConcurrentHashMap<String, Boolean>();
 
     public void publish(final LogRecord record) {
         final ClassLoader appCl = SecurityActions.getAppClassLoader();
@@ -49,21 +45,12 @@ public class Logger extends Handler {
         if (marker.get() != null)
             return;
 
-        final String appId = CapedwarfApiProxy.getAppId();
-        if (apps.containsKey(appId) && isInJBossLogService())
-            return;
-
         marker.set(true);
         try {
-            apps.put(appId, true);
-            try {
-                final Class<?> clazz = appCl.loadClass("org.jboss.capedwarf.log.Logger");
-                final Method method = clazz.getDeclaredMethod("publish", LogRecord.class);
-                method.invoke(null, record);
-            } catch (Exception ignored) {
-            } finally {
-                apps.remove(appId);
-            }
+            final Class<?> clazz = appCl.loadClass("org.jboss.capedwarf.log.Logger");
+            final Method method = clazz.getDeclaredMethod("publish", LogRecord.class);
+            method.invoke(null, record);
+        } catch (Exception ignored) {
         } finally {
             marker.remove();
         }
@@ -73,15 +60,5 @@ public class Logger extends Handler {
     }
 
     public void close() throws SecurityException {
-    }
-
-    protected static boolean isInJBossLogService() {
-        final StackTraceElement[] elts = Thread.currentThread().getStackTrace();
-        for (StackTraceElement elt : elts) {
-            // check if we're already in JBossLogService::log -- TODO better way?
-            if ("org.jboss.capedwarf.log.JBossLogService".equals(elt.getClassName()) && "log".equals(elt.getMethodName()))
-                return true;
-        }
-        return false;
     }
 }
