@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
 
 import org.infinispan.Cache;
 import org.infinispan.manager.EmbeddedCacheManager;
@@ -39,6 +40,7 @@ import org.jboss.as.capedwarf.services.ServletExecutor;
 final class CapedwarfApiProxy {
 
     private static Map<ClassLoader, String> classLoaders = new ConcurrentHashMap<ClassLoader, String>();
+    private static ThreadLocal<ServletRequest> requests = new ThreadLocal<ServletRequest>();
 
     static boolean isCapedwarfApp(ClassLoader classLoader) {
         return classLoaders.containsKey(classLoader);
@@ -78,5 +80,17 @@ final class CapedwarfApiProxy {
                 } catch (Exception ignored) {
                 }
         }
+    }
+
+    static void setRequest(ServletRequest request) {
+        requests.set(request);
+    }
+
+    static ServletRequest getRequest() {
+        return requests.get();
+    }
+
+    static void removeRequest() {
+        requests.remove();
     }
 }

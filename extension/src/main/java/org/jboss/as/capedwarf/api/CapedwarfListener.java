@@ -27,6 +27,8 @@ import javax.naming.InitialContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.ServletRequestEvent;
+import javax.servlet.ServletRequestListener;
 
 import org.infinispan.manager.EmbeddedCacheManager;
 
@@ -37,7 +39,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfListener implements ServletContextListener {
+public class CapedwarfListener implements ServletContextListener, ServletRequestListener {
     private static final String JNDI_NAME = "java:jboss/infinispan/container/capedwarf";
 
     public void contextInitialized(ServletContextEvent sce) {
@@ -54,6 +56,14 @@ public class CapedwarfListener implements ServletContextListener {
 
         CapedwarfApiProxy.destroy(appId, context);
         CapedwarfApiProxy.destroy(appId, getManager());
+    }
+
+    public void requestInitialized(ServletRequestEvent event) {
+        CapedwarfApiProxy.setRequest(event.getServletRequest());
+    }
+
+    public void requestDestroyed(ServletRequestEvent event) {
+        CapedwarfApiProxy.removeRequest();
     }
 
     protected EmbeddedCacheManager getManager() {

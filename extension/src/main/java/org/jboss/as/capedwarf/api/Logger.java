@@ -36,6 +36,10 @@ public class Logger extends Handler {
     private static final ThreadLocal<Boolean> marker = new ThreadLocal<Boolean>();
 
     public void publish(final LogRecord record) {
+        // it didn't came from request, potential cycle
+        if (CapedwarfApiProxy.getRequest() == null)
+            return;
+
         final ClassLoader appCl = SecurityActions.getAppClassLoader();
 
         if (CapedwarfApiProxy.isCapedwarfApp(appCl) == false)
