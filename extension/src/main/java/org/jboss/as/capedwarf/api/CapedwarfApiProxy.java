@@ -22,8 +22,8 @@
 
 package org.jboss.as.capedwarf.api;
 
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContext;
 
@@ -38,19 +38,23 @@ import org.jboss.as.capedwarf.services.ServletExecutor;
  */
 final class CapedwarfApiProxy {
 
-    private static Set<ClassLoader> classLoaders = new CopyOnWriteArraySet<ClassLoader>();
+    private static Map<ClassLoader, String> classLoaders = new ConcurrentHashMap<ClassLoader, String>();
 
     static boolean isCapedwarfApp(ClassLoader classLoader) {
-        return classLoaders.contains(classLoader);
+        return classLoaders.containsKey(classLoader);
     }
 
     static boolean isCapedwarfApp() {
         return isCapedwarfApp(SecurityActions.getAppClassLoader());
     }
 
+    static String getAppId() {
+        return classLoaders.get(SecurityActions.getAppClassLoader());
+    }
+
     static void initialize(final String appId, final ServletContext context) {
         ServletExecutor.registerContext(appId, context);
-        classLoaders.add(SecurityActions.getAppClassLoader());
+        classLoaders.put(SecurityActions.getAppClassLoader(), appId);
     }
 
     static void initialize(final String appId, final EmbeddedCacheManager manager) {
