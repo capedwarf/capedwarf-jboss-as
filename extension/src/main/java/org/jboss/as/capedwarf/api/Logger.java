@@ -32,6 +32,7 @@ import java.util.logging.LogRecord;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class Logger extends Handler {
+    private static final ThreadLocal<Boolean> marker = new ThreadLocal<Boolean>();
 
     public void publish(final LogRecord record) {
         final ClassLoader appCl = SecurityActions.getAppClassLoader();
@@ -39,11 +40,18 @@ public class Logger extends Handler {
         if (CapedwarfApiProxy.isCapedwarfApp(appCl) == false)
             return;
 
+        // we're already logging to CapeDwarf log, might cycle
+        if (marker.get() != null)
+            return;
+
+        marker.set(true);
         try {
             final Class<?> clazz = appCl.loadClass("org.jboss.capedwarf.log.Logger");
             final Method method = clazz.getDeclaredMethod("publish", LogRecord.class);
             method.invoke(null, record);
         } catch (Exception ignored) {
+        } finally {
+            marker.remove();
         }
     }
 
