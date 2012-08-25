@@ -24,6 +24,7 @@ package org.jboss.as.capedwarf.api;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
@@ -39,8 +40,9 @@ import org.jboss.as.capedwarf.services.ServletExecutor;
  */
 final class CapedwarfApiProxy {
 
-    private static Map<ClassLoader, String> classLoaders = new ConcurrentHashMap<ClassLoader, String>();
-    private static ThreadLocal<ServletRequest> requests = new ThreadLocal<ServletRequest>();
+    private static java.util.logging.Logger log = java.util.logging.Logger.getLogger(CapedwarfApiProxy.class.getName());
+    private static final Map<ClassLoader, String> classLoaders = new ConcurrentHashMap<ClassLoader, String>();
+    private static final ThreadLocal<ServletRequest> requests = new ThreadLocal<ServletRequest>();
 
     static boolean isCapedwarfApp(ClassLoader classLoader) {
         return classLoaders.containsKey(classLoader);
@@ -73,11 +75,13 @@ final class CapedwarfApiProxy {
 
     static void destroy(final String appId, final EmbeddedCacheManager manager) {
         for (String cc : Constants.CACHES) {
-            Cache cache = manager.getCache(cc + "_" + appId, false); // name is impl detail ...
+            final String cacheName = cc + "_" + appId;
+            final Cache cache = manager.getCache(cacheName, false); // name is impl detail ...
             if (cache != null)
                 try {
                     cache.stop();
-                } catch (Exception ignored) {
+                } catch (Throwable t) {
+                    log.log(Level.WARNING, "Exception stopping cache: " + cacheName, t);
                 }
         }
     }
