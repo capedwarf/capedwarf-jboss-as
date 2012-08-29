@@ -35,7 +35,7 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <name>Jboss Capedwarf: Parent Aggregator</name>
-    <description>Jboss Capedwarf: Parent Aggregator</description>
+    <description>JBoss Capedwarf: Parent Aggregator</description>
 
     <packaging>pom</packaging>
 
@@ -83,7 +83,7 @@
         <version.junit>4.10</version.junit>
         <version.org.apache.lucene>3.6.0</version.org.apache.lucene>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>1.0.1.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>
-        <version.org.infinispan>5.2.0.ALPHA2</version.org.infinispan>
+        <version.org.infinispan>5.2.0-SNAPSHOT</version.org.infinispan>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
 
         <version.org.jboss.jandex>1.0.3.Final</version.org.jboss.jandex>
