@@ -61,7 +61,6 @@
                         <artifactId>maven-antrun-plugin</artifactId>
                         <inherited>false</inherited>
                         <executions>
-
                             <execution>
                                 <id>build-dist</id>
                                 <goals>
@@ -73,7 +72,6 @@
                                         <ant antfile="build.xml" inheritRefs="true">
                                             <target name="all"/>
                                         </ant>
-
                                     </target>
                                 </configuration>
                             </execution>
@@ -96,12 +94,41 @@
                             </dependency>
                         </dependencies>
                     </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${version.org.codehaus.exec}</version>
+                        <executions>
+                            <execution>
+                                <id>bytecode-transform</id>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <phase>verify</phase>
+                                <configuration>
+                                    <includeProjectDependencies>true</includeProjectDependencies>
+                                    <includePluginDependencies>false</includePluginDependencies>
+                                    <mainClass>org.jboss.maven.plugins.transformer.TransformerUtils</mainClass>
+                                    <arguments>
+                                        <argument>${jboss.dir}/modules/com/google/appengine/main/appengine-api-1.0-sdk-${version.com.google.appengine}.jar</argument>
+                                        <argument>org.jboss.capedwarf.bytecode.FactoriesTransformer</argument>
+                                        <argument>(([.]*ApiProxy*)|([.]*ServiceFactory*)|([.]*.taskqueue.QueueFactory)|([.]*datastore.Cursor*)|([.]*datastore.Entity*)|([.]*datastore.Key*))</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
     </profiles>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.jboss.maven.plugins</groupId>
+            <artifactId>maven-transformer-plugin</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.picketlink</groupId>
