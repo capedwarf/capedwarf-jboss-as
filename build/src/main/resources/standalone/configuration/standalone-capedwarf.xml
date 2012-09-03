@@ -230,6 +230,7 @@
                     <eviction strategy="NONE"/>
                     <file-store preload="true" purge="false"/>
                     <indexing index="LOCAL">
+                        <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
                             java:jboss/infinispan/container/HibernateSearch
@@ -261,6 +262,7 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="true" purge="false"/>
                     <indexing index="LOCAL">
+                        <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
                             java:jboss/infinispan/container/HibernateSearch
@@ -273,6 +275,7 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="true" purge="false"/>
                     <indexing index="LOCAL">
+                        <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
                             java:jboss/infinispan/container/HibernateSearch
@@ -285,6 +288,7 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="true" purge="false"/>
                     <indexing index="LOCAL">
+                        <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
                             java:jboss/infinispan/container/HibernateSearch
@@ -295,17 +299,17 @@
             </cache-container>
             <cache-container name="HibernateSearch" default-cache="LuceneIndexesMetadata">
                 <transport lock-timeout="60000"/>
-                <replicated-cache name="LuceneIndexesMetadata" mode="SYNC" batching="true">
+                <replicated-cache name="LuceneIndexesMetadata" mode="SYNC">
                     <transaction mode="NONE"/>
                     <eviction strategy="NONE"/>
                     <file-store preload="true" purge="false"/>
                 </replicated-cache>
-                <replicated-cache name="LuceneIndexesData" mode="SYNC" batching="true">
+                <replicated-cache name="LuceneIndexesData" mode="SYNC">
                     <transaction mode="NONE"/>
                     <eviction strategy="NONE"/>
                     <file-store preload="true" purge="false"/>
                 </replicated-cache>
-                <replicated-cache name="LuceneIndexesLocking" mode="SYNC" batching="true">
+                <replicated-cache name="LuceneIndexesLocking" mode="SYNC">
                     <transaction mode="NONE"/>
                     <eviction strategy="NONE"/>
                 </replicated-cache>
