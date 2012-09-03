@@ -230,6 +230,9 @@
                     <eviction strategy="NONE"/>
                     <file-store preload="true" purge="false"/>
                     <indexing index="LOCAL">
+                        <!-- Move Lucene* caches into capedwarf container, remove jndiname, backend
+                        <property name="hibernate.search.default.indexmanager" value="org.infinispan.query.indexmanager.InfinispanIndexManager" />
+                        -->
                         <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
