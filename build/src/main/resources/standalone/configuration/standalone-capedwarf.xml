@@ -230,13 +230,13 @@
                     <eviction strategy="NONE"/>
                     <file-store preload="true" purge="false"/>
                     <indexing index="LOCAL">
-                        <!-- Move Lucene* caches into capedwarf container, remove jndiname, backend
+                        <!-- Remove jndiname, backend
                         <property name="hibernate.search.default.indexmanager" value="org.infinispan.query.indexmanager.InfinispanIndexManager" />
                         -->
                         <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
-                            java:jboss/infinispan/container/HibernateSearch
+                            java:jboss/infinispan/container/capedwarf
                         </property>
                         <property name="hibernate.search.default.worker.backend">jgroups</property>
                     </indexing>
@@ -268,7 +268,7 @@
                         <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
-                            java:jboss/infinispan/container/HibernateSearch
+                            java:jboss/infinispan/container/capedwarf
                         </property>
                         <property name="hibernate.search.default.worker.backend">jgroups</property>
                     </indexing>
@@ -281,7 +281,7 @@
                         <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
-                            java:jboss/infinispan/container/HibernateSearch
+                            java:jboss/infinispan/container/capedwarf
                         </property>
                         <property name="hibernate.search.default.worker.backend">jgroups</property>
                     </indexing>
@@ -294,14 +294,11 @@
                         <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
-                            java:jboss/infinispan/container/HibernateSearch
+                            java:jboss/infinispan/container/capedwarf
                         </property>
                         <property name="hibernate.search.default.worker.backend">jgroups</property>
                     </indexing>
                 </distributed-cache>
-            </cache-container>
-            <cache-container name="HibernateSearch" default-cache="LuceneIndexesMetadata">
-                <transport lock-timeout="60000"/>
                 <replicated-cache name="LuceneIndexesMetadata" mode="SYNC">
                     <transaction mode="NONE"/>
                     <eviction strategy="NONE"/>
