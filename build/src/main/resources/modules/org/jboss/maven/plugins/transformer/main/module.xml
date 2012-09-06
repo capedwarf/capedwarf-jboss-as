@@ -29,6 +29,6 @@
 
     <dependencies>
         <module name="org.javassist"/>
-        <module name="org.jboss.capedwarf"/>
+        <module name="org.jboss.capedwarf" optional="true"/>
     </dependencies>
 </module>
