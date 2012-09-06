@@ -32,8 +32,15 @@
         <copy todir="${output.dir}">
             <fileset dir="src/main/resources">
                 <include name="standalone/configuration/**.xml"/>
+                <include name="bin/**.sh"/>
+                <include name="bin/**.bat"/>
             </fileset>
         </copy>
+        <chmod perm="755">
+            <fileset dir="${output.dir}/bin">
+                <include name="**/capedwarf*.sh"/>
+            </fileset>
+        </chmod>
     </target>
 
     <target name="modules" >
@@ -46,8 +53,6 @@
             <maven-resource group="javax.jdo" artifact="jdo-api"/>
         </module-def>
 
-
-
         <module-def name="org.apache.avro">
             <maven-resource group="org.apache.avro" artifact="avro"/>
         </module-def>
@@ -57,8 +62,6 @@
             <maven-resource group="org.apache.lucene" artifact="lucene-analyzers"/>
             <maven-resource group="org.apache.lucene" artifact="lucene-memory"/>
         </module-def>
-
-
 
     	<module-def name="org.bouncycastle.bcmail">
             <maven-resource group="org.bouncycastle" artifact="bcmail-jdk15on"/>
@@ -97,7 +100,6 @@
             <maven-resource group="org.infinispan" artifact="infinispan-query"/>
         </module-def>
 
-
         <module-def name="org.jboss.as.capedwarf">
             <maven-resource group="org.jboss.capedwarf" artifact="jboss-as-capedwarf"/>
         </module-def>
@@ -131,6 +133,9 @@
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-xmpp"/>
         </module-def>
 
+        <module-def name="org.jboss.maven.plugins.transformer">
+            <maven-resource group="org.jboss.maven.plugins" artifact="maven-transformer-plugin"/>
+        </module-def>
 
         <module-def name="org.jivesoftware.smack">
             <maven-resource group="jivesoftware" artifact="smack"/>
@@ -141,7 +146,6 @@
             <maven-resource group="org.openid4java" artifact="openid4java-nodeps"/>
             <maven-resource group="commons-httpclient" artifact="commons-httpclient"/>
         </module-def>
-
 
         <module-def name="org.picketlink.social">
             <maven-resource group="org.picketlink" artifact="picketlink-consolidated-social"/>

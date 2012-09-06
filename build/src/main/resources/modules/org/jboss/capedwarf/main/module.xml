@@ -27,6 +27,9 @@
         <!-- Insert resources here -->
     </resources>
 
+    <!--  This runs bytecode manipulation of Google API jar -->
+    <main-class name="org.jboss.capedwarf.bytecode.CapedwarfTransformerMojo"/>
+
     <dependencies>
         <module name="javax.api"/>
         <module name="javax.enterprise.api"/>
@@ -55,5 +58,6 @@
         <module name="org.picketlink.social"/>
         <module name="com.google.appengine"/>
         <module name="org.datanucleus" optional="true"/>
+        <module name="org.jboss.maven.plugins.transformer" optional="true"/>
     </dependencies>
 </module>

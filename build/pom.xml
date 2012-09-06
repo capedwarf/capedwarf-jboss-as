@@ -340,8 +340,8 @@
         <dependency>
             <groupId>org.jboss.capedwarf.blue</groupId>
             <artifactId>capedwarf-xmpp</artifactId>
-
         </dependency>
+
         <dependency>
             <groupId>org.openid4java</groupId>
             <artifactId>openid4java-consumer</artifactId>
