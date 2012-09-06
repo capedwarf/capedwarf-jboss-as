@@ -108,11 +108,9 @@
                                 <configuration>
                                     <includeProjectDependencies>true</includeProjectDependencies>
                                     <includePluginDependencies>false</includePluginDependencies>
-                                    <mainClass>org.jboss.maven.plugins.transformer.TransformerUtils</mainClass>
+                                    <mainClass>org.jboss.capedwarf.bytecode.CapedwarfTransformerMojo</mainClass>
                                     <arguments>
                                         <argument>${jboss.dir}/modules/com/google/appengine/main/appengine-api-1.0-sdk-${version.com.google.appengine}.jar</argument>
-                                        <argument>org.jboss.capedwarf.bytecode.FactoriesTransformer</argument>
-                                        <argument>(([.]*ApiProxy*)|([.]*ServiceFactory*)|([.]*.taskqueue.QueueFactory)|([.]*datastore.Cursor*)|([.]*datastore.Entity*)|([.]*datastore.Key*))</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
