@@ -26,26 +26,17 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Handler;
 
 import org.jboss.as.capedwarf.api.Constants;
-import org.jboss.as.capedwarf.services.TCCLService;
 import org.jboss.as.logging.LoggingConfigurationProcessor;
 import org.jboss.as.logging.LoggingExtension;
-import org.jboss.as.logging.loggers.LoggerHandlerService;
-import org.jboss.as.logging.util.LogServices;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.logmanager.ContextClassLoaderLogContextSelector;
 import org.jboss.logmanager.LogContext;
-import org.jboss.logmanager.Logger;
 import org.jboss.logmanager.PropertyConfigurator;
 import org.jboss.modules.Module;
-import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceName;
-import org.jboss.msc.service.ServiceTarget;
 import org.jboss.vfs.VirtualFile;
 
 /**
@@ -81,8 +72,6 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         if (module != null) {
             // Always set this - for CapeDwarf subsystem to control logging,
             // as there might be logging config files, but no sys property
-            final LogContext logContext = LogContext.create();
-            unit.putAttachment(LoggingConfigurationProcessor.LOG_CONTEXT_KEY, logContext);
 
             final String path = parseLoggingConfigPath(xml);
             if (path.length() > 0) {
@@ -114,28 +103,29 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
                         Object value = entry.getValue();
                         fixed.put(key, value);
                     }
+                    // Add the capedwarf handler to the root logger
+                    final String capedwarfLogger = Constants.CAPEDWARF.toUpperCase();
+                    final String rootHandlersKey = "logger.handlers";
+                    // Just add the configuration to the fixed properties and let the PropertyConfigurator handle the rest
+                    if (fixed.contains(rootHandlersKey)) {
+                        fixed.put(rootHandlersKey, fixed.get(rootHandlersKey) + "," + capedwarfLogger);
+                    } else {
+                        fixed.put(rootHandlersKey, capedwarfLogger);
+                    }
+                    // Configure the capedwarf handler
+                    fixed.put(getPropertyKey("handler", capedwarfLogger), org.jboss.as.capedwarf.api.Logger.class.getName());
+                    fixed.put(getPropertyKey("handler", capedwarfLogger, "level"), "ALL");
+                    // Create a new log context for the deployment
+                    final LogContext logContext = LogContext.create();
+                    unit.putAttachment(LoggingConfigurationProcessor.LOG_CONTEXT_KEY, logContext);
+                    // Configure the logger
                     new PropertyConfigurator(logContext).configure(fixed);
-                    final ClassLoader classLoader = module.getClassLoader();
-                    getContextSelector().registerLogContext(classLoader, logContext);
-                    addHandler(context.getServiceTarget(), classLoader, unit);
+                    getContextSelector().registerLogContext(module.getClassLoader(), logContext);
                 } else {
                     log.warn("No such logging config file exists: " + path);
                 }
             }
         }
-    }
-
-    protected void addHandler(final ServiceTarget serviceTarget, final ClassLoader classLoader, final DeploymentUnit unit) {
-        final String capedwarfLogger = Constants.CAPEDWARF.toUpperCase();
-        final ServiceName chsName = LogServices.handlerName(capedwarfLogger);
-        final String rootLogger = "ROOT";
-        final LoggerHandlerService lhs = new LoggerHandlerService(rootLogger);
-        final TCCLService<Logger> tccls = new TCCLService<Logger>(lhs, classLoader);
-        final ServiceName lhsName = LogServices.loggerHandlerName(rootLogger, capedwarfLogger).append(unit.getName());
-        final ServiceBuilder<Logger> lhsBuilder = serviceTarget.addService(lhsName, tccls);
-        lhsBuilder.addDependency(chsName, Handler.class, lhs.getHandlerInjector());
-        lhsBuilder.setInitialMode(ServiceController.Mode.ON_DEMAND).install();
-        unit.putAttachment(Constants.LOG_HANDLER_KEY, lhsName);
     }
 
     protected String parseLoggingConfigPath(VirtualFile xml) throws Exception {
@@ -167,5 +157,15 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         } finally {
             safeClose(is);
         }
+    }
+
+    private static String getPropertyKey(final String... keys) {
+        final StringBuilder sb = new StringBuilder();
+        int counter = 0;
+        for (String key : keys) {
+            sb.append(key);
+            if (++counter < keys.length) sb.append(".");
+        }
+        return sb.toString();
     }
 }
