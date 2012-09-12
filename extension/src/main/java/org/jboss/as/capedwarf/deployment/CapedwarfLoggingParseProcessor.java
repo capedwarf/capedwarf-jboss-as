@@ -114,13 +114,15 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
                     }
                     // Configure the capedwarf handler
                     fixed.put(getPropertyKey("handler", capedwarfLogger), org.jboss.as.capedwarf.api.Logger.class.getName());
+                    fixed.put(getPropertyKey("handler", capedwarfLogger, "module"), "org.jboss.as.capedwarf");
                     fixed.put(getPropertyKey("handler", capedwarfLogger, "level"), "ALL");
                     // Create a new log context for the deployment
                     final LogContext logContext = LogContext.create();
-                    unit.putAttachment(LoggingConfigurationProcessor.LOG_CONTEXT_KEY, logContext);
                     // Configure the logger
                     new PropertyConfigurator(logContext).configure(fixed);
                     getContextSelector().registerLogContext(module.getClassLoader(), logContext);
+                    // Add as attachment / marker
+                    unit.putAttachment(LoggingConfigurationProcessor.LOG_CONTEXT_KEY, logContext);
                 } else {
                     log.warn("No such logging config file exists: " + path);
                 }
