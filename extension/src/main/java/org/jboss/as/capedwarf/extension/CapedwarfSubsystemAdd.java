@@ -25,8 +25,6 @@ package org.jboss.as.capedwarf.extension;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.logging.Handler;
-
 import javax.jms.Connection;
 
 import org.jboss.as.capedwarf.api.Constants;
@@ -54,10 +52,8 @@ import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.ServiceVerificationHandler;
-import org.jboss.as.logging.handlers.FormatterSpec;
-import org.jboss.as.logging.handlers.custom.CustomHandlerService;
-import org.jboss.as.logging.loggers.LoggerHandlerService;
-import org.jboss.as.logging.util.LogServices;
+import org.jboss.as.logging.CommonAttributes;
+import org.jboss.as.logging.logmanager.ConfigurationPersistence;
 import org.jboss.as.naming.ManagedReferenceFactory;
 import org.jboss.as.naming.ManagedReferenceInjector;
 import org.jboss.as.naming.ServiceBasedNamingStore;
@@ -70,6 +66,11 @@ import org.jboss.as.server.deployment.Phase;
 import org.jboss.as.server.deployment.module.TempFileProviderService;
 import org.jboss.as.threads.ThreadsServices;
 import org.jboss.dmr.ModelNode;
+import org.jboss.logmanager.config.FormatterConfiguration;
+import org.jboss.logmanager.config.HandlerConfiguration;
+import org.jboss.logmanager.config.LogContextConfiguration;
+import org.jboss.logmanager.config.LoggerConfiguration;
+import org.jboss.logmanager.formatters.PatternFormatter;
 import org.jboss.modules.ModuleLoader;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceBuilder;
@@ -126,7 +127,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
                 final TempDir tempDir = createTempDir(serviceTarget, newControllers);
 
-                addLogger(serviceTarget, newControllers);
+                addLogger();
 
                 final int initialPhaseOrder = Math.min(Phase.PARSE_WEB_DEPLOYMENT, Phase.PARSE_PERSISTENCE_UNIT);
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialPhaseOrder - 20, new CapedwarfInitializationProcessor());
@@ -218,22 +219,31 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         return tempDir;
     }
 
-    protected static void addLogger(final ServiceTarget serviceTarget, final List<ServiceController<?>> newControllers) {
-        final CustomHandlerService chs = new CustomHandlerService(Logger.class.getName(), "org.jboss.as.capedwarf");
-        chs.setFormatterSpec(new FormatterSpec() {
-            public void apply(Handler handler) {
-            }
-        });
+    protected static void addLogger() {
+        final ConfigurationPersistence configPersistence = ConfigurationPersistence.getOrCreateConfigurationPersistence();
+        final LogContextConfiguration config = configPersistence.getLogContextConfiguration();
         final String capedwarfLogger = Constants.CAPEDWARF.toUpperCase();
-        final ServiceName chsName = LogServices.handlerName(capedwarfLogger);
-        final ServiceBuilder<Handler> chsBuilder = serviceTarget.addService(chsName, chs);
-        newControllers.add(chsBuilder.setInitialMode(ServiceController.Mode.ON_DEMAND).install());
+        if (!config.getHandlerNames().contains(capedwarfLogger)) {
+            try {
+                final HandlerConfiguration handlerConfig = config.addHandlerConfiguration("org.jboss.as.capedwarf", Logger.class.getName(), capedwarfLogger);
+                // Formatter name doesn't seem to be needed
+                final FormatterConfiguration fmtConfig;
+                if (config.getFormatterNames().contains(capedwarfLogger)) {
+                    fmtConfig = config.getFormatterConfiguration(capedwarfLogger);
+                } else {
+                    fmtConfig = config.addFormatterConfiguration(null, PatternFormatter.class.getName(), capedwarfLogger, "pattern");
+                }
+                fmtConfig.setPropertyValueString("pattern", CommonAttributes.FORMATTER.getDefaultValue().asString());
+                handlerConfig.setFormatterName(capedwarfLogger);
+                handlerConfig.setLevel(CommonAttributes.LEVEL.getDefaultValue().asString());
 
-        final String rootLogger = "ROOT";
-        final LoggerHandlerService lhs = new LoggerHandlerService(rootLogger);
-        final ServiceBuilder<org.jboss.logmanager.Logger> lhsBuilder = serviceTarget.addService(LogServices.loggerHandlerName(rootLogger, capedwarfLogger), lhs);
-        lhsBuilder.addDependency(LogServices.loggerName(rootLogger));
-        lhsBuilder.addDependency(chsName, Handler.class, lhs.getHandlerInjector());
-        newControllers.add(lhsBuilder.setInitialMode(ServiceController.Mode.ON_DEMAND).install());
+                // Get the root logger, should always be created.
+                final LoggerConfiguration loggerConfig = config.getLoggerConfiguration("");
+                loggerConfig.addHandlerName(capedwarfLogger);
+                config.commit();
+            } finally {
+                config.forget();
+            }
+        }
     }
 }
