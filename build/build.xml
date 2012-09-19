@@ -126,6 +126,7 @@
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-memcache"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-oauth"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-prospectivesearch"/>
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-quota"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-search"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-tasks"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-urlfetch"/>
