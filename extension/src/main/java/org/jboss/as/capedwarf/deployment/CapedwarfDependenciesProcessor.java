@@ -56,6 +56,7 @@ public class CapedwarfDependenciesProcessor extends CapedwarfDeploymentUnitProce
         // serviceTarget.addDependency(IndexingConsumerService.NAME); // we need indexing
         serviceTarget.addDependency(Constants.CHANNEL_BIND_INFO.getBinderServiceName()); // we need indexing
         serviceTarget.addDependency(Constants.EXECUTOR_BIND_INFO.getBinderServiceName()); // we need executor
+        serviceTarget.addDependency(Constants.TF_BIND_INFO.getBinderServiceName()); // we need thread factory
     }
 
 }

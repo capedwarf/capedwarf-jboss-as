@@ -25,6 +25,8 @@ package org.jboss.as.capedwarf.extension;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadFactory;
+
 import javax.jms.Connection;
 
 import org.jboss.as.capedwarf.api.Constants;
@@ -46,6 +48,7 @@ import org.jboss.as.capedwarf.deployment.CapedwarfWebComponentsDeploymentProcess
 import org.jboss.as.capedwarf.deployment.CapedwarfWeldParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWeldProcessor;
 import org.jboss.as.capedwarf.services.OptionalExecutorService;
+import org.jboss.as.capedwarf.services.OptionalThreadFactoryService;
 import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
 import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
@@ -124,6 +127,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 final ServletExecutorConsumerService consumerService = addQueueConsumer(serviceTarget, newControllers);
                 putChannelToJndi(serviceTarget, newControllers);
                 putExecutorToJndi(serviceTarget, newControllers);
+                putThreadFactoryToJndi(serviceTarget, newControllers);
 
                 final TempDir tempDir = createTempDir(serviceTarget, newControllers);
 
@@ -190,6 +194,26 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ServiceBuilder<ManagedReferenceFactory> binderBuilder = serviceTarget.addService(bindInfo.getBinderServiceName(), binder)
                 .addAliases(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(jndiName))
                 .addDependency(optionalExecutor, Executor.class, new ManagedReferenceInjector<Executor>(binder.getManagedObjectInjector()))
+                .addDependency(bindInfo.getParentContextServiceName(), ServiceBasedNamingStore.class, binder.getNamingStoreInjector())
+                .setInitialMode(ServiceController.Mode.ON_DEMAND);
+        newControllers.add(binderBuilder.install());
+    }
+
+    protected void putThreadFactoryToJndi(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers) {
+        final ServiceName realTF = ThreadsServices.threadFactoryName(Constants.CAPEDWARF);
+        final ServiceName optionalTF = ServiceName.JBOSS.append(Constants.CAPEDWARF).append("OptionalThreadFactory");
+        final OptionalThreadFactoryService otfs = new OptionalThreadFactoryService();
+        final ServiceBuilder<ThreadFactory> tfServiceBuilder = serviceTarget.addService(optionalTF, otfs);
+        tfServiceBuilder.addDependency(ServiceBuilder.DependencyType.OPTIONAL, realTF, ThreadFactory.class, otfs.getThreadFactoryInjectedValue());
+        tfServiceBuilder.setInitialMode(ServiceController.Mode.ON_DEMAND);
+        newControllers.add(tfServiceBuilder.install());
+
+        final String jndiName = Constants.TF_JNDI;
+        final ContextNames.BindInfo bindInfo = Constants.TF_BIND_INFO;
+        final BinderService binder = new BinderService(bindInfo.getBindName());
+        final ServiceBuilder<ManagedReferenceFactory> binderBuilder = serviceTarget.addService(bindInfo.getBinderServiceName(), binder)
+                .addAliases(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(jndiName))
+                .addDependency(optionalTF, ThreadFactory.class, new ManagedReferenceInjector<ThreadFactory>(binder.getManagedObjectInjector()))
                 .addDependency(bindInfo.getParentContextServiceName(), ServiceBasedNamingStore.class, binder.getNamingStoreInjector())
                 .setInitialMode(ServiceController.Mode.ON_DEMAND);
         newControllers.add(binderBuilder.install());
