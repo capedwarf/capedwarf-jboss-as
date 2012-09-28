@@ -23,25 +23,33 @@
 package org.jboss.as.capedwarf.deployment;
 
 import org.jboss.as.capedwarf.api.Constants;
-import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
+import org.jboss.as.clustering.infinispan.subsystem.CacheConfigurationService;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 
 /**
- * Define any MSC dependencies.
+ * Handle CapeDwarf caches.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfDependenciesProcessor extends CapedwarfDeploymentUnitProcessor {
+public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
+
+    private static final ServiceName[] CACHE_CONFIGS;
+
+    static {
+        CACHE_CONFIGS = new ServiceName[Constants.CACHES.length];
+        for (int i = 0; i < CACHE_CONFIGS.length; i++) {
+            CACHE_CONFIGS[i] = CacheConfigurationService.getServiceName(CAPEDWARF, Constants.CACHES[i]);
+        }
+    }
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
-        serviceTarget.addDependency(ServletExecutorConsumerService.NAME); // we need queue -- as default gae queue is there by default
-        // serviceTarget.addDependency(IndexingConsumerService.NAME); // we need indexing
-        serviceTarget.addDependency(Constants.CHANNEL_BIND_INFO.getBinderServiceName()); // we need indexing
-        serviceTarget.addDependency(Constants.EXECUTOR_BIND_INFO.getBinderServiceName()); // we need executor
-        serviceTarget.addDependency(Constants.TF_BIND_INFO.getBinderServiceName()); // we need thread factory
+        for (ServiceName cc : CACHE_CONFIGS) {
+            serviceTarget.addDependency(cc);
+        }
     }
 
 }

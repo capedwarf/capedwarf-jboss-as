@@ -40,15 +40,15 @@ import org.jgroups.blocks.mux.Muxer;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class MuxIdService implements Service<Void> {
+public class MuxIdService implements Service<MuxIdGenerator> {
     private static final String MUX_GEN  = "mux_gen";
 
     private InjectedValue<Cache> cacheInjectedValue = new InjectedValue<Cache>();
     private InjectedValue<TransactionManager> tmInjectedValue = new InjectedValue<TransactionManager>();
     private InjectedValue<Channel> channelInjectedValue = new InjectedValue<Channel>();
 
-    private final Action START = new Action() {
-        public void inTx(AdvancedCache<String, MuxIdGenerator> cache, Muxer<UpHandler> muxer) throws Exception {
+    private final Action<Void> START = new Action<Void>() {
+        public Void inTx(AdvancedCache<String, MuxIdGenerator> cache, Muxer<UpHandler> muxer) throws Exception {
             if (cache.lock(MUX_GEN)) {
                 MuxIdGenerator generator = cache.get(MUX_GEN);
                 if (generator == null) {
@@ -57,17 +57,29 @@ public class MuxIdService implements Service<Void> {
                 }
                 generator.increment(muxer, appId);
             }
+            return null;
         }
     };
 
-    private final Action STOP = new Action() {
-        public void inTx(AdvancedCache<String, MuxIdGenerator> cache, Muxer<UpHandler> muxer) throws Exception {
+    private final Action<MuxIdGenerator> GET = new Action<MuxIdGenerator>() {
+        public MuxIdGenerator inTx(AdvancedCache<String, MuxIdGenerator> cache, Muxer<UpHandler> muxer) throws Exception {
+            if (cache.lock(MUX_GEN)) {
+                return cache.get(MUX_GEN);
+            } else {
+                throw new IllegalArgumentException("Cannot get a lock on mux generator!");
+            }
+        }
+    };
+
+    private final Action<Void> STOP = new Action<Void>() {
+        public Void inTx(AdvancedCache<String, MuxIdGenerator> cache, Muxer<UpHandler> muxer) throws Exception {
             if (cache.lock(MUX_GEN)) {
                 MuxIdGenerator generator = cache.get(MUX_GEN);
                 if (generator != null) {
                     generator.decrement(appId);
                 }
             }
+            return null;
         }
     };
 
@@ -77,7 +89,7 @@ public class MuxIdService implements Service<Void> {
         this.appId = appId;
     }
 
-    protected void execute(Action action) {
+    protected <T> T execute(Action<T> action) {
         @SuppressWarnings("unchecked")
         Cache<String, MuxIdGenerator> cache = cacheInjectedValue.getValue();
         TransactionManager tm = tmInjectedValue.getValue();
@@ -88,13 +100,15 @@ public class MuxIdService implements Service<Void> {
             boolean executed = false;
             tm.begin();
             try {
-                action.inTx(cache.getAdvancedCache(), muxer);
+                T result = action.inTx(cache.getAdvancedCache(), muxer);
                 executed = true;
                 tm.commit();
+                return result;
             } catch (Exception e) {
                 if (executed == false) {
                     tm.rollback();
                 }
+                return null;
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -109,12 +123,12 @@ public class MuxIdService implements Service<Void> {
         execute(STOP);
     }
 
-    public Void getValue() throws IllegalStateException, IllegalArgumentException {
-        return null;
+    public MuxIdGenerator getValue() throws IllegalStateException, IllegalArgumentException {
+        return execute(GET);
     }
 
-    private static interface Action {
-        void inTx(AdvancedCache<String, MuxIdGenerator> cache, Muxer<UpHandler> muxer) throws Exception;
+    private static interface Action<T> {
+        T inTx(AdvancedCache<String, MuxIdGenerator> cache, Muxer<UpHandler> muxer) throws Exception;
     }
 
     public InjectedValue<Cache> getCacheInjectedValue() {
