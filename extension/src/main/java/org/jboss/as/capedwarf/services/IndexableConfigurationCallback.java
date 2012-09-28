@@ -28,6 +28,7 @@ import org.hibernate.search.cfg.EntityMapping;
 import org.hibernate.search.cfg.SearchMapping;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.IndexingConfigurationBuilder;
+import org.jboss.msc.value.InjectedValue;
 import org.jgroups.JChannel;
 
 /**
@@ -41,15 +42,14 @@ public abstract class IndexableConfigurationCallback implements ConfigurationCal
     protected final CacheName config;
     protected final String appId;
     protected final ClassLoader classLoader;
-    protected final JChannel channel;
-    protected final MuxIdGenerator generator;
 
-    protected IndexableConfigurationCallback(CacheName config, String appId, ClassLoader classLoader, JChannel channel, MuxIdGenerator generator) {
+    private final InjectedValue<JChannel> channel = new InjectedValue<JChannel>();
+    private final InjectedValue<MuxIdGenerator> generator = new InjectedValue<MuxIdGenerator>();
+
+    protected IndexableConfigurationCallback(CacheName config, String appId, ClassLoader classLoader) {
         this.config = config;
         this.appId = appId;
         this.classLoader = classLoader;
-        this.channel = channel;
-        this.generator = generator;
     }
 
     protected SearchMapping applyIndexing(ConfigurationBuilder builder) {
@@ -66,12 +66,20 @@ public abstract class IndexableConfigurationCallback implements ConfigurationCal
         }
         indexing.setProperty(Environment.MODEL_MAPPING, mapping);
 
-        indexing.setProperty(JGroupsChannelProvider.CHANNEL_INJECT, channel);
+        indexing.setProperty(JGroupsChannelProvider.CHANNEL_INJECT, channel.getValue());
         indexing.setProperty(JGroupsChannelProvider.CLASSLOADER, classLoader);
 
-        short muxId = (short) ((INDEXING_CACHES / 2) * generator.getMuxId(appId) * ci.getPrefix() + ci.getOffset());
+        short muxId = (short) ((INDEXING_CACHES / 2) * generator.getValue().getMuxId(appId) * ci.getPrefix() + ci.getOffset());
         indexing.setProperty(JGroupsChannelProvider.MUX_ID, muxId);
 
         return mapping;
+    }
+
+    public InjectedValue<JChannel> getChannel() {
+        return channel;
+    }
+
+    public InjectedValue<MuxIdGenerator> getGenerator() {
+        return generator;
     }
 }

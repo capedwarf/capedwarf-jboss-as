@@ -47,7 +47,6 @@ public class CapedwarfListener implements ServletContextListener, ServletRequest
         final String appId = (String) context.getAttribute("org.jboss.capedwarf.appId");
 
         CapedwarfApiProxy.initialize(appId, context);
-        // CapedwarfApiProxy.initialize(appId, manager); // enable once we actually do something in that code
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
@@ -55,7 +54,6 @@ public class CapedwarfListener implements ServletContextListener, ServletRequest
         final String appId = (String) context.getAttribute("org.jboss.capedwarf.appId");
 
         CapedwarfApiProxy.destroy(appId, context);
-        CapedwarfApiProxy.destroy(appId, getManager());
     }
 
     public void requestInitialized(ServletRequestEvent event) {

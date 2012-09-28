@@ -25,6 +25,7 @@ package org.jboss.as.capedwarf.deployment;
 import javax.transaction.TransactionManager;
 
 import org.infinispan.Cache;
+import org.jboss.as.capedwarf.services.MuxIdGenerator;
 import org.jboss.as.capedwarf.services.MuxIdService;
 import org.jboss.as.clustering.infinispan.subsystem.CacheService;
 import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
@@ -46,9 +47,9 @@ public class CapedwarfMuxIdProcessor extends CapedwarfDeploymentUnitProcessor {
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         String appId = CapedwarfDeploymentMarker.getAppId(phaseContext.getDeploymentUnit());
         ServiceTarget target = phaseContext.getServiceTarget();
-        ServiceName name = ServiceName.JBOSS.append(CAPEDWARF).append("mux-gen").append(appId);
+        ServiceName name = CAPEDWARF_SERVICE_NAME.append("mux-gen").append(appId);
         MuxIdService service = new MuxIdService(appId);
-        ServiceBuilder<Void> builder = target.addService(name, service);
+        ServiceBuilder<MuxIdGenerator> builder = target.addService(name, service);
         ServiceName cacheName = CacheService.getServiceName(CAPEDWARF, "dist");
         builder.addDependency(cacheName, Cache.class, service.getCacheInjectedValue());
         ServiceName channelName = ChannelService.getServiceName(CAPEDWARF);

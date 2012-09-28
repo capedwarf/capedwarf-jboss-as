@@ -26,7 +26,6 @@ import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.EvictionConfiguration;
 import org.infinispan.container.DataContainer;
-import org.jgroups.JChannel;
 
 /**
  * Default configuration callback.
@@ -34,8 +33,8 @@ import org.jgroups.JChannel;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class TasksConfigurationCallback extends DefaultConfigurationCallback {
-    public TasksConfigurationCallback(String appId, ClassLoader classLoader, JChannel channel, MuxIdGenerator generator) {
-        super(CacheName.TASKS, appId, classLoader, channel, generator);
+    public TasksConfigurationCallback(String appId, ClassLoader classLoader) {
+        super(CacheName.TASKS, appId, classLoader);
     }
 
     public ConfigurationBuilder configure(Configuration c) {

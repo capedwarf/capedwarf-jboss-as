@@ -24,12 +24,10 @@ package org.jboss.as.capedwarf.api;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 
-import org.infinispan.Cache;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.jboss.as.capedwarf.services.ServletExecutor;
 
@@ -40,7 +38,6 @@ import org.jboss.as.capedwarf.services.ServletExecutor;
  */
 final class CapedwarfApiProxy {
 
-    private static java.util.logging.Logger log = java.util.logging.Logger.getLogger(CapedwarfApiProxy.class.getName());
     private static final Map<ClassLoader, String> classLoaders = new ConcurrentHashMap<ClassLoader, String>();
     private static final ThreadLocal<ServletRequest> requests = new ThreadLocal<ServletRequest>();
 
@@ -70,19 +67,6 @@ final class CapedwarfApiProxy {
             ServletExecutor.unregisterContext(appId);
         } finally {
             classLoaders.remove(SecurityActions.getAppClassLoader());
-        }
-    }
-
-    static void destroy(final String appId, final EmbeddedCacheManager manager) {
-        for (String cc : Constants.CACHES) {
-            final String cacheName = cc + "_" + appId;
-            final Cache cache = manager.getCache(cacheName, false); // name is impl detail ...
-            if (cache != null)
-                try {
-                    cache.stop();
-                } catch (Throwable t) {
-                    log.log(Level.WARNING, "Exception stopping cache: " + cacheName, t);
-                }
         }
     }
 

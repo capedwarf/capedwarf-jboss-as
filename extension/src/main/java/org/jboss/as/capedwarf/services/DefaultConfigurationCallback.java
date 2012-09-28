@@ -24,7 +24,6 @@ package org.jboss.as.capedwarf.services;
 
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
-import org.jgroups.JChannel;
 
 /**
  * Default configuration callback.
@@ -32,8 +31,8 @@ import org.jgroups.JChannel;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class DefaultConfigurationCallback extends IndexableConfigurationCallback {
-    public DefaultConfigurationCallback(CacheName config, String appId, ClassLoader classLoader, JChannel channel, MuxIdGenerator generator) {
-        super(config, appId, classLoader, channel, generator);
+    public DefaultConfigurationCallback(CacheName config, String appId, ClassLoader classLoader) {
+        super(config, appId, classLoader);
     }
 
     public ConfigurationBuilder configure(Configuration configuration) {
