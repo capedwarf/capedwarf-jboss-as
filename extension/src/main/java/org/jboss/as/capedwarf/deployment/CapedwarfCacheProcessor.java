@@ -22,6 +22,8 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.util.Arrays;
+
 import org.infinispan.Cache;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.manager.EmbeddedCacheManager;
@@ -31,6 +33,7 @@ import org.jboss.as.capedwarf.services.ConfigurationCallback;
 import org.jboss.as.capedwarf.services.DefaultConfigurationCallback;
 import org.jboss.as.capedwarf.services.IndexableConfigurationCallback;
 import org.jboss.as.capedwarf.services.MuxIdGenerator;
+import org.jboss.as.capedwarf.services.TasksConfigurationCallback;
 import org.jboss.as.clustering.infinispan.subsystem.CacheConfigurationService;
 import org.jboss.as.clustering.infinispan.subsystem.EmbeddedCacheManagerService;
 import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
@@ -60,10 +63,21 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
         final ClassLoader classLoader = unit.getAttachment(Attachments.MODULE).getClassLoader();
 
         final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
-        // default cache
-        final DefaultConfigurationCallback defaultCallback = new DefaultConfigurationCallback(CacheName.DEFAULT, appId, classLoader);
-        final ServiceBuilder<Cache> defaultBuilder = createBuilder(serviceTarget, CacheName.DEFAULT, appId, defaultCallback);
-        defaultBuilder.setInitialMode(ServiceController.Mode.ACTIVE).install();
+        // default, search, ps cache
+        for (CacheName cn : Arrays.asList(CacheName.DEFAULT, CacheName.SEARCH, CacheName.PROSPECTIVE_SEARCH)) {
+            final ConfigurationCallback callback = new DefaultConfigurationCallback(cn, appId, classLoader);
+            final ServiceBuilder<Cache> builder = createBuilder(serviceTarget, cn, appId, callback);
+            builder.setInitialMode(ServiceController.Mode.ACTIVE).install();
+        }
+        // data, metadata, memcache, dist
+        for (CacheName cn : Arrays.asList(CacheName.DATA, CacheName.METADATA, CacheName.MEMCACHE, CacheName.DIST)) {
+            final ServiceBuilder<Cache> builder = createBuilder(serviceTarget, cn, appId, null);
+            builder.setInitialMode(ServiceController.Mode.ACTIVE).install();
+        }
+        // tasks cache
+        final ConfigurationCallback tasksCallback = new TasksConfigurationCallback(appId, classLoader);
+        final ServiceBuilder<Cache> tasksBuilder = createBuilder(serviceTarget, CacheName.TASKS, appId, tasksCallback);
+        tasksBuilder.setInitialMode(ServiceController.Mode.ACTIVE).install();
     }
 
     protected ServiceBuilder<Cache> createBuilder(ServiceTarget serviceTarget, CacheName cacheName, String appId, ConfigurationCallback callback) {

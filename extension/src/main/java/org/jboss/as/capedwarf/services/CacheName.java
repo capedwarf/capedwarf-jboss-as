@@ -29,13 +29,13 @@ package org.jboss.as.capedwarf.services;
  */
 public enum CacheName {
     DEFAULT("default", true, new CacheIndexing(1).setOffset(-1).addClass("com.google.appengine.api.datastore.Entity")),
+    SEARCH("search", true, new CacheIndexing(-1).setOffset(1).addClass("org.jboss.capedwarf.search.CacheValue")),
+    PROSPECTIVE_SEARCH("prospective_search", true, new CacheIndexing(-1).addClass("org.jboss.capedwarf.prospectivesearch.SubscriptionHolder")),
+    TASKS("tasks", true, new CacheIndexing(1).addClass("org.jboss.capedwarf.tasks.TaskOptionsEntity")),
     DATA("data", false),
     METADATA("metadata", false),
     MEMCACHE("memcache", false),
-    DIST("dist", false),
-    TASKS("tasks", true, new CacheIndexing(1).addClass("org.jboss.capedwarf.tasks.TaskOptionsEntity")),
-    SEARCH("search", true, new CacheIndexing(-1).setOffset(1).addClass("org.jboss.capedwarf.search.CacheValue")),
-    PROSPECTIVE_SEARCH("prospective_search", true, new CacheIndexing(-1).addClass("org.jboss.capedwarf.prospectivesearch.SubscriptionHolder"));
+    DIST("dist", false);
 
     private String name;
     private boolean config;
