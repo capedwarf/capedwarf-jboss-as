@@ -23,6 +23,7 @@
 package org.jboss.as.capedwarf.services;
 
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import org.infinispan.container.DefaultDataContainer;
 import org.infinispan.container.entries.InternalCacheEntry;
@@ -35,11 +36,17 @@ import org.infinispan.eviction.EvictionThreadPolicy;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 class PurgeDataContainer extends DefaultDataContainer {
-    private final String cacheName;
+    private static final Logger log = Logger.getLogger(PurgeDataContainer.class.getName());
 
-    PurgeDataContainer(int concurrencyLevel, int maxEntries, EvictionStrategy strategy, EvictionThreadPolicy policy, String cacheName) {
+    private static final String TLE_CLASSNAME = "org.jboss.capedwarf.tasks.TaskLeaseEntity";
+    private static final String QF_CLASSNAME = "com.google.appengine.api.taskqueue.QueueFactory";
+    private static final String TO_CLASSNAME = "com.google.appengine.api.taskqueue.TaskOptions";
+
+    private ClassLoader classLoader;
+
+    PurgeDataContainer(int concurrencyLevel, int maxEntries, EvictionStrategy strategy, EvictionThreadPolicy policy, ClassLoader classLoader) {
         super(concurrencyLevel, maxEntries, strategy, policy);
-        this.cacheName = cacheName;
+        this.classLoader = classLoader;
     }
 
     @SuppressWarnings("unchecked")
@@ -50,13 +57,27 @@ class PurgeDataContainer extends DefaultDataContainer {
             if (e.isExpired(currentTimeMillis)) {
                 purgeCandidates.remove();
                 Object value = e.getValue();
-                /*
-                if (value instanceof TaskLeaseEntity) {
-                    TaskLeaseEntity tle = (TaskLeaseEntity) value;
-                    queue.add(tle.getOptions());
+                if (value != null && value.getClass().getName().equals(TLE_CLASSNAME)) {
+                    try {
+                        // super hack-ish to re-add TO
+                        Class<?> qfClass = classLoader.loadClass(QF_CLASSNAME);
+                        Class<?> tleClass = value.getClass();
+                        String queueName = tleClass.getMethod("getQueueName").invoke(value).toString();
+                        Object queue = qfClass.getMethod("getQueue", String.class).invoke(null, queueName);
+                        Object options = tleClass.getMethod("getOptions").invoke(value);
+                        Class<?> toClass = classLoader.loadClass(TO_CLASSNAME);
+                        queue.getClass().getMethod("add", toClass).invoke(queue, options);
+                    } catch (Exception ex) {
+                        log.warning("Failed to re-add TaskLeaseEntity - " + value + ": " + ex);
+                    }
                 }
-                */
             }
         }
+    }
+
+    @Override
+    public void clear() {
+        classLoader = null;
+        super.clear();
     }
 }

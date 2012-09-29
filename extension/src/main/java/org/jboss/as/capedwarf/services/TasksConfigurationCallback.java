@@ -44,7 +44,7 @@ public class TasksConfigurationCallback extends DefaultConfigurationCallback {
                 e.maxEntries(),
                 e.strategy(),
                 e.threadPolicy(),
-                CacheName.TASKS + "_" + appId);
+                classLoader);
 
         final ConfigurationBuilder builder = super.configure(c);
         builder.dataContainer().dataContainer(container);
