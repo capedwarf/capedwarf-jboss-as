@@ -241,12 +241,12 @@
                         <property name="hibernate.search.default.worker.backend">jgroups</property>
                     </indexing>
                 </distributed-cache>
-                <replicated-cache name="data" mode="ASYNC">
+                <replicated-cache name="data" mode="SYNC">
                     <transaction mode="NON_XA"/>
                     <eviction strategy="NONE"/>
                     <file-store preload="true" purge="false"/>
                 </replicated-cache>
-                <replicated-cache name="metadata" mode="ASYNC">
+                <replicated-cache name="metadata" mode="SYNC">
                     <transaction mode="NON_XA"/>
                     <eviction strategy="NONE"/>
                     <file-store preload="true" purge="false"/>
