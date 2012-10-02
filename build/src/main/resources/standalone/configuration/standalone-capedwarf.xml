@@ -227,7 +227,7 @@
                 <!-- distributed-cache name="default" owners="2" mode="ASYNC" indexing="LOCAL" -->
                 <distributed-cache name="default" mode="ASYNC">
                     <transaction mode="NON_XA"/>
-                    <eviction strategy="NONE"/>
+                    <eviction strategy="LIRS" max-entries="100000"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
                         <!-- Remove jndiname, backend
@@ -243,12 +243,12 @@
                 </distributed-cache>
                 <replicated-cache name="data" mode="SYNC">
                     <transaction mode="NON_XA"/>
-                    <eviction strategy="NONE"/>
+                    <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                 </replicated-cache>
                 <replicated-cache name="metadata" mode="SYNC">
                     <transaction mode="NON_XA"/>
-                    <eviction strategy="NONE"/>
+                    <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                 </replicated-cache>
                 <replicated-cache name="memcache" mode="ASYNC">
@@ -301,12 +301,12 @@
                 </distributed-cache>
                 <replicated-cache name="LuceneIndexesMetadata" mode="SYNC">
                     <transaction mode="NONE"/>
-                    <eviction strategy="NONE"/>
+                    <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="true" purge="false"/>
                 </replicated-cache>
                 <replicated-cache name="LuceneIndexesData" mode="SYNC">
                     <transaction mode="NONE"/>
-                    <eviction strategy="NONE"/>
+                    <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="true" purge="false"/>
                 </replicated-cache>
                 <replicated-cache name="LuceneIndexesLocking" mode="SYNC">
