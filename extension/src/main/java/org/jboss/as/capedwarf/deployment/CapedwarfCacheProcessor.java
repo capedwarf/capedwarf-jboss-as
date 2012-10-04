@@ -66,21 +66,18 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
         // default, search, ps cache
         for (CacheName cn : Arrays.asList(CacheName.DEFAULT, CacheName.SEARCH, CacheName.PROSPECTIVE_SEARCH)) {
             final ConfigurationCallback callback = new DefaultConfigurationCallback(cn, appId, classLoader);
-            final ServiceBuilder<Cache> builder = createBuilder(serviceTarget, cn, appId, callback);
-            builder.setInitialMode(ServiceController.Mode.ACTIVE).install();
+            createBuilder(serviceTarget, cn, appId, callback);
         }
         // data, metadata, memcache, dist
         for (CacheName cn : Arrays.asList(CacheName.DATA, CacheName.METADATA, CacheName.MEMCACHE, CacheName.DIST)) {
-            final ServiceBuilder<Cache> builder = createBuilder(serviceTarget, cn, appId, null);
-            builder.setInitialMode(ServiceController.Mode.ACTIVE).install();
+            createBuilder(serviceTarget, cn, appId, null);
         }
         // tasks cache
         final ConfigurationCallback tasksCallback = new TasksConfigurationCallback(appId, classLoader);
-        final ServiceBuilder<Cache> tasksBuilder = createBuilder(serviceTarget, CacheName.TASKS, appId, tasksCallback);
-        tasksBuilder.setInitialMode(ServiceController.Mode.ACTIVE).install();
+        createBuilder(serviceTarget, CacheName.TASKS, appId, tasksCallback);
     }
 
-    protected ServiceBuilder<Cache> createBuilder(ServiceTarget serviceTarget, CacheName cacheName, String appId, ConfigurationCallback callback) {
+    protected ServiceController<Cache> createBuilder(ServiceTarget serviceTarget, CacheName cacheName, String appId, ConfigurationCallback callback) {
         final CacheLifecycleService cls = new CacheLifecycleService(cacheName.getName(), appId, callback);
         final ServiceBuilder<Cache> builder = serviceTarget.addService(CLS_SERVICE_NAME.append(cacheName.getName()).append(appId), cls);
         if (callback instanceof IndexableConfigurationCallback) {
@@ -90,6 +87,7 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
         }
         builder.addDependency(CACHE_CONTAINER, EmbeddedCacheManager.class, cls.getEcmiv());
         builder.addDependency(CacheConfigurationService.getServiceName(CAPEDWARF, cacheName.getName()), Configuration.class, cls.getCiv());
-        return builder;
+        builder.setInitialMode(ServiceController.Mode.ACTIVE);
+        return builder.install();
     }
 }
