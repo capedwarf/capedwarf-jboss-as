@@ -59,9 +59,12 @@
         <jboss.as.scm.connection>git@github.com:capedwarf/capedwarf-jboss-as.git</jboss.as.scm.connection>
 
         <!-- Build configuration -->
+        <maven.compiler.plugin>2.5.1</maven.compiler.plugin>
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
 
+        <maven.release.plugin>2.3.2</maven.release.plugin>
+        <maven.surefire.plugin>2.12.1</maven.surefire.plugin>
 
         <version.jboss.as>7.2.0.Alpha1-SNAPSHOT</version.jboss.as>
         <version.org.jboss.capedwarf>1.0.0-SNAPSHOT</version.org.jboss.capedwarf>
