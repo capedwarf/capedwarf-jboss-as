@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.jboss.as.capedwarf.api.Constants;
-import org.jboss.as.logging.LoggingConfigurationProcessor;
+import org.jboss.as.logging.LoggingDeploymentUnitProcessor;
 import org.jboss.as.logging.LoggingExtension;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -122,7 +122,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
                     new PropertyConfigurator(logContext).configure(fixed);
                     getContextSelector().registerLogContext(module.getClassLoader(), logContext);
                     // Add as attachment / marker
-                    unit.putAttachment(LoggingConfigurationProcessor.LOG_CONTEXT_KEY, logContext);
+                    unit.putAttachment(LoggingDeploymentUnitProcessor.LOG_CONTEXT_KEY, logContext);
                 } else {
                     log.warn("No such logging config file exists: " + path);
                 }
