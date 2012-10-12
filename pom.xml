@@ -34,8 +34,8 @@
     <artifactId>capedwarf-as-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <name>Jboss Capedwarf: Parent Aggregator</name>
-    <description>JBoss Capedwarf: Parent Aggregator</description>
+    <name>Capedwarf - Parent Aggregator</name>
+    <description>Capedwarf - Parent Aggregator</description>
 
     <packaging>pom</packaging>
 

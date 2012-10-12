@@ -12,7 +12,7 @@
 
     <artifactId>jboss-capedwarf-build</artifactId>
 
-    <name>CapeDwarf: Build</name>
+    <name>CapeDwarf - Build</name>
     <packaging>pom</packaging>
 
     <properties>

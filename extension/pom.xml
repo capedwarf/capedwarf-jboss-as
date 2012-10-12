@@ -32,7 +32,7 @@
     <groupId>org.jboss.capedwarf</groupId>
     <artifactId>jboss-as-capedwarf</artifactId>
 
-    <name>JBoss Application Server: Capedwarf subsystem</name>
+    <name>Capedwarf - JBossAS Subsystem</name>
 
     <packaging>jar</packaging>
 
