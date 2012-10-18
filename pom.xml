@@ -84,7 +84,7 @@
         <version.org.datanucleus.cache>3.1.0</version.org.datanucleus.cache>
         <version.org.bouncycastle>1.47</version.org.bouncycastle>
         <version.junit>4.10</version.junit>
-        <version.org.apache.lucene>3.6.0</version.org.apache.lucene>
+        <version.org.apache.lucene>3.6.1</version.org.apache.lucene>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>1.0.1.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>
         <version.org.infinispan>5.2.0.Beta2</version.org.infinispan>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>

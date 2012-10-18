@@ -23,14 +23,12 @@
 package org.jboss.as.capedwarf.services;
 
 import java.util.List;
-
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.jms.JMSBackendQueueTask;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.infinispan.Cache;
@@ -81,7 +79,7 @@ class IndexingConsumer implements MessageListener {
         }
         final ObjectMessage objectMessage = (ObjectMessage) message;
         try {
-            final String indexName = objectMessage.getStringProperty(JMSBackendQueueTask.INDEX_NAME_JMS_PROPERTY);
+            final String indexName = objectMessage.getStringProperty("HSearchIndexName"); // from JmsBackendQueueTask
             final String cacheName = indexName.split("__")[0];
             final Cache cache = manager.getCache(cacheName, false);
             if (cache == null) {
