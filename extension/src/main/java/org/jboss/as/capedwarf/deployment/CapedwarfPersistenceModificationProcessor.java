@@ -56,6 +56,7 @@ public class CapedwarfPersistenceModificationProcessor extends CapedwarfPersiste
     static final String PROPERTIES = "<properties>";
     static final String LOAD_AT_RUNTIME_KEY = "datanucleus.metadata.allowLoadAtRuntime";
     static final String LOAD_AT_RUNTIME = "<property name=\"" + LOAD_AT_RUNTIME_KEY + "\" value=\"true\"/>\n";
+    static final String METADATA_SCANNER = "<property name=\"" + METADATA_SCANNER_KEY + "\" value=\"" + METADATA_SCANNER_CLASS + "\"/>\n";
 
     static final AttachmentKey<AttachmentList<Closeable>> ASSEMBLY_HANDLE = AttachmentKey.createList(Closeable.class);
     static final Random rng = new Random();
@@ -105,6 +106,7 @@ public class CapedwarfPersistenceModificationProcessor extends CapedwarfPersiste
 
                 final int offset = p + PROPERTIES.length();
                 // TODO -- check if explicitly set
+                builder.insert(offset, METADATA_SCANNER);
                 builder.insert(offset, LOAD_AT_RUNTIME);
             }
             content = builder.toString();

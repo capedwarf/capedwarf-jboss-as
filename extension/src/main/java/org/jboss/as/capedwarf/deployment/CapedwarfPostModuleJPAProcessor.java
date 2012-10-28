@@ -40,8 +40,6 @@ import org.jboss.as.server.deployment.module.ResourceRoot;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfPostModuleJPAProcessor extends CapedwarfPersistenceProcessor {
-    static final String METADATA_SCANNER_KEY = "datanucleus.metadata.scanner";
-    static final String METADATA_SCANNER_CLASS = "org.jboss.capedwarf.datastore.datancleus.JndiMetaDataScanner"; // TODO - configurable?
 
     protected void modifyPersistenceInfo(DeploymentUnit unit, ResourceRoot resourceRoot, ResourceType type) {
         final PersistenceUnitMetadataHolder holder = resourceRoot.getAttachment(PersistenceUnitMetadataHolder.PERSISTENCE_UNITS);

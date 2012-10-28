@@ -22,22 +22,24 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.module.ResourceRoot;
 
-import java.io.IOException;
-import java.util.List;
-
 /**
- * Fix CapeDwarf persistence.xml / JPA usage - atm we use Hibernate.
- * DataNucleus support is on the roadmap.
+ * Adjust some of the DataNucleus usage.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public abstract class CapedwarfPersistenceProcessor extends CapedwarfDeploymentUnitProcessor {
+
+    static final String METADATA_SCANNER_KEY = "datanucleus.metadata.scanner";
+    static final String METADATA_SCANNER_CLASS = "org.jboss.capedwarf.datastore.datancleus.JndiMetaDataScanner"; // TODO - configurable?
 
     static final String DIALECT_PROPERTY_KEY = "hibernate.dialect";
     static final String DEFAULT_DIALECT = "org.hibernate.dialect.H2Dialect";
