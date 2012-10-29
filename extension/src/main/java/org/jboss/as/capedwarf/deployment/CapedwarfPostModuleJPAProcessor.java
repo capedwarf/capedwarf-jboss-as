@@ -53,10 +53,11 @@ public class CapedwarfPostModuleJPAProcessor extends CapedwarfPersistenceProcess
                     // afaik, P_C_DN_GAE marks old 1.x, 2.x GAE DN
                     if (Configuration.PROVIDER_CLASS_DATANUCLEUS.equals(providerClass)) {
                         final Properties properties = pumd.getProperties();
-                        if (properties.containsKey(METADATA_SCANNER_KEY) == false) {
+                        Object scanner = properties.get(METADATA_SCANNER_KEY);
+                        if (scanner == null || (scanner instanceof String && METADATA_SCANNER_CLASS.equals(scanner))) {
                             try {
                                 final Constructor ctor = cl.loadClass(METADATA_SCANNER_CLASS).getConstructor(Set.class);
-                                final Object scanner = ctor.newInstance(entities);
+                                scanner = ctor.newInstance(entities);
                                 properties.put(METADATA_SCANNER_KEY, scanner);
                             } catch (Throwable t) {
                                 log.warn("Cannot create metadata scanner, only supported from DataNucleus 3.1.x.", t);
