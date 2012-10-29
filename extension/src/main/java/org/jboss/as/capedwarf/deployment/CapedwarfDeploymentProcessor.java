@@ -77,6 +77,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier HTTP_COMPONENTS = ModuleIdentifier.create("org.apache.httpcomponents");
     private static final ModuleIdentifier PICKETLINK = ModuleIdentifier.create("org.picketlink");
     private static final ModuleIdentifier PICKETLINK_SOCIAL = ModuleIdentifier.create("org.picketlink.social");
+    private static final ModuleIdentifier GUAVA = ModuleIdentifier.create("com.google.guava");
     // inline this module deps, if running with bundled
     private static final ModuleIdentifier[] INLINE = {
             MODULES,
@@ -91,7 +92,8 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
             LUCENE,
             HTTP_COMPONENTS,
             PICKETLINK,
-            PICKETLINK_SOCIAL
+            PICKETLINK_SOCIAL,
+            GUAVA
     };
 
     private static final VirtualFileFilter JARS_VFS = new VirtualFileFilter() {

@@ -57,6 +57,7 @@
         <module name="org.picketlink"/>
         <module name="org.picketlink.social"/>
         <module name="com.google.appengine"/>
+        <module name="com.google.guava"/>
         <module name="org.datanucleus" optional="true"/>
         <module name="org.jboss.maven.plugins.transformer" optional="true"/>
     </dependencies>
