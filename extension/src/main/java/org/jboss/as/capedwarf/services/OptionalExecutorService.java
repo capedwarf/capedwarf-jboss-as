@@ -22,11 +22,8 @@
 
 package org.jboss.as.capedwarf.services;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -41,18 +38,24 @@ import org.jboss.msc.value.InjectedValue;
  */
 public class OptionalExecutorService implements Service<Executor> {
     private InjectedValue<Executor> executorInjectedValue = new InjectedValue<Executor>();
+    private ThreadsHandler handler;
     private ExecutorService executor;
+
+    public OptionalExecutorService(ThreadsHandler handler) {
+        this.handler = handler;
+    }
 
     public void start(StartContext context) throws StartException {
         final Executor e = executorInjectedValue.getOptionalValue();
         if (e == null) {
-            executor = new ThreadPoolExecutor(1, 3, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(3));
+            executor = handler.getExecutor();
         }
     }
 
     public void stop(StopContext context) {
         if (executor != null) {
-            executor.shutdown();
+            executor = null;
+            handler.ungetExecutor();
         }
     }
 

@@ -37,20 +37,25 @@ import org.jboss.msc.value.InjectedValue;
  */
 public class OptionalThreadFactoryService implements Service<ThreadFactory> {
     private InjectedValue<ThreadFactory> tfInjectedValue = new InjectedValue<ThreadFactory>();
+    private ThreadsHandler handler;
     private ThreadFactory factory;
+
+    public OptionalThreadFactoryService(ThreadsHandler handler) {
+        this.handler = handler;
+    }
 
     public void start(StartContext context) throws StartException {
         final ThreadFactory tf = tfInjectedValue.getOptionalValue();
         if (tf == null) {
-            factory = new ThreadFactory() {
-                public Thread newThread(Runnable r) {
-                    return new Thread(r);
-                }
-            };
+            factory = handler.getExecutor().getThreadFactory();
         }
     }
 
     public void stop(StopContext context) {
+        if (factory != null) {
+            factory = null;
+            handler.ungetExecutor();
+        }
     }
 
     public ThreadFactory getValue() throws IllegalStateException, IllegalArgumentException {

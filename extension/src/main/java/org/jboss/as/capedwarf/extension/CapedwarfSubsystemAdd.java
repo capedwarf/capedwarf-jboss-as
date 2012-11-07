@@ -51,6 +51,8 @@ import org.jboss.as.capedwarf.deployment.CapedwarfWeldProcessor;
 import org.jboss.as.capedwarf.services.OptionalExecutorService;
 import org.jboss.as.capedwarf.services.OptionalThreadFactoryService;
 import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
+import org.jboss.as.capedwarf.services.SimpleThreadsHandler;
+import org.jboss.as.capedwarf.services.ThreadsHandler;
 import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
@@ -127,8 +129,9 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
                 final ServletExecutorConsumerService consumerService = addQueueConsumer(serviceTarget, newControllers);
                 putChannelToJndi(serviceTarget, newControllers);
-                putExecutorToJndi(serviceTarget, newControllers);
-                putThreadFactoryToJndi(serviceTarget, newControllers);
+                final ThreadsHandler handler = new SimpleThreadsHandler();
+                putExecutorToJndi(serviceTarget, newControllers, handler);
+                putThreadFactoryToJndi(serviceTarget, newControllers, handler);
 
                 final TempDir tempDir = createTempDir(serviceTarget, newControllers);
 
@@ -181,10 +184,10 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         newControllers.add(binderBuilder.install());
     }
 
-    protected void putExecutorToJndi(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers) {
+    protected void putExecutorToJndi(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers, ThreadsHandler handler) {
         final ServiceName realExecutor = ThreadsServices.executorName(Constants.CAPEDWARF);
         final ServiceName optionalExecutor = ServiceName.JBOSS.append(Constants.CAPEDWARF).append("OptionalExecutor");
-        final OptionalExecutorService oes = new OptionalExecutorService();
+        final OptionalExecutorService oes = new OptionalExecutorService(handler);
         final ServiceBuilder<Executor> executorServiceBuilder = serviceTarget.addService(optionalExecutor, oes);
         executorServiceBuilder.addDependency(ServiceBuilder.DependencyType.OPTIONAL, realExecutor, Executor.class, oes.getExecutorInjectedValue());
         executorServiceBuilder.setInitialMode(ServiceController.Mode.ON_DEMAND);
@@ -201,10 +204,10 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         newControllers.add(binderBuilder.install());
     }
 
-    protected void putThreadFactoryToJndi(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers) {
+    protected void putThreadFactoryToJndi(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers, ThreadsHandler handler) {
         final ServiceName realTF = ThreadsServices.threadFactoryName(Constants.CAPEDWARF);
         final ServiceName optionalTF = ServiceName.JBOSS.append(Constants.CAPEDWARF).append("OptionalThreadFactory");
-        final OptionalThreadFactoryService otfs = new OptionalThreadFactoryService();
+        final OptionalThreadFactoryService otfs = new OptionalThreadFactoryService(handler);
         final ServiceBuilder<ThreadFactory> tfServiceBuilder = serviceTarget.addService(optionalTF, otfs);
         tfServiceBuilder.addDependency(ServiceBuilder.DependencyType.OPTIONAL, realTF, ThreadFactory.class, otfs.getThreadFactoryInjectedValue());
         tfServiceBuilder.setInitialMode(ServiceController.Mode.ON_DEMAND);
