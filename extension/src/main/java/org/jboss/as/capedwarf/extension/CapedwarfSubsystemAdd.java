@@ -110,6 +110,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
     @Override
     protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
         CapedwarfDefinition.APPENGINE_API.validateAndSet(operation, model);
+        CapedwarfDefinition.ADMIN_AUTH.validateAndSet(operation, model);
     }
 
     /**
