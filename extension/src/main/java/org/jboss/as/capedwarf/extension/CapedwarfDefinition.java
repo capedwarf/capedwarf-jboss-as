@@ -1,5 +1,7 @@
 package org.jboss.as.capedwarf.extension;
 
+import java.util.EnumSet;
+
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.ReloadRequiredWriteAttributeHandler;
@@ -15,9 +17,8 @@ import org.jboss.as.controller.operations.validation.StringLengthValidator;
 import org.jboss.as.controller.registry.AttributeAccess;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.controller.registry.OperationEntry;
+import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
-
-import java.util.EnumSet;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REMOVE;
@@ -34,6 +35,14 @@ class CapedwarfDefinition extends SimpleResourceDefinition {
                     .setAllowExpression(true)
                     .setXmlName(CapedwarfModel.APPENGINE_API)
                     .setValidator(new StringLengthValidator(5, Integer.MAX_VALUE, true, true))
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .build();
+
+    protected static final SimpleAttributeDefinition ADMIN_AUTH =
+            new SimpleAttributeDefinitionBuilder(CapedwarfModel.ADMIN_AUTH, ModelType.BOOLEAN, true)
+                    .setAllowExpression(true)
+                    .setXmlName(CapedwarfModel.ADMIN_AUTH)
+                    .setDefaultValue(new ModelNode(false))
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .build();
 
@@ -58,5 +67,6 @@ class CapedwarfDefinition extends SimpleResourceDefinition {
     @Override
     public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
         resourceRegistration.registerReadWriteAttribute(APPENGINE_API, null, new ReloadRequiredWriteAttributeHandler());
+        resourceRegistration.registerReadWriteAttribute(ADMIN_AUTH, null, new ReloadRequiredWriteAttributeHandler());
     }
 }

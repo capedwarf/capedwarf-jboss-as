@@ -123,6 +123,9 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode appEngineModel = CapedwarfDefinition.APPENGINE_API.resolveModelAttribute(context, model);
         final String appengineAPI = appEngineModel.isDefined() ? appEngineModel.asString() : null;
 
+        final ModelNode adminAuthModel = CapedwarfDefinition.ADMIN_AUTH.resolveModelAttribute(context, model);
+        final boolean adminAuth = adminAuthModel.isDefined() && adminAuthModel.asBoolean();
+
         context.addStep(new AbstractDeploymentChainStep() {
             public void execute(DeploymentProcessorTarget processorTarget) {
                 final ServiceTarget serviceTarget = context.getServiceTarget();
