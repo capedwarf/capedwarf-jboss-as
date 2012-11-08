@@ -10,15 +10,24 @@ import org.jboss.metadata.javaee.spec.EnvironmentRefsGroupMetaData;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.javaee.spec.ResourceReferenceMetaData;
 import org.jboss.metadata.javaee.spec.ResourceReferencesMetaData;
+import org.jboss.metadata.javaee.spec.SecurityRoleMetaData;
+import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
+import org.jboss.metadata.web.spec.AuthConstraintMetaData;
 import org.jboss.metadata.web.spec.DispatcherType;
 import org.jboss.metadata.web.spec.FilterMappingMetaData;
 import org.jboss.metadata.web.spec.FilterMetaData;
 import org.jboss.metadata.web.spec.FiltersMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
+import org.jboss.metadata.web.spec.LoginConfigMetaData;
+import org.jboss.metadata.web.spec.SecurityConstraintMetaData;
 import org.jboss.metadata.web.spec.ServletMappingMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
 import org.jboss.metadata.web.spec.ServletsMetaData;
+import org.jboss.metadata.web.spec.TransportGuaranteeType;
+import org.jboss.metadata.web.spec.UserDataConstraintMetaData;
 import org.jboss.metadata.web.spec.WebMetaData;
+import org.jboss.metadata.web.spec.WebResourceCollectionMetaData;
+import org.jboss.metadata.web.spec.WebResourceCollectionsMetaData;
 
 /**
  * Add GAE filter and auth servlet.
@@ -26,6 +35,7 @@ import org.jboss.metadata.web.spec.WebMetaData;
  *
  * @author <a href="mailto:marko.luksa@gmail.com">Marko Luksa</a>
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author <a href="mailto:mlazar@redhat.com">Matej Lazar</a>
  */
 public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModificationDeploymentProcessor {
 
@@ -33,6 +43,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String AUTH_SERVLET_NAME = "authservlet";
     private static final String ADMIN_SERVLET_NAME = "CapedwarfAdminServlet";
     private static final String CHANNEL_SERVLET_NAME = "ChannelServlet";
+    private static final String[] ADMIN_SERVLET_URL_MAPPING = {"/_ah/admin/*", "/_ah/admin/"};
 
     private final ListenerMetaData GAE_LISTENER;
     private final ListenerMetaData CDI_LISTENER;
@@ -46,8 +57,15 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ServletMappingMetaData ADMIN_SERVLET_MAPPING;
     private final ServletMappingMetaData CHANNEL_SERVLET_MAPPING;
     private final ResourceReferenceMetaData INFINISPAN_REF;
+    private final boolean ADMIN_AUTH;
 
-    public CapedwarfWebComponentsDeploymentProcessor() {
+    private SecurityConstraintMetaData adminServletConstraint;
+    private LoginConfigMetaData adminservletAdminConfig;
+    private SecurityRoleMetaData adminServletRole;
+
+
+    public CapedwarfWebComponentsDeploymentProcessor(boolean adminAuth) {
+        ADMIN_AUTH = adminAuth;
         GAE_LISTENER = createGaeListener();
         CDI_LISTENER = createCdiListener();
         CDAS_LISTENER = createAsListener();
@@ -61,6 +79,12 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         CHANNEL_SERVLET_MAPPING = createChannelServletMapping();
 
         INFINISPAN_REF = createInfinispanRef();
+
+        if (ADMIN_AUTH) {
+            adminServletConstraint = createAdminServletSecurityConstraint();
+            adminservletAdminConfig = createAdminServletLogin();
+            adminServletRole = createAdminServletSecurityRole();
+        }
     }
 
     @Override
@@ -83,6 +107,12 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
             getServletMappings(webMetaData).add(CHANNEL_SERVLET_MAPPING);
 
             addResourceReference(webMetaData);
+
+            if (ADMIN_AUTH) {
+                getSecurityConstraints(webMetaData).add(adminServletConstraint);
+                getSecurityRoles(webMetaData).add(adminServletRole);
+                webMetaData.setLoginConfig(adminservletAdminConfig);
+            }
         }
     }
 
@@ -207,7 +237,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private ServletMappingMetaData createAdminServletMapping() {
         ServletMappingMetaData servletMapping = new ServletMappingMetaData();
         servletMapping.setServletName(ADMIN_SERVLET_NAME);
-        servletMapping.setUrlPatterns(Arrays.asList("/_ah/admin/*", "/_ah/admin/"));
+        servletMapping.setUrlPatterns(Arrays.asList(ADMIN_SERVLET_URL_MAPPING));
         return servletMapping;
     }
 
@@ -239,4 +269,56 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         }
         references.add(INFINISPAN_REF);
     }
+
+    private SecurityConstraintMetaData createAdminServletSecurityConstraint() {
+        SecurityConstraintMetaData scMetaData = new SecurityConstraintMetaData();
+        scMetaData.setDisplayName("CapeDwarf admin console.");
+        WebResourceCollectionsMetaData resourceCollections = new WebResourceCollectionsMetaData();
+        WebResourceCollectionMetaData resourcePath = new WebResourceCollectionMetaData();
+        resourcePath.setUrlPatterns(Arrays.asList(ADMIN_SERVLET_URL_MAPPING));
+        resourceCollections.add(resourcePath);
+        scMetaData.setResourceCollections(resourceCollections);
+
+        AuthConstraintMetaData authConstraint = new AuthConstraintMetaData();
+        authConstraint.setRoleNames(Arrays.asList("admin"));
+        scMetaData.setAuthConstraint(authConstraint);
+
+        UserDataConstraintMetaData userDataConstraint = new UserDataConstraintMetaData();
+        userDataConstraint.setTransportGuarantee(TransportGuaranteeType.NONE);
+        scMetaData.setUserDataConstraint(userDataConstraint);
+
+        return scMetaData;
+    }
+
+    private List<SecurityConstraintMetaData> getSecurityConstraints(WebMetaData webMetaData) {
+        List<SecurityConstraintMetaData> securityConstraints = webMetaData.getSecurityConstraints();
+        if (securityConstraints == null) {
+            securityConstraints = new ArrayList<SecurityConstraintMetaData>();
+            webMetaData.setSecurityConstraints(securityConstraints);
+        }
+        return securityConstraints;
+    }
+
+    private SecurityRoleMetaData createAdminServletSecurityRole() {
+        SecurityRoleMetaData roleMetaData = new SecurityRoleMetaData();
+        roleMetaData.setName("admin");
+        return roleMetaData;
+    }
+
+    private SecurityRolesMetaData getSecurityRoles(WebMetaData webMetaData) {
+        SecurityRolesMetaData securityRoles = webMetaData.getSecurityRoles();
+        if (securityRoles == null) {
+            securityRoles = new SecurityRolesMetaData();
+            webMetaData.setSecurityRoles(securityRoles);
+        }
+        return securityRoles;
+    }
+
+    private LoginConfigMetaData createAdminServletLogin() {
+        LoginConfigMetaData configMetaData = new LoginConfigMetaData();
+        configMetaData.setAuthMethod("BASIC");
+        configMetaData.setRealmName("ApplicationRealm");
+        return configMetaData;
+    }
+
 }

@@ -127,6 +127,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final boolean adminAuth = adminAuthModel.isDefined() && adminAuthModel.asBoolean();
 
         context.addStep(new AbstractDeploymentChainStep() {
+            @Override
             public void execute(DeploymentProcessorTarget processorTarget) {
                 final ServiceTarget serviceTarget = context.getServiceTarget();
 
@@ -145,7 +146,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialPhaseOrder - 15, new CapedwarfAppIdParseProcessor()); // adjust order as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialPhaseOrder - 10, new CapedwarfPersistenceModificationProcessor(tempDir)); // before persistence.xml parsing
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WEB_DEPLOYMENT + 1, new CapedwarfWebCleanupProcessor()); // right after web.xml parsing
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WEB_COMPONENTS - 1, new CapedwarfWebComponentsDeploymentProcessor());
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WEB_COMPONENTS - 1, new CapedwarfWebComponentsDeploymentProcessor(adminAuth));
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WELD_DEPLOYMENT + 10, new CapedwarfWeldParseProcessor()); // before Weld web integration
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_WELD - 10, new CapedwarfWeldProcessor()); // before Weld
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 10, new CapedwarfJPAProcessor()); // before default JPA processor
@@ -236,13 +237,16 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         }
 
         final ServiceBuilder<TempDir> builder = serviceTarget.addService(ServiceName.JBOSS.append(Constants.CAPEDWARF).append("tempDir"), new Service<TempDir>() {
+            @Override
             public void start(StartContext context) throws StartException {
             }
 
+            @Override
             public void stop(StopContext context) {
                 VFSUtils.safeClose(tempDir);
             }
 
+            @Override
             public TempDir getValue() throws IllegalStateException, IllegalArgumentException {
                 return tempDir;
             }
