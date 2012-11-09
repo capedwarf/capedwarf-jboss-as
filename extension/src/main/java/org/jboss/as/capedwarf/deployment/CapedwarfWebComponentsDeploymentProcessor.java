@@ -57,15 +57,16 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ServletMappingMetaData ADMIN_SERVLET_MAPPING;
     private final ServletMappingMetaData CHANNEL_SERVLET_MAPPING;
     private final ResourceReferenceMetaData INFINISPAN_REF;
-    private final boolean ADMIN_AUTH;
+    private SecurityConstraintMetaData ADMIN_SERVLET_CONSTRAINT;
+    private LoginConfigMetaData ADMIN_SERVLET_CONFIG;
+    private SecurityRoleMetaData ADMIN_SERVLET_ROLE;
 
-    private SecurityConstraintMetaData adminServletConstraint;
-    private LoginConfigMetaData adminservletAdminConfig;
-    private SecurityRoleMetaData adminServletRole;
 
+    private final boolean adminAuth;
 
     public CapedwarfWebComponentsDeploymentProcessor(boolean adminAuth) {
-        ADMIN_AUTH = adminAuth;
+        this.adminAuth = adminAuth;
+
         GAE_LISTENER = createGaeListener();
         CDI_LISTENER = createCdiListener();
         CDAS_LISTENER = createAsListener();
@@ -80,11 +81,9 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
         INFINISPAN_REF = createInfinispanRef();
 
-        if (ADMIN_AUTH) {
-            adminServletConstraint = createAdminServletSecurityConstraint();
-            adminservletAdminConfig = createAdminServletLogin();
-            adminServletRole = createAdminServletSecurityRole();
-        }
+        ADMIN_SERVLET_CONSTRAINT = createAdminServletSecurityConstraint();
+        ADMIN_SERVLET_CONFIG = createAdminServletLogin();
+        ADMIN_SERVLET_ROLE = createAdminServletSecurityRole();
     }
 
     @Override
@@ -108,10 +107,10 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
             addResourceReference(webMetaData);
 
-            if (ADMIN_AUTH) {
-                getSecurityConstraints(webMetaData).add(adminServletConstraint);
-                getSecurityRoles(webMetaData).add(adminServletRole);
-                webMetaData.setLoginConfig(adminservletAdminConfig);
+            if (adminAuth) {
+                getSecurityConstraints(webMetaData).add(ADMIN_SERVLET_CONSTRAINT);
+                getSecurityRoles(webMetaData).add(ADMIN_SERVLET_ROLE);
+                webMetaData.setLoginConfig(ADMIN_SERVLET_CONFIG);
             }
         }
     }

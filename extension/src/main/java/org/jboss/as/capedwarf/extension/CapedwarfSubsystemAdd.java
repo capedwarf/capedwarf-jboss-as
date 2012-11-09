@@ -128,7 +128,6 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final boolean adminAuth = adminAuthModel.isDefined() && adminAuthModel.asBoolean();
 
         context.addStep(new AbstractDeploymentChainStep() {
-            @Override
             public void execute(DeploymentProcessorTarget processorTarget) {
                 final ServiceTarget serviceTarget = context.getServiceTarget();
 
@@ -238,16 +237,13 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         }
 
         final ServiceBuilder<TempDir> builder = serviceTarget.addService(ServiceName.JBOSS.append(Constants.CAPEDWARF).append("tempDir"), new Service<TempDir>() {
-            @Override
             public void start(StartContext context) throws StartException {
             }
 
-            @Override
             public void stop(StopContext context) {
                 VFSUtils.safeClose(tempDir);
             }
 
-            @Override
             public TempDir getValue() throws IllegalStateException, IllegalArgumentException {
                 return tempDir;
             }
