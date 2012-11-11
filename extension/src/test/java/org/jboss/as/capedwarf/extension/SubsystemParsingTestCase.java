@@ -1,18 +1,19 @@
 package org.jboss.as.capedwarf.extension;
 
+import java.io.IOException;
 
 import org.jboss.as.subsystem.test.AbstractSubsystemBaseTest;
-
-import java.io.IOException;
 
 /**
  * @author <a href="mailto:marko.luksa@gmail.com">Marko Luksa</a>
  * @author Tomaz Cerar
+ * @author <a href="mailto:mlazar@redhat.com">Matej Lazar</a>
  */
 public class SubsystemParsingTestCase extends AbstractSubsystemBaseTest {
     private static final String SUBSYSTEM_XML =
             "<subsystem xmlns=\"urn:jboss:domain:capedwarf:1.0\">\n" +
                     "            <appengine-api>abc123</appengine-api>\n" +
+                    "            <admin-auth>false</admin-auth>\n" +
                     "         </subsystem>";
 
     public SubsystemParsingTestCase() {
