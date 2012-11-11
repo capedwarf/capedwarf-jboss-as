@@ -89,7 +89,9 @@
                 </handlers>
             </root-logger>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:capedwarf:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:capedwarf:1.0">
+            <admin-auth>false</admin-auth>
+        </subsystem>
         <subsystem xmlns="urn:jboss:domain:datasources:1.1">
             <datasources>
                 <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true"
