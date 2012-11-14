@@ -39,6 +39,9 @@ import org.jboss.metadata.web.spec.WebResourceCollectionsMetaData;
  */
 public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModificationDeploymentProcessor {
 
+    private static final String GAE_REMOTE_API_SERVLET_NAME = "com.google.apphosting.utils.remoteapi.RemoteApiServlet";
+    private static final String CAPEDWARF_REMOTE_API_SERVLET_NAME = "org.jboss.capedwarf.admin.remote.RemoteApiServlet";
+
     private static final String GAE_FILTER_NAME = "GAEFilter";
     private static final String AUTH_SERVLET_NAME = "authservlet";
     private static final String ADMIN_SERVLET_NAME = "CapedwarfAdminServlet";
@@ -105,12 +108,22 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
             getServlets(webMetaData).add(CHANNEL_SERVLET);
             getServletMappings(webMetaData).add(CHANNEL_SERVLET_MAPPING);
 
+            replaceRemoteApiServlet(webMetaData);
+
             addResourceReference(webMetaData);
 
             if (adminAuth) {
                 getSecurityConstraints(webMetaData).add(ADMIN_SERVLET_CONSTRAINT);
                 getSecurityRoles(webMetaData).add(ADMIN_SERVLET_ROLE);
                 webMetaData.setLoginConfig(ADMIN_SERVLET_CONFIG);
+            }
+        }
+    }
+
+    private void replaceRemoteApiServlet(WebMetaData webMetaData) {
+        for (ServletMetaData servletMetaData : getServlets(webMetaData)) {
+            if (GAE_REMOTE_API_SERVLET_NAME.equals(servletMetaData.getServletClass())) {
+                servletMetaData.setServletClass(CAPEDWARF_REMOTE_API_SERVLET_NAME);
             }
         }
     }
