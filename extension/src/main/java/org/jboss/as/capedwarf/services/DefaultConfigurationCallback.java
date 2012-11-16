@@ -22,23 +22,62 @@
 
 package org.jboss.as.capedwarf.services;
 
-import org.infinispan.configuration.cache.Configuration;
-import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.AdvancedCache;
+import org.infinispan.Cache;
+import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.notifications.Listener;
+import org.infinispan.notifications.cachemanagerlistener.annotation.CacheStopped;
+import org.infinispan.notifications.cachemanagerlistener.event.CacheStoppedEvent;
 
 /**
  * Default configuration callback.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class DefaultConfigurationCallback extends IndexableConfigurationCallback {
-    public DefaultConfigurationCallback(CacheName config, String appId, ClassLoader classLoader) {
-        super(config, appId, classLoader);
+public class DefaultConfigurationCallback extends BasicConfigurationCallback {
+    private static final StatsListener LISTENER = new StatsListener();
+
+    public DefaultConfigurationCallback(String appId, ClassLoader classLoader) {
+        super(CacheName.DEFAULT, appId, classLoader);
     }
 
-    public ConfigurationBuilder configure(Configuration configuration) {
-        ConfigurationBuilder builder = new ConfigurationBuilder();
-        builder.read(configuration);
-        applyIndexing(builder);
-        return builder;
+    @Override
+    public void start(EmbeddedCacheManager manager) {
+        if (manager.getListeners().contains(LISTENER) == false) {
+            manager.addListener(LISTENER);
+        }
+        LISTENER.counter++;
+    }
+
+    @Override
+    public void stop(EmbeddedCacheManager manager) {
+        if (--LISTENER.counter == 0) {
+            manager.removeListener(LISTENER);
+        }
+    }
+
+    @Listener
+    public static class StatsListener {
+        volatile int counter;
+
+        @CacheStopped
+        public void onCacheStopped(CacheStoppedEvent event) {
+            String cacheName = event.getCacheName();
+            if (cacheName.startsWith("default_")) {
+                Cache cache = event.getCacheManager().getCache(cacheName, false);
+                AdvancedCache ac = cache.getAdvancedCache();
+                Object listener = null;
+                for (Object l : ac.getListeners()) {
+                    // impl detail!
+                    if (l.getClass().getName().equals("org.jboss.capedwarf.datastore.query.EagerStatsQueryHandle$EagerListener")) {
+                        listener = l;
+                        break;
+                    }
+                }
+                if (listener != null) {
+                    ac.removeListener(listener);
+                }
+            }
+        }
     }
 }

@@ -36,7 +36,7 @@ import org.jgroups.JChannel;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public abstract class IndexableConfigurationCallback implements ConfigurationCallback {
+public abstract class IndexableConfigurationCallback extends AbstractConfigurationCallback {
     private static final int INDEXING_CACHES = 4;
 
     protected final CacheName config;

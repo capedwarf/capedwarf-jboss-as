@@ -23,49 +23,23 @@
 package org.jboss.as.capedwarf.services;
 
 import org.infinispan.Cache;
-import org.infinispan.configuration.cache.Configuration;
-import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
 
 /**
- * Lazy cache configuration callback.
+ * Abstract cache callback.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public interface ConfigurationCallback {
-    /**
-     * Configure cache.
-     *
-     * @param configuration the template configuration
-     * @return builder to apply custom config
-     */
-    ConfigurationBuilder configure(final Configuration configuration);
+public abstract class AbstractConfigurationCallback implements ConfigurationCallback {
+    public void start(EmbeddedCacheManager manager) {
+    }
 
-    /**
-     * Before starting the cache.
-     *
-     * @param manager the manager
-     */
-    void start(EmbeddedCacheManager manager);
+    public void stop(EmbeddedCacheManager manager) {
+    }
 
-    /**
-     * After stopping the cache.
-     *
-     * @param manager the manager
-     */
-    void stop(EmbeddedCacheManager manager);
+    public void start(Cache cache) {
+    }
 
-    /**
-     * After starting the cache.
-     *
-     * @param cache the cache
-     */
-    void start(Cache cache);
-
-    /**
-     * Before stopping the cache.
-     *
-     * @param cache the cache
-     */
-    void stop(Cache cache);
+    public void stop(Cache cache) {
+    }
 }

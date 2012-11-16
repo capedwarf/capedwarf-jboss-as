@@ -38,7 +38,7 @@ import org.jboss.msc.value.InjectedValue;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CacheLifecycleService implements Service<Cache>, ConfigurationCallback {
+public class CacheLifecycleService extends AbstractConfigurationCallback implements Service<Cache> {
     private final String cacheName;
     private final String appId;
     private final ConfigurationCallback callback;
@@ -62,27 +62,38 @@ public class CacheLifecycleService implements Service<Cache>, ConfigurationCallb
         final EmbeddedCacheManager cacheManager = ecmiv.getValue();
         final String fullCacheName = cacheName + "_" + appId; // impl detail!
 
+        final ConfigurationCallback cc = (callback != null) ? callback : this;
+
         cache = cacheManager.getCache(fullCacheName, false);
         if (cache != null) {
             final ComponentStatus status = cache.getStatus();
             if (status != ComponentStatus.INITIALIZING && status != ComponentStatus.RUNNING) {
+                cc.start(cacheManager);
                 cache.start(); // re-start stopped cache
+                cc.start(cache);
             }
             return;
         }
 
-        final ConfigurationCallback cc = (callback != null) ? callback : this;
         final ConfigurationBuilder builder = cc.configure(civ.getValue());
         cacheManager.defineConfiguration(fullCacheName, builder.build());
 
+        cc.start(cacheManager);
         cache = cacheManager.getCache(fullCacheName, true);
+        cc.start(cache);
     }
 
     public void stop(StopContext context) {
         final Cache tmp = cache;
         cache = null;
         if (tmp != null) {
-            tmp.stop();
+            final ConfigurationCallback cc = (callback != null) ? callback : this;
+            try {
+                cc.stop(tmp);
+            } finally {
+                tmp.stop();
+                cc.stop(ecmiv.getValue());
+            }
         }
     }
 

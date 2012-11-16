@@ -27,6 +27,7 @@ import java.util.Arrays;
 import org.infinispan.Cache;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.jboss.as.capedwarf.services.BasicConfigurationCallback;
 import org.jboss.as.capedwarf.services.CacheLifecycleService;
 import org.jboss.as.capedwarf.services.CacheName;
 import org.jboss.as.capedwarf.services.ConfigurationCallback;
@@ -63,9 +64,11 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
         final ClassLoader classLoader = unit.getAttachment(Attachments.MODULE).getClassLoader();
 
         final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
-        // default, search, ps cache
-        for (CacheName cn : Arrays.asList(CacheName.DEFAULT, CacheName.SEARCH, CacheName.PROSPECTIVE_SEARCH)) {
-            final ConfigurationCallback callback = new DefaultConfigurationCallback(cn, appId, classLoader);
+        // default
+        createBuilder(serviceTarget, CacheName.DEFAULT, appId, new DefaultConfigurationCallback(appId, classLoader));
+        // search, ps cache
+        for (CacheName cn : Arrays.asList(CacheName.SEARCH, CacheName.PROSPECTIVE_SEARCH)) {
+            final ConfigurationCallback callback = new BasicConfigurationCallback(cn, appId, classLoader);
             createBuilder(serviceTarget, cn, appId, callback);
         }
         // data, metadata, memcache, dist

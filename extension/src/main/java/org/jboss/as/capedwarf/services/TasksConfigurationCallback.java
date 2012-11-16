@@ -32,7 +32,7 @@ import org.infinispan.container.DataContainer;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class TasksConfigurationCallback extends DefaultConfigurationCallback {
+public class TasksConfigurationCallback extends BasicConfigurationCallback {
     public TasksConfigurationCallback(String appId, ClassLoader classLoader) {
         super(CacheName.TASKS, appId, classLoader);
     }
