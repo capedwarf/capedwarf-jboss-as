@@ -22,34 +22,32 @@
 
 package org.jboss.as.capedwarf.services;
 
-import org.apache.catalina.connector.Request;
-import org.apache.catalina.connector.RequestFacade;
-import org.apache.catalina.connector.Response;
-import org.apache.catalina.core.ApplicationFilterChain;
-import org.apache.catalina.core.ApplicationFilterFactory;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.Principal;
-import java.security.PrivilegedExceptionAction;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Map;
+
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.RequestFacade;
+import org.apache.catalina.connector.Response;
+import org.apache.catalina.core.ApplicationDispatcher;
+import org.apache.catalina.core.ApplicationFilterChain;
+import org.apache.catalina.core.ApplicationFilterFactory;
 
 /**
  * Hack around to dispatch custom request from static view.
@@ -59,40 +57,12 @@ import java.util.Map;
 class Hack {
 
     private static final HttpServletResponse NOOP = new NoopServletResponse();
-    private static final Method invoke;
 
-    static {
-        try {
-            final SecurityManager sm = System.getSecurityManager();
-            if (sm == null) {
-                invoke = getInvoke();
-            } else {
-                invoke = AccessController.doPrivileged(new PrivilegedExceptionAction<Method>() {
-                    public Method run() throws Exception {
-                        return getInvoke();
-                    }
-                });
-            }
-        } catch (Throwable t) {
-            throw new IllegalArgumentException("Error finding *invoke* on ApplicationDispatcher.", t);
-        }
-    }
-
-    static void invoke(final RequestDispatcher dispatcher, final HttpServletRequest delegate) throws IOException {
-        final SecurityManager sm = System.getSecurityManager();
-        try {
-            if (sm == null) {
-                invoke.invoke(dispatcher, wrap(delegate), NOOP);
-            } else {
-                AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
-                    public Object run() throws Exception {
-                        invoke.invoke(dispatcher, wrap(delegate), NOOP);
-                        return null;
-                    }
-                });
-            }
-        } catch (Exception e) {
-            throw new IOException(e);
+    static void invoke(final RequestDispatcher dispatcher, final HttpServletRequest delegate) throws ServletException, IOException {
+        if (dispatcher instanceof ApplicationDispatcher) {
+            ApplicationDispatcher.class.cast(dispatcher).invoke(wrap(delegate), NOOP);
+        } else {
+            throw new IllegalStateException("Can only invoke on " + ApplicationDispatcher.class.getSimpleName());
         }
 
         // check for dispatch error
@@ -113,13 +83,6 @@ class Hack {
         // see AppDispatcher::processRequest
         delegate.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR, ApplicationFilterFactory.REQUEST_INTEGER);
         return new HttpServletRequestWrapper(new RequestFacadeHack(delegate));
-    }
-
-    private static Method getInvoke() throws Exception {
-        final Class<?> clazz = Hack.class.getClassLoader().loadClass("org.apache.catalina.core.ApplicationDispatcher");
-        final Method m = clazz.getDeclaredMethod("invoke", ServletRequest.class, ServletResponse.class);
-        m.setAccessible(true);
-        return m;
     }
 
     private static class RequestFacadeHack extends RequestFacade {
