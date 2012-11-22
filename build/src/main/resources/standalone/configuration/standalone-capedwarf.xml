@@ -215,7 +215,7 @@
                 <transport lock-timeout="60000"/>
                 <distributed-cache name="default" mode="ASYNC">
                     <transaction mode="NON_XA"/>
-                    <eviction strategy="LIRS" max-entries="100000"/>
+                    <eviction strategy="NONE"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
                         <!-- Remove jndiname, backend
@@ -251,7 +251,7 @@
                 </distributed-cache>
                 <distributed-cache name="tasks" mode="ASYNC">
                     <transaction mode="NON_XA"/>
-                    <eviction strategy="LIRS" max-entries="10000"/>
+                    <eviction strategy="NONE"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
                         <property name="hibernate.search.default.exclusive_index_use">false</property>
@@ -264,7 +264,7 @@
                 </distributed-cache>
                 <distributed-cache name="search" mode="ASYNC">
                     <transaction mode="NON_XA"/>
-                    <eviction strategy="LIRS" max-entries="10000"/>
+                    <eviction strategy="NONE"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
                         <property name="hibernate.search.default.exclusive_index_use">false</property>
@@ -277,7 +277,7 @@
                 </distributed-cache>
                 <distributed-cache name="prospective_search" mode="ASYNC">
                     <transaction mode="NON_XA"/>
-                    <eviction strategy="LIRS" max-entries="10000"/>
+                    <eviction strategy="NONE"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
                         <property name="hibernate.search.default.exclusive_index_use">false</property>
