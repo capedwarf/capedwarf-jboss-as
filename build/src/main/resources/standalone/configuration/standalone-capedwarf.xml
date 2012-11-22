@@ -213,7 +213,6 @@
             </cache-container>
             <cache-container name="capedwarf" default-cache="default">
                 <transport lock-timeout="60000"/>
-                <!-- distributed-cache name="default" owners="2" mode="ASYNC" indexing="LOCAL" -->
                 <distributed-cache name="default" mode="ASYNC">
                     <transaction mode="NON_XA"/>
                     <eviction strategy="LIRS" max-entries="100000"/>
@@ -242,11 +241,12 @@
                 </replicated-cache>
                 <replicated-cache name="memcache" mode="ASYNC">
                     <transaction mode="NON_XA" locking="PESSIMISTIC"/>
-                    <eviction strategy="NONE"/>
+                    <eviction strategy="LIRS" max-entries="10000"/>
+                    <file-store preload="false" purge="true"/>
                 </replicated-cache>
                 <distributed-cache name="dist" mode="ASYNC">
                     <transaction mode="NON_XA" locking="PESSIMISTIC"/>
-                    <eviction strategy="NONE"/>
+                    <eviction strategy="LIRS" max-entries="100000"/>
                     <file-store preload="false" purge="false"/>
                 </distributed-cache>
                 <distributed-cache name="tasks" mode="ASYNC">
@@ -290,17 +290,18 @@
                 </distributed-cache>
                 <replicated-cache name="LuceneIndexesMetadata" mode="SYNC">
                     <transaction mode="NONE"/>
-                    <eviction strategy="LIRS" max-entries="10000"/>
+                    <eviction strategy="LIRS" max-entries="100000"/>
                     <file-store preload="true" purge="false"/>
                 </replicated-cache>
                 <replicated-cache name="LuceneIndexesData" mode="SYNC">
                     <transaction mode="NONE"/>
-                    <eviction strategy="LIRS" max-entries="10000"/>
+                    <eviction strategy="LIRS" max-entries="100000"/>
                     <file-store preload="true" purge="false"/>
                 </replicated-cache>
                 <replicated-cache name="LuceneIndexesLocking" mode="SYNC">
                     <transaction mode="NONE"/>
-                    <eviction strategy="NONE"/>
+                    <eviction strategy="LIRS" max-entries="100000"/>
+                    <file-store preload="false" purge="true"/>
                 </replicated-cache>
             </cache-container>
         </subsystem>
