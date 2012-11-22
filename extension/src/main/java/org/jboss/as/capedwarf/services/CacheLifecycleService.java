@@ -59,7 +59,7 @@ public class CacheLifecycleService extends AbstractConfigurationCallback impleme
     }
 
     public void start(StartContext context) throws StartException {
-        final EmbeddedCacheManager cacheManager = ecmiv.getValue();
+        final EmbeddedCacheManager cacheManager = getCacheManager();
         final String fullCacheName = cacheName + "_" + appId; // impl detail!
 
         final ConfigurationCallback cc = (callback != null) ? callback : this;
@@ -84,17 +84,23 @@ public class CacheLifecycleService extends AbstractConfigurationCallback impleme
     }
 
     public void stop(StopContext context) {
-        final Cache tmp = cache;
-        cache = null;
-        if (tmp != null) {
-            final ConfigurationCallback cc = (callback != null) ? callback : this;
-            try {
-                cc.stop(tmp);
-            } finally {
-                tmp.stop();
-                cc.stop(ecmiv.getValue());
+        synchronized (getCacheManager()) {
+            final Cache tmp = cache;
+            cache = null;
+            if (tmp != null) {
+                final ConfigurationCallback cc = (callback != null) ? callback : this;
+                try {
+                    cc.stop(tmp);
+                } finally {
+                    tmp.stop();
+                    cc.stop(getCacheManager());
+                }
             }
         }
+    }
+
+    private EmbeddedCacheManager getCacheManager() {
+        return ecmiv.getValue();
     }
 
     public Cache getValue() throws IllegalStateException, IllegalArgumentException {
