@@ -301,7 +301,6 @@
                 <replicated-cache name="LuceneIndexesLocking" mode="SYNC">
                     <transaction mode="NONE"/>
                     <eviction strategy="NONE"/>
-                    <file-store preload="false" purge="true"/>
                 </replicated-cache>
             </cache-container>
         </subsystem>
