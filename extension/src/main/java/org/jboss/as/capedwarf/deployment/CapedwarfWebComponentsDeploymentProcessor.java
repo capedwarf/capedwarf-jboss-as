@@ -242,7 +242,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private ServletMappingMetaData createAuthServletMapping() {
         ServletMappingMetaData servletMapping = new ServletMappingMetaData();
         servletMapping.setServletName(AUTH_SERVLET_NAME);
-        servletMapping.setUrlPatterns(Collections.singletonList("/_capedwarf_/auth/*"));   // TODO: introduce AuthServlet.URL_PATTERN
+        servletMapping.setUrlPatterns(Collections.singletonList("/_ah/auth/*"));   // TODO: introduce AuthServlet.URL_PATTERN
         return servletMapping;
     }
 
