@@ -242,7 +242,7 @@
                 <replicated-cache name="memcache" mode="ASYNC">
                     <transaction mode="NON_XA" locking="PESSIMISTIC"/>
                     <eviction strategy="LIRS" max-entries="10000"/>
-                    <file-store preload="false" purge="true"/>
+                    <!-- no file-store as explicitly no persistence -->
                 </replicated-cache>
                 <distributed-cache name="dist" mode="ASYNC">
                     <transaction mode="NON_XA" locking="PESSIMISTIC"/>
