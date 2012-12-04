@@ -30,9 +30,6 @@
             <id>update-as</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>jboss.dir</name>
-                </property>
             </activation>
             <build>
                 <plugins>

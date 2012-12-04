@@ -37,11 +37,7 @@
                 <include name="bin/**.conf"/>
             </fileset>
         </copy>
-        <chmod perm="755">
-            <fileset dir="${output.dir}/bin">
-                <include name="**/capedwarf*.sh"/>
-            </fileset>
-        </chmod>
+        <chmod file="${output.dir}/bin/capedwarf-bytecode.sh" perm="755"/>
     </target>
 
     <target name="modules" >
@@ -178,5 +174,6 @@
             <fileset dir="${output.dir}" />
         </copy>
 
+        <chmod file="${jboss.dir}/bin/capedwarf-bytecode.sh" perm="755"/>
     </target>
 </project>
