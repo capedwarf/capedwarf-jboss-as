@@ -22,19 +22,20 @@
 
 package org.jboss.as.capedwarf.services;
 
-import org.jboss.logging.Logger;
-import org.jboss.modules.Module;
-import org.jboss.modules.ModuleIdentifier;
-import org.jboss.modules.ModuleLoadException;
-import org.jboss.modules.ModuleLoader;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.jboss.logging.Logger;
+import org.jboss.modules.Module;
+import org.jboss.modules.ModuleIdentifier;
+import org.jboss.modules.ModuleLoadException;
+import org.jboss.modules.ModuleLoader;
 
 /**
  * JMS consumer for servlet executor.
@@ -106,8 +107,10 @@ class ServletExecutorConsumer implements MessageListener {
             final String path = getValue(message, "path");
             ServletExecutor.dispatch(appId, path, context, request);
         } catch (RuntimeException e) {
+            log.error("Error handling servlet execution.", e);
             throw e;
         } catch (Exception e) {
+            log.error("Error handling servlet execution.", e);
             throw new RuntimeException(e);
         }
     }
