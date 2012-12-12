@@ -24,7 +24,6 @@ package org.jboss.as.capedwarf.deployment;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,14 +31,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.JarFile;
 
-import org.jboss.as.jpa.config.Configuration;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.module.ModuleDependency;
 import org.jboss.as.server.deployment.module.ModuleSpecification;
-import org.jboss.as.server.deployment.module.ResourceRoot;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
@@ -47,8 +44,6 @@ import org.jboss.modules.ResourceLoader;
 import org.jboss.modules.ResourceLoaderSpec;
 import org.jboss.modules.ResourceLoaders;
 import org.jboss.modules.filter.PathFilters;
-import org.jboss.vfs.VirtualFile;
-import org.jboss.vfs.VirtualFileFilter;
 
 /**
  * Add CapeDwarf modules.
@@ -96,12 +91,6 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
             GUAVA
     };
 
-    private static final VirtualFileFilter JARS_VFS = new VirtualFileFilter() {
-        public boolean accepts(VirtualFile file) {
-            return file.getName().endsWith(".jar");
-        }
-    };
-
     private static final FilenameFilter JARS_SDK = new FilenameFilter() {
         public boolean accept(File dir, String name) {
             return name.endsWith(".jar");
@@ -111,7 +100,6 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private List<ResourceLoaderSpec> capedwarfResources;
 
     private String appengingAPI;
-    private String datanucleusAPI = "datanucleus-api-jpa"; // TODO -- configurable
 
     public CapedwarfDeploymentProcessor(String appengingAPI) {
         if (appengingAPI == null)
@@ -126,24 +114,13 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         final ModuleLoader loader = Module.getBootModuleLoader();
         final ModuleSpecification moduleSpecification = unit.getAttachment(Attachments.MODULE_SPECIFICATION);
         // CapeDwarf AS module -- api only
-        final ModuleDependency cdas = createModuleDependency(loader, CAPEDWARF_AS);
+        final ModuleDependency cdas = LibUtils.createModuleDependency(loader, CAPEDWARF_AS);
         cdas.addExportFilter(PathFilters.isChildOf("org.jboss.as.capedwarf.api"), true);
         moduleSpecification.addSystemDependency(cdas);
         // always add Infinispan
-        moduleSpecification.addSystemDependency(createModuleDependency(loader, INFINISPAN));
-        // get libs
-        List<VirtualFile> libs = getLibs(unit);
-        // ignore datanucleus module if bundled
-        Set<String> persistenceProviders = CapedwarfDeploymentMarker.getPersistenceProviders(unit);
-        for (String persistenceProvider : persistenceProviders) {
-            if (Configuration.PROVIDER_CLASS_DATANUCLEUS.equals(persistenceProvider) && hasLibrary(libs, datanucleusAPI)) {
-                ModuleIdentifier mi = ModuleIdentifier.create(Configuration.getProviderModuleNameFromProviderClassName(persistenceProvider));
-                moduleSpecification.addExclusion(mi);
-                break;
-            }
-        }
+        moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, INFINISPAN));
         // check if we bundle gae api jar
-        if (hasLibrary(libs, appengingAPI)) {
+        if (LibUtils.hasLibrary(unit, appengingAPI)) {
             // set it in marker
             CapedwarfDeploymentMarker.setBundledAppEngineApi(unit);
             // add a transformer, modifying GAE service factories
@@ -153,35 +130,13 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
                 moduleSpecification.addResourceLoader(rls);
             // add other needed dependencies
             for (ModuleIdentifier mi : INLINE)
-                moduleSpecification.addSystemDependency(createModuleDependency(loader, mi));
+                moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, mi));
         } else {
             // add CapeDwarf
-            moduleSpecification.addSystemDependency(createModuleDependency(loader, CAPEDWARF));
+            moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, CAPEDWARF));
             // add modified AppEngine
-            moduleSpecification.addSystemDependency(createModuleDependency(loader, APPENGINE));
+            moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, APPENGINE));
         }
-    }
-
-    protected List<VirtualFile> getLibs(DeploymentUnit unit) throws DeploymentUnitProcessingException {
-        try {
-            final ResourceRoot root = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
-            final VirtualFile libs = root.getRoot().getChild("WEB-INF/lib");
-            return libs.exists() ? libs.getChildren(JARS_VFS) : Collections.<VirtualFile>emptyList();
-        } catch (IOException e) {
-            throw new DeploymentUnitProcessingException(e);
-        }
-    }
-
-    protected boolean hasLibrary(List<VirtualFile> libs, String library) throws DeploymentUnitProcessingException {
-        for (VirtualFile lib : libs) {
-            if (lib.getName().contains(library))
-                return true;
-        }
-        return false;
-    }
-
-    protected ModuleDependency createModuleDependency(ModuleLoader loader, ModuleIdentifier moduleIdentifier) {
-        return new ModuleDependency(loader, moduleIdentifier, false, false, true, false);
     }
 
     protected synchronized List<ResourceLoaderSpec> getCapedwarfResources() throws DeploymentUnitProcessingException {

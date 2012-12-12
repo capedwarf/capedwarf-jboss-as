@@ -22,6 +22,7 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -32,6 +33,9 @@ import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.module.ModuleSpecification;
 import org.jboss.as.server.deployment.module.ResourceRoot;
+import org.jboss.modules.Module;
+import org.jboss.modules.ModuleIdentifier;
+import org.jboss.modules.ModuleLoader;
 
 /**
  * Fix CapeDwarf JPA usage - ignore PU service.
@@ -39,8 +43,13 @@ import org.jboss.as.server.deployment.module.ResourceRoot;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfJPAProcessor extends CapedwarfPersistenceProcessor {
+    private static final ModuleIdentifier DN_CORE = ModuleIdentifier.create("org.datanucleus");
+    private static final ModuleIdentifier DN_GAE = ModuleIdentifier.create("org.datanucleus.appengine");
+    private static final ModuleIdentifier JDO = ModuleIdentifier.create("javax.jdo.api");
 
-    protected void modifyPersistenceInfo(DeploymentUnit unit, ResourceRoot resourceRoot, ResourceType type) {
+    private String datanucleusLib = "datanucleus-core"; // TODO -- configurable
+
+    protected void modifyPersistenceInfo(DeploymentUnit unit, ResourceRoot resourceRoot, ResourceType type) throws IOException {
         final PersistenceUnitMetadataHolder holder = resourceRoot.getAttachment(PersistenceUnitMetadataHolder.PERSISTENCE_UNITS);
         if (holder != null) {
             final List<PersistenceUnitMetadata> pus = holder.getPersistenceUnits();
@@ -58,10 +67,22 @@ public class CapedwarfJPAProcessor extends CapedwarfPersistenceProcessor {
                         if (properties.containsKey(Configuration.JPA_CONTAINER_MANAGED) == false) {
                             properties.put(Configuration.JPA_CONTAINER_MANAGED, Boolean.FALSE.toString());
                         }
+
+                        if (LibUtils.hasLibrary(unit, datanucleusLib)) {
+                            // ignore if DN is bundled
+                            ModuleIdentifier mi = ModuleIdentifier.create(Configuration.getProviderModuleNameFromProviderClassName(providerClass));
+                            moduleSpecification.addExclusion(mi);
+                        } else {
+                            // it's not bundled, add it; JDO is also direct as entities need it
+                            final ModuleLoader loader = Module.getBootModuleLoader();
+                            moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, DN_CORE));
+                            moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, DN_GAE));
+                            moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, JDO));
+                        }
                     }
                 }
             }
         }
     }
-
 }
+
