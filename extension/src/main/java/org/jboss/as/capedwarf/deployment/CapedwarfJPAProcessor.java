@@ -28,6 +28,7 @@ import java.util.Properties;
 
 import org.jboss.as.jpa.config.Configuration;
 import org.jboss.as.jpa.config.PersistenceUnitMetadataHolder;
+import org.jboss.as.jpa.persistenceprovider.PersistenceProviderLoader;
 import org.jboss.as.jpa.spi.PersistenceUnitMetadata;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -48,6 +49,7 @@ public class CapedwarfJPAProcessor extends CapedwarfPersistenceProcessor {
     private static final ModuleIdentifier JDO = ModuleIdentifier.create("javax.jdo.api");
 
     private String datanucleusLib = "datanucleus-core"; // TODO -- configurable
+    private boolean flag;
 
     protected void modifyPersistenceInfo(DeploymentUnit unit, ResourceRoot resourceRoot, ResourceType type) throws IOException {
         final PersistenceUnitMetadataHolder holder = resourceRoot.getAttachment(PersistenceUnitMetadataHolder.PERSISTENCE_UNITS);
@@ -73,6 +75,9 @@ public class CapedwarfJPAProcessor extends CapedwarfPersistenceProcessor {
                             ModuleIdentifier mi = ModuleIdentifier.create(Configuration.getProviderModuleNameFromProviderClassName(providerClass));
                             moduleSpecification.addExclusion(mi);
                         } else {
+                            // add DN module manually, since we ignore start-up
+                            addDataNucleus();
+
                             // it's not bundled, add it; JDO is also direct as entities need it
                             final ModuleLoader loader = Module.getBootModuleLoader();
                             moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, DN_CORE));
@@ -81,6 +86,17 @@ public class CapedwarfJPAProcessor extends CapedwarfPersistenceProcessor {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    protected synchronized void addDataNucleus() throws IOException {
+        if (flag == false) {
+            flag = true;
+            try {
+                PersistenceProviderLoader.loadProviderModuleByName(DN_CORE.toString());
+            } catch (Exception e) {
+                throw new IOException(e);
             }
         }
     }
