@@ -44,6 +44,7 @@ import org.jboss.as.capedwarf.deployment.CapedwarfLoggingParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfMuxIdProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfPersistenceModificationProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfPostModuleJPAProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfSubsystemProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWebCleanupProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWebComponentsDeploymentProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWeldParseProcessor;
@@ -141,10 +142,12 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
                 addLogger();
 
-                final int initialPhaseOrder = Math.min(Phase.PARSE_WEB_DEPLOYMENT, Phase.PARSE_PERSISTENCE_UNIT);
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialPhaseOrder - 20, new CapedwarfInitializationProcessor());
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialPhaseOrder - 15, new CapedwarfAppIdParseProcessor()); // adjust order as needed
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialPhaseOrder - 10, new CapedwarfPersistenceModificationProcessor(tempDir)); // before persistence.xml parsing
+                final int initialStructureOrder = Math.max(Phase.STRUCTURE_WAR, Phase.STRUCTURE_WAR_DEPLOYMENT_INIT);
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.STRUCTURE, initialStructureOrder + 10, new CapedwarfInitializationProcessor());
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.STRUCTURE, initialStructureOrder + 20, new CapedwarfSubsystemProcessor());
+                final int initialParseOrder = Math.min(Phase.PARSE_WEB_DEPLOYMENT, Phase.PARSE_PERSISTENCE_UNIT);
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 15, new CapedwarfAppIdParseProcessor()); // adjust order as needed
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 10, new CapedwarfPersistenceModificationProcessor(tempDir)); // before persistence.xml parsing
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WEB_DEPLOYMENT + 1, new CapedwarfWebCleanupProcessor()); // right after web.xml parsing
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WEB_COMPONENTS - 1, new CapedwarfWebComponentsDeploymentProcessor(adminAuth));
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WELD_DEPLOYMENT + 10, new CapedwarfWeldParseProcessor()); // before Weld web integration
