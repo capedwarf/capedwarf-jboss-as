@@ -372,12 +372,29 @@
 
         <dependency>
             <groupId>org.openid4java</groupId>
-            <artifactId>openid4java-consumer</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.openid4java</groupId>
             <artifactId>openid4java-nodeps</artifactId>
         </dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.nekohtml</groupId>
+			<artifactId>nekohtml</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.guice</groupId>
+			<artifactId>guice</artifactId>
+		</dependency>
+
         <dependency>
             <groupId>jivesoftware</groupId>
             <artifactId>smack</artifactId>
