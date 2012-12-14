@@ -144,9 +144,11 @@
         </module-def>
 
         <module-def name="org.openid4java">
-            <maven-resource group="org.openid4java" artifact="openid4java-consumer"/>
             <maven-resource group="org.openid4java" artifact="openid4java-nodeps"/>
-            <maven-resource group="commons-httpclient" artifact="commons-httpclient"/>
+            <maven-resource group="org.apache.httpcomponents" artifact="httpclient"/>
+            <maven-resource group="org.apache.httpcomponents" artifact="httpcore"/>
+            <maven-resource group="net.sourceforge.nekohtml" artifact="nekohtml"/>
+            <maven-resource group="com.google.code.guice" artifact="guice"/>
         </module-def>
 
         <module-def name="org.picketlink.social">
