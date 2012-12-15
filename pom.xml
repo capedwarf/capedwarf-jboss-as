@@ -106,7 +106,6 @@
         <version.org.picketlink>2.1.4.Final</version.org.picketlink>
         <version.org.picketlink.consolidated.social>2.0.0.Beta1</version.org.picketlink.consolidated.social>
         <version.org.openid4java>0.9.6</version.org.openid4java>
-        <version.org.apache.httpcomponents>4.0</version.org.apache.httpcomponents>
         <version.net.sourceforge.nekohtml>1.9.10</version.net.sourceforge.nekohtml>
         <version.com.google.code.guice>2.0</version.com.google.code.guice>
 
@@ -580,18 +579,6 @@
                 </exclusions>
             </dependency>
 
-			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpclient</artifactId>
-				<version>${version.org.apache.httpcomponents}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpcore</artifactId>
-				<version>${version.org.apache.httpcomponents}</version>
-			</dependency>
-			
 			<dependency>
 				<groupId>net.sourceforge.nekohtml</groupId>
 				<artifactId>nekohtml</artifactId>

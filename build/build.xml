@@ -145,9 +145,11 @@
 
         <module-def name="org.openid4java">
             <maven-resource group="org.openid4java" artifact="openid4java-nodeps"/>
-            <maven-resource group="org.apache.httpcomponents" artifact="httpclient"/>
-            <maven-resource group="org.apache.httpcomponents" artifact="httpcore"/>
+            <!-- Move this one out if needed -->
             <maven-resource group="net.sourceforge.nekohtml" artifact="nekohtml"/>
+        </module-def>
+
+        <module-def name="com.google.code.guice">
             <maven-resource group="com.google.code.guice" artifact="guice"/>
         </module-def>
 
