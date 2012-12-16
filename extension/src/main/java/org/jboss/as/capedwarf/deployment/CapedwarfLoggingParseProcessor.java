@@ -92,9 +92,23 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         if (module != null) {
             // Always set this - for CapeDwarf subsystem to control logging,
             // as there might be logging config files, but no sys property
-
             final Properties fixed = new Properties();
-
+            // Add the capedwarf handler to the root logger
+            final String capedwarfLogger = Constants.CAPEDWARF.toUpperCase();
+            final String rootHandlersKey = "logger.handlers";
+            // Just add the configuration to the fixed properties and let the PropertyConfigurator handle the rest
+            if (fixed.contains(rootHandlersKey)) {
+                fixed.put(rootHandlersKey, fixed.get(rootHandlersKey) + "," + capedwarfLogger);
+            } else {
+                fixed.put(rootHandlersKey, capedwarfLogger);
+            }
+            // Configure the capedwarf handler
+            fixed.put(getPropertyKey("handler", capedwarfLogger), org.jboss.as.capedwarf.api.Logger.class.getName());
+            fixed.put(getPropertyKey("handler", capedwarfLogger, "module"), "org.jboss.as.capedwarf");
+            fixed.put(getPropertyKey("handler", capedwarfLogger, "level"), "ALL");
+            // exclude AS7, CapeDwarf internals
+            buildExcludedLoggers(fixed);
+            // check for more fine-grained logging config
             final String path = parseLoggingConfigPath(xml);
             if (path.length() > 0) {
                 VirtualFile config = root.getChild(path);
@@ -128,21 +142,6 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
                     log.warn("No such logging config file exists: " + path);
                 }
             }
-            // Add the capedwarf handler to the root logger
-            final String capedwarfLogger = Constants.CAPEDWARF.toUpperCase();
-            final String rootHandlersKey = "logger.handlers";
-            // Just add the configuration to the fixed properties and let the PropertyConfigurator handle the rest
-            if (fixed.contains(rootHandlersKey)) {
-                fixed.put(rootHandlersKey, fixed.get(rootHandlersKey) + "," + capedwarfLogger);
-            } else {
-                fixed.put(rootHandlersKey, capedwarfLogger);
-            }
-            // Configure the capedwarf handler
-            fixed.put(getPropertyKey("handler", capedwarfLogger), org.jboss.as.capedwarf.api.Logger.class.getName());
-            fixed.put(getPropertyKey("handler", capedwarfLogger, "module"), "org.jboss.as.capedwarf");
-            fixed.put(getPropertyKey("handler", capedwarfLogger, "level"), "ALL");
-            // exclude AS7, CapeDwarf internals
-            buildExcludedLoggers(fixed);
             // Create a new log context for the deployment
             final LogContext logContext = LogContext.create();
             // Configure the logger
