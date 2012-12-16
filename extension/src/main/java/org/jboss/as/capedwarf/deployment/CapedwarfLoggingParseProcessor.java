@@ -22,6 +22,7 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -63,22 +64,21 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
     private static final String USE_PARENT_HANDLERS = ".useParentHandlers";
     private static final String LOGGING = "\"java.util.logging.config.file\"";
 
-    // excluded loggers
-    private final static Set<String> loggers = new HashSet<String>();
+    private final static Set<String> excludedLoggers = new HashSet<String>();
     static {
-        loggers.add("org.jboss.capedwarf");
-        loggers.add("org.jboss.as");
-        loggers.add("org.jboss.modules");
-        loggers.add("org.jboss.vfs");
-        loggers.add("org.apache.lucene");
-        loggers.add("org.apache.velocity");
-        loggers.add("org.hibernate.search");
-        loggers.add("org.hornetq");
-        loggers.add("org.infinispan");
-        loggers.add("org.javassist");
-        loggers.add("org.jgroups");
-        loggers.add("org.picketbox");
-        loggers.add("org.picketlink");
+        excludedLoggers.add("org.jboss.capedwarf");
+        excludedLoggers.add("org.jboss.as");
+        excludedLoggers.add("org.jboss.modules");
+        excludedLoggers.add("org.jboss.vfs");
+        excludedLoggers.add("org.apache.lucene");
+        excludedLoggers.add("org.apache.velocity");
+        excludedLoggers.add("org.hibernate.search");
+        excludedLoggers.add("org.hornetq");
+        excludedLoggers.add("org.infinispan");
+        excludedLoggers.add("org.javassist");
+        excludedLoggers.add("org.jgroups");
+        excludedLoggers.add("org.picketbox");
+        excludedLoggers.add("org.picketlink");
     }
 
     private ContextClassLoaderLogContextSelector contextSelector;
@@ -123,13 +123,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             if (path.length() > 0) {
                 VirtualFile config = root.getChild(path);
                 if (config.exists()) {
-                    final Properties properties = new Properties();
-                    final InputStream stream = config.openStream();
-                    try {
-                        properties.load(stream);
-                    } finally {
-                        safeClose(stream);
-                    }
+                    Properties properties = loadLoggingProperties(config);
                     if (properties.containsKey(USE_PARENT_HANDLERS) == false) {
                         fixed.setProperty(LOGGER + USE_PARENT_HANDLERS, Boolean.TRUE.toString());
                     }
@@ -137,13 +131,11 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
                         String key = entry.getKey().toString();
                         if (key.length() == 0) continue;
                         if (key.startsWith(LOGGER_DOT) == false) {
-                            final StringBuilder builder = new StringBuilder(key);
-                            if (builder.charAt(0) != DOT) {
-                                builder.insert(0, LOGGER_DOT);
+                            if (key.charAt(0) == DOT) {
+                                key = LOGGER + key;
                             } else {
-                                builder.insert(0, LOGGER);
+                                key = LOGGER_DOT + key;
                             }
-                            key = builder.toString();
                         }
                         Object value = entry.getValue();
                         fixed.put(key, value);
@@ -201,9 +193,20 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         }
     }
 
+    private Properties loadLoggingProperties(VirtualFile config) throws IOException {
+        Properties properties = new Properties();
+        InputStream stream = config.openStream();
+        try {
+            properties.load(stream);
+        } finally {
+            safeClose(stream);
+        }
+        return properties;
+    }
+
     protected static void buildExcludedLoggers(Properties fixed) {
         StringBuilder sb = new StringBuilder();
-        for (String logger : loggers) {
+        for (String logger : excludedLoggers) {
             fixed.put(getPropertyKey(LOGGER, logger, "level"), "OFF");
             if (sb.length() > 0) {
                 sb.append(",");
