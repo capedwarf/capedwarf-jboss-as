@@ -24,8 +24,10 @@ package org.jboss.as.capedwarf.deployment;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.jboss.as.capedwarf.api.Constants;
 import org.jboss.as.logging.LoggingDeploymentUnitProcessor;
@@ -51,6 +53,24 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
     private static final String USE_PARENT_HANDLERS = ".useParentHandlers";
     private static final String LOGGING = "\"java.util.logging.config.file\"";
 
+    // excluded loggers
+    private final static Set<String> loggers = new HashSet<String>();
+    static {
+        loggers.add("org.jboss.capedwarf");
+        loggers.add("org.jboss.as");
+        loggers.add("org.jboss.modules");
+        loggers.add("org.jboss.vfs");
+        loggers.add("org.apache.lucene");
+        loggers.add("org.apache.velocity");
+        loggers.add("org.hibernate.search");
+        loggers.add("org.hornetq");
+        loggers.add("org.infinispan");
+        loggers.add("org.javassist");
+        loggers.add("org.jgroups");
+        loggers.add("org.picketbox");
+        loggers.add("org.picketlink");
+    }
+
     private ContextClassLoaderLogContextSelector contextSelector;
 
     protected synchronized ContextClassLoaderLogContextSelector getContextSelector() {
@@ -73,6 +93,8 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             // Always set this - for CapeDwarf subsystem to control logging,
             // as there might be logging config files, but no sys property
 
+            final Properties fixed = new Properties();
+
             final String path = parseLoggingConfigPath(xml);
             if (path.length() > 0) {
                 VirtualFile config = root.getChild(path);
@@ -84,7 +106,6 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
                     } finally {
                         safeClose(stream);
                     }
-                    final Properties fixed = new Properties();
                     if (properties.containsKey(USE_PARENT_HANDLERS) == false) {
                         fixed.setProperty(LOGGER + USE_PARENT_HANDLERS, Boolean.TRUE.toString());
                     }
@@ -103,31 +124,45 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
                         Object value = entry.getValue();
                         fixed.put(key, value);
                     }
-                    // Add the capedwarf handler to the root logger
-                    final String capedwarfLogger = Constants.CAPEDWARF.toUpperCase();
-                    final String rootHandlersKey = "logger.handlers";
-                    // Just add the configuration to the fixed properties and let the PropertyConfigurator handle the rest
-                    if (fixed.contains(rootHandlersKey)) {
-                        fixed.put(rootHandlersKey, fixed.get(rootHandlersKey) + "," + capedwarfLogger);
-                    } else {
-                        fixed.put(rootHandlersKey, capedwarfLogger);
-                    }
-                    // Configure the capedwarf handler
-                    fixed.put(getPropertyKey("handler", capedwarfLogger), org.jboss.as.capedwarf.api.Logger.class.getName());
-                    fixed.put(getPropertyKey("handler", capedwarfLogger, "module"), "org.jboss.as.capedwarf");
-                    fixed.put(getPropertyKey("handler", capedwarfLogger, "level"), "ALL");
-                    // Create a new log context for the deployment
-                    final LogContext logContext = LogContext.create();
-                    // Configure the logger
-                    new PropertyConfigurator(logContext).configure(fixed);
-                    getContextSelector().registerLogContext(module.getClassLoader(), logContext);
-                    // Add as attachment / marker
-                    unit.putAttachment(LoggingDeploymentUnitProcessor.LOG_CONTEXT_KEY, logContext);
                 } else {
                     log.warn("No such logging config file exists: " + path);
                 }
             }
+            // Add the capedwarf handler to the root logger
+            final String capedwarfLogger = Constants.CAPEDWARF.toUpperCase();
+            final String rootHandlersKey = "logger.handlers";
+            // Just add the configuration to the fixed properties and let the PropertyConfigurator handle the rest
+            if (fixed.contains(rootHandlersKey)) {
+                fixed.put(rootHandlersKey, fixed.get(rootHandlersKey) + "," + capedwarfLogger);
+            } else {
+                fixed.put(rootHandlersKey, capedwarfLogger);
+            }
+            // Configure the capedwarf handler
+            fixed.put(getPropertyKey("handler", capedwarfLogger), org.jboss.as.capedwarf.api.Logger.class.getName());
+            fixed.put(getPropertyKey("handler", capedwarfLogger, "module"), "org.jboss.as.capedwarf");
+            fixed.put(getPropertyKey("handler", capedwarfLogger, "level"), "ALL");
+            // exclude AS7, CapeDwarf internals
+            buildExcludedLoggers(fixed);
+            // Create a new log context for the deployment
+            final LogContext logContext = LogContext.create();
+            // Configure the logger
+            new PropertyConfigurator(logContext).configure(fixed);
+            getContextSelector().registerLogContext(module.getClassLoader(), logContext);
+            // Add as attachment / marker
+            unit.putAttachment(LoggingDeploymentUnitProcessor.LOG_CONTEXT_KEY, logContext);
         }
+    }
+
+    protected static void buildExcludedLoggers(Properties fixed) {
+        StringBuilder sb = new StringBuilder();
+        for (String logger : loggers) {
+            fixed.put(getPropertyKey(LOGGER, logger, "level"), "OFF");
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append(logger);
+        }
+        fixed.put("loggers", sb.toString());
     }
 
     protected String parseLoggingConfigPath(VirtualFile xml) throws Exception {

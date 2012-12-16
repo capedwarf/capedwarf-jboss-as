@@ -40,17 +40,13 @@ public class Logger extends Handler {
         if (CapedwarfApiProxy.getRequest() == null)
             return;
 
-        final ClassLoader appCl = SecurityActions.getAppClassLoader();
-
-        if (CapedwarfApiProxy.isCapedwarfApp(appCl) == false)
-            return;
-
         // we're already logging to CapeDwarf log, might cycle
         if (marker.get() != null)
             return;
 
         marker.set(true);
         try {
+            final ClassLoader appCl = SecurityActions.getAppClassLoader();
             final Class<?> clazz = appCl.loadClass("org.jboss.capedwarf.log.Logger");
             final Method method = clazz.getDeclaredMethod("publish", LogRecord.class);
             method.invoke(null, record);

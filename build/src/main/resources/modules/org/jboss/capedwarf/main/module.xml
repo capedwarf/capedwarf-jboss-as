@@ -48,6 +48,7 @@
         <module name="org.jivesoftware.smack"/>
         <module name="org.javassist"/>
         <module name="org.jgroups"/>
+        <module name="org.jboss.common-core"/>
         <module name="org.jboss.logmanager"/>
         <module name="org.infinispan"/>
         <module name="org.infinispan.query"/>
