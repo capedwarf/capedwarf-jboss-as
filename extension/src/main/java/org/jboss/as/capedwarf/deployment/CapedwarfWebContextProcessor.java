@@ -112,13 +112,11 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
         }
 
         public void setup(Map<String, Object> properties) {
-            if (isContextSetup()) {
-                setTL(appCL, "setAppEngineWebXml", appConfig);
-                setTL(appCL, "setCapedwarfConfiguration", cdConfig);
-                setTL(appCL, "setQueueXml", queueConfig);
+            setTL(appCL, "setAppEngineWebXml", appConfig);
+            setTL(appCL, "setCapedwarfConfiguration", cdConfig);
+            setTL(appCL, "setQueueXml", queueConfig);
 
-                invokeListener(appCL, "setup");
-            }
+            invokeListener(appCL, "setup");
         }
 
         public void teardown(Map<String, Object> properties) {
@@ -139,34 +137,27 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
             return Collections.emptySet();
         }
 
-        protected static boolean isContextSetup() {
-            StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-            for (StackTraceElement element : elements) {
-                if (element.getClassName().equals("org.apache.catalina.core.StandardContext"))
-                    return true;
-            }
-            return false;
+        protected boolean isContextSetup() {
+            return (Boolean) invokeListener(appCL, "isSetup");
         }
 
         protected static void setTL(ClassLoader appCL, String method, Object value){
-            try {
-                Class<?> gaeListenerClass = appCL.loadClass("org.jboss.capedwarf.appidentity.GAEListener");
-                Method m = gaeListenerClass.getDeclaredMethod(method, Object.class);
-                m.invoke(null, value);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            invokeListener(appCL, method, new Class[]{Object.class}, new Object[]{value});
         }
 
         protected static void resetTL(ClassLoader appCL, String method){
             setTL(appCL, method, null);
         }
 
-        protected static void invokeListener(ClassLoader appCL, String method) {
+        protected static Object invokeListener(ClassLoader appCL, String method) {
+            return invokeListener(appCL, method, new Class[0], new Object[0]);
+        }
+
+        protected static Object invokeListener(ClassLoader appCL, String method, Class<?>[] types, Object[] args) {
             try {
                 Class<?> gaeListenerClass = appCL.loadClass("org.jboss.capedwarf.appidentity.GAEListener");
-                Method m = gaeListenerClass.getDeclaredMethod(method);
-                m.invoke(null);
+                Method m = gaeListenerClass.getDeclaredMethod(method, types);
+                return m.invoke(null, args);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
