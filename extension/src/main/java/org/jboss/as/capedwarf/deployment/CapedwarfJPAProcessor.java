@@ -37,6 +37,7 @@ import org.jboss.as.server.deployment.module.ResourceRoot;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
+import org.jboss.vfs.VirtualFile;
 
 /**
  * Fix CapeDwarf JPA usage - ignore PU service.
@@ -48,10 +49,19 @@ public class CapedwarfJPAProcessor extends CapedwarfPersistenceProcessor {
     private static final ModuleIdentifier DN_GAE = ModuleIdentifier.create("org.datanucleus.appengine");
     private static final ModuleIdentifier JDO = ModuleIdentifier.create("javax.jdo.api");
 
+    private static final String DN_TRANSFORMER = "org.jboss.capedwarf.bytecode.datanucleus.DataNucleusTransformer";
+
     private String datanucleusLib = "datanucleus-core"; // TODO -- configurable
     private boolean flag;
 
     protected void modifyPersistenceInfo(DeploymentUnit unit, ResourceRoot resourceRoot, ResourceType type) throws IOException {
+        final ModuleSpecification moduleSpecification = unit.getAttachment(Attachments.MODULE_SPECIFICATION);
+
+        final boolean hasDataNucleusLib = LibUtils.hasLibrary(unit, datanucleusLib);
+        if (hasDataNucleusLib || (type == ResourceType.DEPLOYMENT_ROOT && isJDO(resourceRoot))) {
+            addTransformer(moduleSpecification);
+        }
+
         final PersistenceUnitMetadataHolder holder = resourceRoot.getAttachment(PersistenceUnitMetadataHolder.PERSISTENCE_UNITS);
         if (holder != null) {
             final List<PersistenceUnitMetadata> pus = holder.getPersistenceUnits();
@@ -62,21 +72,21 @@ public class CapedwarfJPAProcessor extends CapedwarfPersistenceProcessor {
                     CapedwarfDeploymentMarker.addPersistenceProvider(unit, providerClass);
 
                     if (Configuration.PROVIDER_CLASS_DATANUCLEUS.equals(providerClass) || Configuration.PROVIDER_CLASS_DATANUCLEUS_GAE.equals(providerClass)) {
-                        final ModuleSpecification moduleSpecification = unit.getAttachment(Attachments.MODULE_SPECIFICATION);
-                        moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.datanucleus.DataNucleusTransformer");
                         // do not start PU service, should we do it for all PUs, not just DNs?
                         final Properties properties = pumd.getProperties();
                         if (properties.containsKey(Configuration.JPA_CONTAINER_MANAGED) == false) {
                             properties.put(Configuration.JPA_CONTAINER_MANAGED, Boolean.FALSE.toString());
                         }
 
-                        if (LibUtils.hasLibrary(unit, datanucleusLib)) {
+                        if (hasDataNucleusLib) {
                             // ignore if DN is bundled
                             ModuleIdentifier mi = ModuleIdentifier.create(Configuration.getProviderModuleNameFromProviderClassName(providerClass));
                             moduleSpecification.addExclusion(mi);
                         } else {
                             // add DN module manually, since we ignore start-up
                             addDataNucleus();
+                            // add transformer
+                            addTransformer(moduleSpecification);
 
                             // it's not bundled, add it; JDO is also direct as entities need it
                             final ModuleLoader loader = Module.getBootModuleLoader();
@@ -87,6 +97,19 @@ public class CapedwarfJPAProcessor extends CapedwarfPersistenceProcessor {
                     }
                 }
             }
+        }
+    }
+
+    protected static boolean isJDO(ResourceRoot rr) {
+        VirtualFile root = rr.getRoot();
+        VirtualFile jdoconfig = root.getChild("WEB-INF/classes/META-INF/jdoconfig.xml");
+        return (jdoconfig != null && jdoconfig.exists());
+    }
+
+    protected static void addTransformer(ModuleSpecification spec) {
+        List<String> transformers = spec.getClassFileTransformers();
+        if (transformers.contains(DN_TRANSFORMER) == false) {
+            spec.addClassFileTransformer(DN_TRANSFORMER);
         }
     }
 
