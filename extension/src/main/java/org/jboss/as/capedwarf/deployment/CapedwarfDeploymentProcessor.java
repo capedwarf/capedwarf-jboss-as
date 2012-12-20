@@ -73,6 +73,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier PICKETLINK = ModuleIdentifier.create("org.picketlink");
     private static final ModuleIdentifier PICKETLINK_SOCIAL = ModuleIdentifier.create("org.picketlink.social");
     private static final ModuleIdentifier GUAVA = ModuleIdentifier.create("com.google.guava");
+    private static final ModuleIdentifier SMACK = ModuleIdentifier.create("org.jivesoftware.smack");
     // inline this module deps, if running with bundled
     private static final ModuleIdentifier[] INLINE = {
             MODULES,
@@ -88,7 +89,8 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
             HTTP_COMPONENTS,
             PICKETLINK,
             PICKETLINK_SOCIAL,
-            GUAVA
+            GUAVA,
+            SMACK
     };
 
     private static final FilenameFilter JARS_SDK = new FilenameFilter() {
