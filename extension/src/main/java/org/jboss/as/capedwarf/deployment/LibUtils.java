@@ -49,11 +49,16 @@ final class LibUtils {
     }
 
     public static boolean hasLibrary(DeploymentUnit unit, String library) {
+        VirtualFile lib = findLibrary(unit, library);
+        return (lib != null && lib.exists());
+    }
+
+    public static VirtualFile findLibrary(DeploymentUnit unit, String library) {
         for (VirtualFile lib : getLibs(unit)) {
             if (lib.getName().contains(library))
-                return true;
+                return lib;
         }
-        return false;
+        return null;
     }
 
     public static ModuleDependency createModuleDependency(ModuleLoader loader, ModuleIdentifier moduleIdentifier) {

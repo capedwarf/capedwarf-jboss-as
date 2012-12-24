@@ -26,8 +26,10 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarFile;
 
@@ -44,6 +46,7 @@ import org.jboss.modules.ResourceLoader;
 import org.jboss.modules.ResourceLoaderSpec;
 import org.jboss.modules.ResourceLoaders;
 import org.jboss.modules.filter.PathFilters;
+import org.jboss.vfs.VirtualFile;
 
 /**
  * Add CapeDwarf modules.
@@ -107,7 +110,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         }
     };
 
-    private List<ResourceLoaderSpec> capedwarfResources;
+    private Map<String, List<ResourceLoaderSpec>> capedwarfResources = new HashMap<String, List<ResourceLoaderSpec>>();
 
     private String appengingAPI;
 
@@ -130,13 +133,15 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         // always add Infinispan
         moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, INFINISPAN));
         // check if we bundle gae api jar
-        if (LibUtils.hasLibrary(unit, appengingAPI)) {
+        final VirtualFile gae = LibUtils.findLibrary(unit, appengingAPI);
+        if (gae != null && gae.exists()) {
             // set it in marker
             CapedwarfDeploymentMarker.setBundledAppEngineApi(unit);
             // add a transformer, modifying GAE service factories
             moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.FactoriesTransformer");
             // add CapeDwarf resources directly as libs
-            for (ResourceLoaderSpec rls : getCapedwarfResources())
+            final String version = getVersion(gae);
+            for (ResourceLoaderSpec rls : getCapedwarfResources(version))
                 moduleSpecification.addResourceLoader(rls);
             // add other needed dependencies
             for (ModuleIdentifier mi : INLINE)
@@ -149,9 +154,19 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         }
     }
 
-    protected synchronized List<ResourceLoaderSpec> getCapedwarfResources() throws DeploymentUnitProcessingException {
-        try {
-            if (capedwarfResources == null) {
+    protected String getVersion(VirtualFile gae) {
+        // Better way?
+        // MANIFEST.MF doesn't hold the info
+        String name = gae.getName();
+        int p = name.lastIndexOf("-");
+        int q = name.lastIndexOf(".");
+        return name.substring(p + 1, q);
+    }
+
+    protected synchronized List<ResourceLoaderSpec> getCapedwarfResources(final String version) throws DeploymentUnitProcessingException {
+        List<ResourceLoaderSpec> resources = capedwarfResources.get(version);
+        if (resources == null) {
+            try {
                 final List<File> mps;
                 final String modulePaths = System.getProperty("module.path");
                 if (modulePaths == null) {
@@ -161,43 +176,63 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
                     for (String s : modulePaths.split(":"))
                         mps.add(new File(s));
                 }
-                final List<File> capedwarfJars = findCapedwarfJars(mps);
+                final List<File> capedwarfJars = findCapedwarfJars(version, mps);
                 if (capedwarfJars.isEmpty())
                     throw new DeploymentUnitProcessingException("No CapeDwarf jars found!");
 
-                final List<ResourceLoaderSpec> resources = new ArrayList<ResourceLoaderSpec>();
+                resources = new ArrayList<ResourceLoaderSpec>();
                 for (File jar : capedwarfJars) {
                     final JarFile jarFile = new JarFile(jar);
                     final ResourceLoader rl = ResourceLoaders.createJarResourceLoader(jar.getName(), jarFile);
                     resources.add(ResourceLoaderSpec.createResourceLoaderSpec(rl));
                 }
-                capedwarfResources = resources;
+                capedwarfResources.put(version, resources);
+            } catch (DeploymentUnitProcessingException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new DeploymentUnitProcessingException(e);
             }
-            return capedwarfResources;
-        } catch (DeploymentUnitProcessingException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new DeploymentUnitProcessingException(e);
         }
+        return resources;
     }
 
-    protected List<File> findCapedwarfJars(List<File> mps) {
+    protected List<File> findCapedwarfJars(String version, List<File> mps) {
         final List<File> results = new ArrayList<File>();
         final Set<String> existing = new HashSet<String>();
         for (File mp : mps) {
-            findCapedwarfJars(mp, results, existing);
+            findCapedwarfJars(version, mp, results, existing);
         }
         return results;
     }
 
-    protected void findCapedwarfJars(File mp, List<File> results, Set<String> existing) {
-        final File cdModules = new File(mp, "org/jboss/capedwarf/main");
-        if (cdModules.exists()) {
+    protected void findCapedwarfJars(String version, File mp, List<File> results, Set<String> existing) {
+        final File cdModules = bestVersionMatch(version, mp);
+        if (cdModules != null) {
             for (File jar : cdModules.listFiles(JARS_SDK)) {
                 if (existing.add(jar.getName())) {
                     results.add(jar);
                 }
             }
         }
+    }
+
+    protected File bestVersionMatch(String version, File mp) {
+        while (true) {
+            final File cdModules = new File(mp, "org/jboss/capedwarf/" + version);
+            if (cdModules.exists()) {
+                return cdModules;
+            }
+            int p = version.lastIndexOf(".");
+            if (p < 0) {
+                if ("main".equals(version)) {
+                    break;
+                } else {
+                    version = "main";
+                }
+            } else {
+                version = version.substring(0, p);
+            }
+        }
+        return null;
     }
 }
