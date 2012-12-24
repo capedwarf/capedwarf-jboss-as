@@ -77,6 +77,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier BOUNCY_CASTLE_MAIL = ModuleIdentifier.create("org.bouncycastle.bcmail");
     private static final ModuleIdentifier BOUNCY_CASTLE_PKIX = ModuleIdentifier.create("org.bouncycastle.bcpkix");
     private static final ModuleIdentifier BOUNCY_CASTLE_PROV = ModuleIdentifier.create("org.bouncycastle.bcprov");
+    private static final ModuleIdentifier COMMON_CORE = ModuleIdentifier.create("org.jboss.common-core");
     // inline this module deps, if running with bundled
     private static final ModuleIdentifier[] INLINE = {
             MODULES,
@@ -96,7 +97,8 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
             SMACK,
             BOUNCY_CASTLE_MAIL,
             BOUNCY_CASTLE_PKIX,
-            BOUNCY_CASTLE_PROV
+            BOUNCY_CASTLE_PROV,
+            COMMON_CORE
     };
 
     private static final FilenameFilter JARS_SDK = new FilenameFilter() {
