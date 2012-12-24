@@ -147,10 +147,29 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
             for (ModuleIdentifier mi : INLINE)
                 moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, mi));
         } else {
-            // add CapeDwarf
-            moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, CAPEDWARF));
-            // add modified AppEngine
-            moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, APPENGINE));
+            // check if CD and GAE deps already exist
+            final List<ModuleDependency> systemDependencies = moduleSpecification.getSystemDependencies();
+            boolean cdDependencyExists = false;
+            boolean gaeDependencyExists = false;
+            for (ModuleDependency md : systemDependencies) {
+                final String mdName = md.getIdentifier().getName();
+                if (cdDependencyExists == false && CAPEDWARF.getName().equals(mdName)) {
+                    cdDependencyExists = true;
+                }
+                if (gaeDependencyExists == false && APPENGINE.getName().equals(mdName)) {
+                    gaeDependencyExists = true;
+                }
+            }
+
+            // add default CapeDwarf
+            if (cdDependencyExists == false) {
+                moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, CAPEDWARF));
+            }
+
+            // add default modified AppEngine
+            if (gaeDependencyExists == false) {
+                moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, APPENGINE));
+            }
         }
     }
 
