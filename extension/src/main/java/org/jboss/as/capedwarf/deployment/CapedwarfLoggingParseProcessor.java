@@ -30,15 +30,22 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.jboss.as.capedwarf.api.Constants;
+import org.jboss.as.logging.CommonAttributes;
 import org.jboss.as.logging.LoggingDeploymentUnitProcessor;
 import org.jboss.as.logging.LoggingExtension;
+import org.jboss.as.logging.stdio.LogContextStdioContextSelector;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.logmanager.ContextClassLoaderLogContextSelector;
+import org.jboss.logmanager.Level;
 import org.jboss.logmanager.LogContext;
+import org.jboss.logmanager.Logger;
 import org.jboss.logmanager.PropertyConfigurator;
 import org.jboss.modules.Module;
+import org.jboss.stdio.LoggingOutputStream;
+import org.jboss.stdio.NullInputStream;
+import org.jboss.stdio.StdioContext;
 import org.jboss.vfs.VirtualFile;
 
 /**
@@ -146,10 +153,30 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             final LogContext logContext = LogContext.create();
             // Configure the logger
             new PropertyConfigurator(logContext).configure(fixed);
+            // change stderr level
+            applyStdioContext(logContext);
+            // register log context
             getContextSelector().registerLogContext(module.getClassLoader(), logContext);
             // Add as attachment / marker
             unit.putAttachment(LoggingDeploymentUnitProcessor.LOG_CONTEXT_KEY, logContext);
         }
+    }
+
+    protected StdioContext applyStdioContext(final LogContext logContext) {
+        final Logger root = logContext.getLogger(CommonAttributes.ROOT_LOGGER_NAME);
+        StdioContext stdioContext = root.getAttachment(LogContextStdioContextSelector.STDIO_CONTEXT_ATTACHMENT_KEY);
+        if (stdioContext == null) {
+            stdioContext = StdioContext.create(
+                    new NullInputStream(),
+                    new LoggingOutputStream(logContext.getLogger("stdout"), Level.INFO),
+                    new LoggingOutputStream(logContext.getLogger("stderr"), Level.WARN)
+            );
+            final StdioContext appearing = root.attachIfAbsent(LogContextStdioContextSelector.STDIO_CONTEXT_ATTACHMENT_KEY, stdioContext);
+            if (appearing != null) {
+                stdioContext = appearing;
+            }
+        }
+        return stdioContext;
     }
 
     protected static void buildExcludedLoggers(Properties fixed) {
