@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Handler;
 
 import org.jboss.as.capedwarf.api.Constants;
 import org.jboss.as.logging.CommonAttributes;
@@ -42,6 +43,8 @@ import org.jboss.logmanager.Level;
 import org.jboss.logmanager.LogContext;
 import org.jboss.logmanager.Logger;
 import org.jboss.logmanager.PropertyConfigurator;
+import org.jboss.logmanager.handlers.ConsoleHandler;
+import org.jboss.logmanager.handlers.FileHandler;
 import org.jboss.modules.Module;
 import org.jboss.stdio.LoggingOutputStream;
 import org.jboss.stdio.NullInputStream;
@@ -155,6 +158,9 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             new PropertyConfigurator(logContext).configure(fixed);
             // change stderr level
             applyStdioContext(logContext);
+            // add console, file handlers
+            //noinspection unchecked
+            addHandlers(logContext, ConsoleHandler.class, FileHandler.class);
             // register log context
             getContextSelector().registerLogContext(module.getClassLoader(), logContext);
             // Add as attachment / marker
@@ -177,6 +183,22 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             }
         }
         return stdioContext;
+    }
+
+    protected void addHandlers(final LogContext logContext, final Class<? extends Handler>... handlerTypes) {
+        final LogContext sysLogContext = LogContext.getSystemLogContext();
+        final Logger systemRoot = sysLogContext.getLogger(CommonAttributes.ROOT_LOGGER_NAME);
+        final Handler[] handlers = systemRoot.getHandlers();
+        if (handlers != null && handlers.length > 0) {
+            final Logger currentRoot = logContext.getLogger(CommonAttributes.ROOT_LOGGER_NAME);
+            for (Handler handler : handlers) {
+                for (Class<? extends Handler> handlerType : handlerTypes) {
+                    if (handlerType.isInstance(handler)) {
+                        currentRoot.addHandler(handler);
+                    }
+                }
+            }
+        }
     }
 
     protected static void buildExcludedLoggers(Properties fixed) {
