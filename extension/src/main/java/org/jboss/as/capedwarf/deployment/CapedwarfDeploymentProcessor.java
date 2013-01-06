@@ -110,6 +110,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         }
     };
 
+    private String defaultGaeVersion;
     private Map<String, List<ResourceLoaderSpec>> capedwarfResources = new HashMap<String, List<ResourceLoaderSpec>>();
 
     private String appengingAPI;
@@ -132,6 +133,8 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         moduleSpecification.addSystemDependency(cdas);
         // always add Infinispan
         moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, INFINISPAN));
+        // GAE version
+        final String version;
         // check if we bundle gae api jar
         final VirtualFile gae = LibUtils.findLibrary(unit, appengingAPI);
         if (gae != null && gae.exists()) {
@@ -140,7 +143,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
             // add a transformer, modifying GAE service factories
             moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.FactoriesTransformer");
             // add CapeDwarf resources directly as libs
-            final String version = getVersion(gae);
+            version = getVersion(gae);
             for (ResourceLoaderSpec rls : getCapedwarfResources(version))
                 moduleSpecification.addResourceLoader(rls);
             // add other needed dependencies
@@ -149,52 +152,66 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         } else {
             // check if CD and GAE deps already exist
             final List<ModuleDependency> systemDependencies = moduleSpecification.getSystemDependencies();
-            boolean cdDependencyExists = false;
-            boolean gaeDependencyExists = false;
+            ModuleDependency cdDependency = null;
+            ModuleDependency gaeDependency = null;
             for (ModuleDependency md : systemDependencies) {
                 final String mdName = md.getIdentifier().getName();
-                if (cdDependencyExists == false && CAPEDWARF.getName().equals(mdName)) {
-                    cdDependencyExists = true;
+                if (cdDependency == null && CAPEDWARF.getName().equals(mdName)) {
+                    cdDependency = md;
                 }
-                if (gaeDependencyExists == false && APPENGINE.getName().equals(mdName)) {
-                    gaeDependencyExists = true;
+                if (gaeDependency == null && APPENGINE.getName().equals(mdName)) {
+                    gaeDependency = md;
                 }
             }
 
             // add default CapeDwarf
-            if (cdDependencyExists == false) {
+            if (cdDependency == null) {
                 moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, CAPEDWARF));
             }
 
             // add default modified AppEngine
-            if (gaeDependencyExists == false) {
+            if (gaeDependency == null) {
                 moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, APPENGINE));
+                version = getDefaultGaeVersion();
+            } else {
+                version = gaeDependency.getIdentifier().getSlot();
             }
         }
+        // set best guess version
+        CapedwarfDeploymentMarker.setVersion(unit, version);
     }
 
     protected String getVersion(VirtualFile gae) {
         // Better way?
         // MANIFEST.MF doesn't hold the info
-        String name = gae.getName();
+        final String name = gae.getName();
+        return getVersion(name);
+    }
+
+    protected String getVersion(final String name) {
         int p = name.lastIndexOf("-");
         int q = name.lastIndexOf(".");
         return name.substring(p + 1, q);
+    }
+
+    protected static List<File> getModulePaths() {
+        final List<File> mps;
+        final String modulePaths = System.getProperty("module.path");
+        if (modulePaths == null) {
+            mps = Collections.singletonList(new File(System.getProperty("jboss.home.dir"), "modules"));
+        } else {
+            mps = new ArrayList<File>();
+            for (String s : modulePaths.split(":"))
+                mps.add(new File(s));
+        }
+        return mps;
     }
 
     protected synchronized List<ResourceLoaderSpec> getCapedwarfResources(final String version) throws DeploymentUnitProcessingException {
         List<ResourceLoaderSpec> resources = capedwarfResources.get(version);
         if (resources == null) {
             try {
-                final List<File> mps;
-                final String modulePaths = System.getProperty("module.path");
-                if (modulePaths == null) {
-                    mps = Collections.singletonList(new File(System.getProperty("jboss.home.dir"), "modules"));
-                } else {
-                    mps = new ArrayList<File>();
-                    for (String s : modulePaths.split(":"))
-                        mps.add(new File(s));
-                }
+                final List<File> mps = getModulePaths();
                 final List<File> capedwarfJars = findCapedwarfJars(version, mps);
                 if (capedwarfJars.isEmpty())
                     throw new DeploymentUnitProcessingException("No CapeDwarf jars found!");
@@ -250,6 +267,28 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
                 }
             } else {
                 version = version.substring(0, p);
+            }
+        }
+        return null;
+    }
+
+    protected synchronized String getDefaultGaeVersion() {
+        if (defaultGaeVersion == null) {
+            defaultGaeVersion = findDefaultGaeVersion();
+        }
+        return defaultGaeVersion;
+    }
+
+    private String findDefaultGaeVersion() {
+        final List<File> mps = getModulePaths();
+        for (File mp : mps) {
+            final File gaeModule = new File(mp, "com/google/appengine/main");
+            if (gaeModule.exists()) {
+                File[] jars = gaeModule.listFiles(JARS_SDK);
+                //noinspection LoopStatementThatDoesntLoop
+                for (File jar : jars) {
+                    return getVersion(jar.getName());
+                }
             }
         }
         return null;

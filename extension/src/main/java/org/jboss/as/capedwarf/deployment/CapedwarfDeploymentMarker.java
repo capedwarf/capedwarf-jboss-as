@@ -39,7 +39,9 @@ public class CapedwarfDeploymentMarker {
 
     private boolean bundledAppEngineApi;
     private boolean cdiApp;
+    private String version;
     private String appId;
+    private String appVersion;
     private Set<String> persistenceProviders;
     private Set<String> entities;
 
@@ -112,6 +114,29 @@ public class CapedwarfDeploymentMarker {
     }
 
     /**
+     * Set runtime version info.
+     *
+     * @param unit  the deployment unit
+     * @param version the version
+     */
+    public static void setVersion(DeploymentUnit unit, String version) {
+        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        if (marker != null)
+            marker.version = version;
+    }
+
+    /**
+     * Get runtime version.
+     *
+     * @param unit the deployment unit
+     * @return app id
+     */
+    public static String getVersion(DeploymentUnit unit) {
+        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        return marker != null ? marker.version : null;
+    }
+
+    /**
      * Set app id info.
      *
      * @param unit  the deployment unit
@@ -132,6 +157,29 @@ public class CapedwarfDeploymentMarker {
     public static String getAppId(DeploymentUnit unit) {
         final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
         return marker != null ? marker.appId : null;
+    }
+
+    /**
+     * Set app version info.
+     *
+     * @param unit  the deployment unit
+     * @param appVersion the app version
+     */
+    public static void setAppVersion(DeploymentUnit unit, String appVersion) {
+        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        if (marker != null)
+            marker.appVersion = appVersion;
+    }
+
+    /**
+     * Get app version.
+     *
+     * @param unit the deployment unit
+     * @return app version
+     */
+    public static String getAppVersion(DeploymentUnit unit) {
+        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        return marker != null ? marker.appVersion : null;
     }
 
     /**

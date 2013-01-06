@@ -37,6 +37,7 @@ import org.jboss.as.capedwarf.deployment.CapedwarfCleanupProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfDependenciesProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfDeploymentProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfEntityProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfEnvironmentProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfInitializationProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfJPAProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfLoggingParseProcessor;
@@ -145,6 +146,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_WELD - 10, new CapedwarfWeldProcessor()); // before Weld
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 10, new CapedwarfJPAProcessor()); // before default JPA processor
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 5, new CapedwarfDeploymentProcessor(appengineAPI));
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_INJECTION_ANNOTATION - 1, new CapedwarfEnvironmentProcessor()); // after module
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_LOGGING_CONFIG - 1, new CapedwarfLoggingParseProcessor()); // just before AS logging configuration
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 10, new CapedwarfCDIExtensionProcessor()); // after Weld portable extensions lookup
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 20, new CapedwarfEntityProcessor()); // adjust as needed
