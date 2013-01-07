@@ -25,6 +25,7 @@ package org.jboss.as.capedwarf.deployment;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import org.jboss.as.capedwarf.utils.CapedwarfProperties;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -37,15 +38,22 @@ import org.jboss.modules.Module;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfEnvironmentProcessor extends CapedwarfDeploymentUnitProcessor {
+    private final CapedwarfProperties properties;
+
+    public CapedwarfEnvironmentProcessor(CapedwarfProperties properties) {
+        this.properties = properties;
+    }
+
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final DeploymentUnit unit = phaseContext.getDeploymentUnit();
         final Module module = unit.getAttachment(Attachments.MODULE);
         if (module != null) {
+            final ClassLoader classLoader = module.getClassLoader();
+            properties.init(classLoader);
+
             try {
-                ClassLoader classLoader = module.getClassLoader();
                 Class<?> spc = classLoader.loadClass("com.google.appengine.api.utils.SystemProperty");
                 Method key = spc.getMethod("key");
-                Method set = spc.getMethod("set", String.class);
 
                 Field environmentField = spc.getField("environment");
                 Field versionField = spc.getField("version");
@@ -58,18 +66,33 @@ public class CapedwarfEnvironmentProcessor extends CapedwarfDeploymentUnitProces
                 String appId = CapedwarfDeploymentMarker.getAppId(unit);
                 String appVersion = CapedwarfDeploymentMarker.getAppVersion(unit);
 
-                setValue(environmentField, set, environment);
-                setValue(versionField, set, version);
-                setValue(appIdField, set, appId);
-                setValue(appVersionField, set, appVersion);
+                final ClassLoader previous = SecurityActions.setTCCL(classLoader);
+                try {
+                    setValue(environmentField, key, environment);
+                    setValue(versionField, key, version);
+                    setValue(appIdField, key, appId);
+                    setValue(appVersionField, key, appVersion);
+                } finally {
+                    SecurityActions.setTCCL(previous);
+                }
             } catch (Exception e) {
                 throw new DeploymentUnitProcessingException(e);
             }
         }
     }
 
-    private static void setValue(Field field, Method set, String value) throws Exception {
-        Object property = field.get(null);
-        set.invoke(property, value);
+    protected void doUndeploy(DeploymentUnit unit) {
+        final Module module = unit.getAttachment(Attachments.MODULE);
+        if (module != null) {
+            ClassLoader classLoader = module.getClassLoader();
+            properties.clean(classLoader);
+        }
+    }
+
+    private static void setValue(Field field, Method key, String value) throws Exception {
+        if (value != null) {
+            Object property = field.get(null);
+            System.setProperty((String)key.invoke(property), value);
+        }
     }
 }

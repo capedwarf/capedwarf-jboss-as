@@ -55,6 +55,7 @@ import org.jboss.as.capedwarf.services.OptionalThreadFactoryService;
 import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
 import org.jboss.as.capedwarf.services.SimpleThreadsHandler;
 import org.jboss.as.capedwarf.services.ThreadsHandler;
+import org.jboss.as.capedwarf.utils.CapedwarfProperties;
 import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
@@ -122,6 +123,9 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode adminAuthModel = CapedwarfDefinition.ADMIN_AUTH.resolveModelAttribute(context, model);
         final boolean adminAuth = adminAuthModel.isDefined() && adminAuthModel.asBoolean();
 
+        final CapedwarfProperties properties = new CapedwarfProperties(System.getProperties());
+        System.setProperties(properties); // override global properties, w/o synched code ...
+
         context.addStep(new AbstractDeploymentChainStep() {
             public void execute(DeploymentProcessorTarget processorTarget) {
                 final ServiceTarget serviceTarget = context.getServiceTarget();
@@ -146,7 +150,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_WELD - 10, new CapedwarfWeldProcessor()); // before Weld
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 10, new CapedwarfJPAProcessor()); // before default JPA processor
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 5, new CapedwarfDeploymentProcessor(appengineAPI));
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_INJECTION_ANNOTATION - 1, new CapedwarfEnvironmentProcessor()); // after module
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_INJECTION_ANNOTATION - 1, new CapedwarfEnvironmentProcessor(properties)); // after module
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_LOGGING_CONFIG - 1, new CapedwarfLoggingParseProcessor()); // just before AS logging configuration
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 10, new CapedwarfCDIExtensionProcessor()); // after Weld portable extensions lookup
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 20, new CapedwarfEntityProcessor()); // adjust as needed
