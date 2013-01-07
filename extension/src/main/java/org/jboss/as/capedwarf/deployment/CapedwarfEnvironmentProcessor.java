@@ -69,9 +69,9 @@ public class CapedwarfEnvironmentProcessor extends CapedwarfDeploymentUnitProces
                 final ClassLoader previous = SecurityActions.setTCCL(classLoader);
                 try {
                     setValue(environmentField, key, environment);
-                    setValue(versionField, key, version);
+                    setValue(versionField, key, "JBoss CapeDwarf/" + version);
                     setValue(appIdField, key, appId);
-                    setValue(appVersionField, key, appVersion + ".1");
+                    setValue(appVersionField, key, appVersion + getDeploymentVersion(phaseContext, environment));
                 } finally {
                     SecurityActions.setTCCL(previous);
                 }
@@ -79,6 +79,11 @@ public class CapedwarfEnvironmentProcessor extends CapedwarfDeploymentUnitProces
                 throw new DeploymentUnitProcessingException(e);
             }
         }
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    protected String getDeploymentVersion(DeploymentPhaseContext context, String environment) {
+        return ".1"; // TODO
     }
 
     protected void doUndeploy(DeploymentUnit unit) {
