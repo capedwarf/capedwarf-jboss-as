@@ -71,7 +71,7 @@ public class CapedwarfEnvironmentProcessor extends CapedwarfDeploymentUnitProces
                     setValue(environmentField, key, environment);
                     setValue(versionField, key, version);
                     setValue(appIdField, key, appId);
-                    setValue(appVersionField, key, appVersion);
+                    setValue(appVersionField, key, appVersion + ".1");
                 } finally {
                     SecurityActions.setTCCL(previous);
                 }
