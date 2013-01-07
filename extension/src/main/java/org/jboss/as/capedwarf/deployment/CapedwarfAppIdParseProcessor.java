@@ -23,6 +23,10 @@
 package org.jboss.as.capedwarf.deployment;
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -37,11 +41,13 @@ import org.jboss.vfs.VirtualFile;
  */
 public class CapedwarfAppIdParseProcessor extends CapedwarfAppEngineWebXmlParseProcessor {
     private static final String APPLICATION = "<application>";
+    private static final String VERSION = "<version>";
 
     private Set<String> apps = new ConcurrentSkipListSet<String>();
 
     protected void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
-        String appId = parseAppId(xml);
+        final Map<String, String> results = parseTokens(xml, new LinkedHashSet<String>(Arrays.asList(APPLICATION, VERSION)));
+        final String appId = results.get(APPLICATION);
 
         if (appId == null || appId.length() == 0)
             throw new IllegalArgumentException("App id is null or empty!");
@@ -50,30 +56,48 @@ public class CapedwarfAppIdParseProcessor extends CapedwarfAppEngineWebXmlParseP
             throw new IllegalArgumentException("App id already exists: " + appId);
 
         CapedwarfDeploymentMarker.setAppId(unit, appId);
+        CapedwarfDeploymentMarker.setAppVersion(unit, results.get(VERSION));
     }
 
-    protected String parseAppId(VirtualFile xml) throws Exception {
+    private Map<String, String> parseTokens(VirtualFile xml, final Set<String> tokens) throws Exception {
+        final Map<String, String> results = new HashMap<String, String>();
         InputStream is = xml.openStream();
         try {
             StringBuilder builder = new StringBuilder();
             int x;
-            boolean isAppId = false;
-            StringBuilder appId = new StringBuilder();
+            String token = null;
+            StringBuilder tokenBuilder = new StringBuilder();
             while ((x = is.read()) != -1) {
                 char ch = (char) x;
-                if (isAppId) {
-                    if (ch == '<')
-                        break;
-                    else
-                        appId.append(ch);
+                if (token != null) {
+                    if (ch == '<') {
+                        results.put(token, tokenBuilder.toString());
+                        if (tokens.isEmpty()) {
+                            break;
+                        } else {
+                            token = null;
+                            tokenBuilder.setLength(0); // reset builder
+                        }
+                    } else {
+                        tokenBuilder.append(ch);
+                    }
                 } else {
                     builder.append(ch);
                 }
-                if (isAppId == false && builder.toString().endsWith(APPLICATION)) {
-                    isAppId = true;
+                // check if we hit any token
+                if (token == null) {
+                    for (String t : tokens) {
+                        if (builder.toString().endsWith(t)) {
+                            token = t;
+                            break;
+                        }
+                    }
+                    if (token != null) {
+                        tokens.remove(token);
+                    }
                 }
             }
-            return appId.toString();
+            return results;
         } finally {
             safeClose(is);
         }
