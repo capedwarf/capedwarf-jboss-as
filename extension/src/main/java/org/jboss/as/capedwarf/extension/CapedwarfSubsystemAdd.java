@@ -30,7 +30,7 @@ import java.util.concurrent.ThreadFactory;
 import javax.jms.Connection;
 
 import org.jboss.as.capedwarf.api.Constants;
-import org.jboss.as.capedwarf.deployment.CapedwarfAppIdParseProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfAppInfoParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCDIExtensionProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCacheProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCleanupProcessor;
@@ -142,7 +142,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.STRUCTURE, initialStructureOrder + 10, new CapedwarfInitializationProcessor());
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.STRUCTURE, initialStructureOrder + 20, new CapedwarfSubsystemProcessor());
                 final int initialParseOrder = Math.min(Phase.PARSE_WEB_DEPLOYMENT, Phase.PARSE_PERSISTENCE_UNIT);
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 15, new CapedwarfAppIdParseProcessor()); // adjust order as needed
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 15, new CapedwarfAppInfoParseProcessor()); // adjust order as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 10, new CapedwarfPersistenceModificationProcessor(tempDir)); // before persistence.xml parsing
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WEB_DEPLOYMENT + 1, new CapedwarfWebCleanupProcessor()); // right after web.xml parsing
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WEB_COMPONENTS - 1, new CapedwarfWebComponentsDeploymentProcessor(adminAuth));

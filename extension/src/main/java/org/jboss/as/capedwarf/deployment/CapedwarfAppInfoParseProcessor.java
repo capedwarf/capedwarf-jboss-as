@@ -35,11 +35,11 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.vfs.VirtualFile;
 
 /**
- * Parse app id.
+ * Parse app info - id, version.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfAppIdParseProcessor extends CapedwarfAppEngineWebXmlParseProcessor {
+public class CapedwarfAppInfoParseProcessor extends CapedwarfAppEngineWebXmlParseProcessor {
     private static final String APPLICATION = "<application>";
     private static final String VERSION = "<version>";
 
