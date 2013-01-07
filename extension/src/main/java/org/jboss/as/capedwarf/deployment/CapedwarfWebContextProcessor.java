@@ -52,6 +52,7 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
             throw new DeploymentUnitProcessingException("No CL module: " + unit);
         }
         final ClassLoader classLoader = module.getClassLoader();
+        final ClassLoader previous = SecurityActions.setTCCL(classLoader);
         try {
             // appengine-web.xml
             final InputStream appIs = getInputStream(deploymentRoot, "WEB-INF/appengine-web.xml", true);
@@ -71,6 +72,8 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
             throw e;
         } catch (Exception e) {
             throw new DeploymentUnitProcessingException(e);
+        } finally {
+            SecurityActions.setTCCL(previous);
         }
     }
 
