@@ -25,6 +25,7 @@ package org.jboss.as.capedwarf.extension;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 
 import javax.jms.Connection;
@@ -133,7 +134,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 final ServletExecutorConsumerService consumerService = addQueueConsumer(serviceTarget, newControllers);
                 putChannelToJndi(serviceTarget, newControllers);
                 final ThreadsHandler handler = new SimpleThreadsHandler();
-                putExecutorToJndi(serviceTarget, newControllers, handler);
+                putExecutorServiceToJndi(serviceTarget, newControllers, handler);
                 putThreadFactoryToJndi(serviceTarget, newControllers, handler);
 
                 final TempDir tempDir = createTempDir(serviceTarget, newControllers);
@@ -189,12 +190,12 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         newControllers.add(binderBuilder.install());
     }
 
-    protected void putExecutorToJndi(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers, ThreadsHandler handler) {
+    protected void putExecutorServiceToJndi(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers, ThreadsHandler handler) {
         final ServiceName realExecutor = ThreadsServices.executorName(Constants.CAPEDWARF);
-        final ServiceName optionalExecutor = ServiceName.JBOSS.append(Constants.CAPEDWARF).append("OptionalExecutor");
+        final ServiceName optionalExecutor = ServiceName.JBOSS.append(Constants.CAPEDWARF).append("OptionalExecutorService");
         final OptionalExecutorService oes = new OptionalExecutorService(handler);
         final ServiceBuilder<Executor> executorServiceBuilder = serviceTarget.addService(optionalExecutor, oes);
-        executorServiceBuilder.addDependency(ServiceBuilder.DependencyType.OPTIONAL, realExecutor, Executor.class, oes.getExecutorInjectedValue());
+        executorServiceBuilder.addDependency(ServiceBuilder.DependencyType.OPTIONAL, realExecutor, ExecutorService.class, oes.getExecutorInjectedValue());
         executorServiceBuilder.setInitialMode(ServiceController.Mode.ON_DEMAND);
         newControllers.add(executorServiceBuilder.install());
 

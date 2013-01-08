@@ -37,7 +37,7 @@ import org.jboss.msc.value.InjectedValue;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class OptionalExecutorService implements Service<Executor> {
-    private InjectedValue<Executor> executorInjectedValue = new InjectedValue<Executor>();
+    private InjectedValue<ExecutorService> executorInjectedValue = new InjectedValue<ExecutorService>();
     private ThreadsHandler handler;
     private ExecutorService executor;
 
@@ -46,7 +46,7 @@ public class OptionalExecutorService implements Service<Executor> {
     }
 
     public void start(StartContext context) throws StartException {
-        final Executor e = executorInjectedValue.getOptionalValue();
+        final ExecutorService e = executorInjectedValue.getOptionalValue();
         if (e == null) {
             executor = handler.getExecutor();
         }
@@ -59,11 +59,11 @@ public class OptionalExecutorService implements Service<Executor> {
         }
     }
 
-    public Executor getValue() throws IllegalStateException, IllegalArgumentException {
+    public ExecutorService getValue() throws IllegalStateException, IllegalArgumentException {
         return (executor != null) ? executor : executorInjectedValue.getValue();
     }
 
-    public InjectedValue<Executor> getExecutorInjectedValue() {
+    public InjectedValue<ExecutorService> getExecutorInjectedValue() {
         return executorInjectedValue;
     }
 }
