@@ -1,6 +1,6 @@
 package org.jboss.as.capedwarf.services;
 
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -17,8 +17,10 @@ public class SimpleThreadsHandler implements ThreadsHandler {
     public synchronized ThreadPoolExecutor getExecutor() {
         counter++;
         if (executor == null) {
-            int maxPoolSize = Integer.parseInt(System.getProperty("jboss.capedwarf.maxPoolSize", "3"));
-            executor = new ThreadPoolExecutor(1, maxPoolSize, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(maxPoolSize), this);
+            int poolSize = Integer.parseInt(System.getProperty("jboss.capedwarf.poolSize", "10"));
+            long keepAliveTime = Long.parseLong(System.getProperty("jboss.capedwarf.keepAliveTime", "10"));
+            int blockingSize = Integer.parseInt(System.getProperty("jboss.capedwarf.blockingSize", String.valueOf(Integer.MAX_VALUE))); // unbounded
+            executor = new ThreadPoolExecutor(poolSize, poolSize, keepAliveTime, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(blockingSize), this);
         }
         return executor;
     }
