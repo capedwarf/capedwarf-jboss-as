@@ -140,8 +140,9 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         if (gae != null && gae.exists()) {
             // set it in marker
             CapedwarfDeploymentMarker.setBundledAppEngineApi(unit);
-            // add a transformer, modifying GAE service factories
+            // add a transformer, modifying GAE service factories and other misc classes
             moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.FactoriesTransformer");
+            moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.MiscTransformer");
             // add CapeDwarf resources directly as libs
             version = getVersion(gae);
             for (ResourceLoaderSpec rls : getCapedwarfResources(version))
