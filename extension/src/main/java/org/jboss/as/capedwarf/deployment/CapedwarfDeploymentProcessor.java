@@ -141,8 +141,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
             // set it in marker
             CapedwarfDeploymentMarker.setBundledAppEngineApi(unit);
             // add a transformer, modifying GAE service factories and other misc classes
-            moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.FactoriesTransformer");
-            moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.MiscTransformer");
+            moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.CapedwarfTransformer");
             // add CapeDwarf resources directly as libs
             version = getVersion(gae);
             for (ResourceLoaderSpec rls : getCapedwarfResources(version))
