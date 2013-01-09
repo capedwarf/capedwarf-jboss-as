@@ -42,11 +42,12 @@ import org.jboss.vfs.VirtualFile;
 public class CapedwarfAppInfoParseProcessor extends CapedwarfAppEngineWebXmlParseProcessor {
     private static final String APPLICATION = "<application>";
     private static final String VERSION = "<version>";
+    private static final String THREADSAFE = "<threadsafe>";
 
     private Set<String> apps = new ConcurrentSkipListSet<String>();
 
     protected void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
-        final Map<String, String> results = parseTokens(xml, new LinkedHashSet<String>(Arrays.asList(APPLICATION, VERSION)));
+        final Map<String, String> results = parseTokens(xml, new LinkedHashSet<String>(Arrays.asList(APPLICATION, VERSION, THREADSAFE)));
         final String appId = results.get(APPLICATION);
 
         if (appId == null || appId.length() == 0)
@@ -57,6 +58,7 @@ public class CapedwarfAppInfoParseProcessor extends CapedwarfAppEngineWebXmlPars
 
         CapedwarfDeploymentMarker.setAppId(unit, appId);
         CapedwarfDeploymentMarker.setAppVersion(unit, results.get(VERSION));
+        CapedwarfDeploymentMarker.setThreadsafe(unit, Boolean.parseBoolean(results.get(THREADSAFE)));
     }
 
     private Map<String, String> parseTokens(VirtualFile xml, final Set<String> tokens) throws Exception {

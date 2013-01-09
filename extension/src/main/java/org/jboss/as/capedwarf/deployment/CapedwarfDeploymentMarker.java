@@ -42,6 +42,7 @@ public class CapedwarfDeploymentMarker {
     private String version;
     private String appId;
     private String appVersion;
+    private boolean threadsafe;
     private Set<String> persistenceProviders;
     private Set<String> entities;
 
@@ -180,6 +181,29 @@ public class CapedwarfDeploymentMarker {
     public static String getAppVersion(DeploymentUnit unit) {
         final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
         return marker != null ? marker.appVersion : null;
+    }
+
+    /**
+     * Set threadsafe info.
+     *
+     * @param unit  the deployment unit
+     * @param threadsafe the threadsafe flag
+     */
+    public static void setThreadsafe(DeploymentUnit unit, boolean threadsafe) {
+        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        if (marker != null)
+            marker.threadsafe = threadsafe;
+    }
+
+    /**
+     * Is threadsafe.
+     *
+     * @param unit the deployment unit
+     * @return threadsafe flag
+     */
+    public static boolean isThreadsafe(DeploymentUnit unit) {
+        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        return marker != null && marker.threadsafe;
     }
 
     /**
