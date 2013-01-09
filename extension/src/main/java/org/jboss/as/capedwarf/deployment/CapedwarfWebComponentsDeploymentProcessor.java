@@ -42,6 +42,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String GAE_REMOTE_API_SERVLET_NAME = "com.google.apphosting.utils.remoteapi.RemoteApiServlet";
     private static final String CAPEDWARF_REMOTE_API_SERVLET_NAME = "org.jboss.capedwarf.admin.remote.RemoteApiServlet";
 
+    private static final String SINGLE_THREAD_FILTER_NAME = "SingleThreadFilter";
     private static final String GAE_FILTER_NAME = "GAEFilter";
     private static final String AUTH_SERVLET_NAME = "authservlet";
     private static final String ADMIN_SERVLET_NAME = "CapedwarfAdminServlet";
@@ -51,7 +52,9 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ListenerMetaData GAE_LISTENER;
     private final ListenerMetaData CDI_LISTENER;
     private final ListenerMetaData CDAS_LISTENER;
+    private final FilterMetaData SINGLE_THREAD_FILTER;
     private final FilterMetaData GAE_FILTER;
+    private final FilterMappingMetaData SINGLE_THREAD_FILTER_MAPPING;
     private final FilterMappingMetaData GAE_FILTER_MAPPING;
     private final ServletMetaData GAE_SERVLET;
     private final ServletMetaData ADMIN_SERVLET;
@@ -75,6 +78,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         CDAS_LISTENER = createAsListener();
         GAE_FILTER = createGaeFilter();
         GAE_FILTER_MAPPING = createGaeFilterMapping();
+        SINGLE_THREAD_FILTER = createSingleThreadFilter();
+        SINGLE_THREAD_FILTER_MAPPING = createSingleThreadFilterMapping();
         GAE_SERVLET = createAuthServlet();
         GAE_SERVLET_MAPPING = createAuthServletMapping();
         ADMIN_SERVLET = createAdminServlet();
@@ -98,6 +103,11 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
             getFilters(webMetaData).add(GAE_FILTER);
             getFilterMappings(webMetaData).add(0, GAE_FILTER_MAPPING);
+
+            if (!CapedwarfDeploymentMarker.isThreadsafe(unit)) {
+                getFilters(webMetaData).add(SINGLE_THREAD_FILTER);
+                getFilterMappings(webMetaData).add(0, SINGLE_THREAD_FILTER_MAPPING);
+            }
 
             getServlets(webMetaData).add(GAE_SERVLET);
             getServletMappings(webMetaData).add(GAE_SERVLET_MAPPING);
@@ -171,6 +181,13 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         return filter;
     }
 
+    private FilterMetaData createSingleThreadFilter() {
+        FilterMetaData filter = new FilterMetaData();
+        filter.setFilterName(SINGLE_THREAD_FILTER_NAME);
+        filter.setFilterClass("org.jboss.capedwarf.common.singlethread.SingleThreadFilter");
+        return filter;
+    }
+
     private FiltersMetaData getFilters(WebMetaData webMetaData) {
         FiltersMetaData filters = webMetaData.getFilters();
         if (filters == null) {
@@ -183,6 +200,14 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private FilterMappingMetaData createGaeFilterMapping() {
         FilterMappingMetaData filterMapping = new FilterMappingMetaData();
         filterMapping.setFilterName(GAE_FILTER_NAME);
+        filterMapping.setUrlPatterns(Collections.singletonList("/*"));
+        filterMapping.setDispatchers(Arrays.asList(DispatcherType.REQUEST, DispatcherType.FORWARD));
+        return filterMapping;
+    }
+
+    private FilterMappingMetaData createSingleThreadFilterMapping() {
+        FilterMappingMetaData filterMapping = new FilterMappingMetaData();
+        filterMapping.setFilterName(SINGLE_THREAD_FILTER_NAME);
         filterMapping.setUrlPatterns(Collections.singletonList("/*"));
         filterMapping.setDispatchers(Arrays.asList(DispatcherType.REQUEST, DispatcherType.FORWARD));
         return filterMapping;
