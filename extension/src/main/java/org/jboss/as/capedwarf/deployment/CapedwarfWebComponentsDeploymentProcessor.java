@@ -78,7 +78,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         CDAS_LISTENER = createAsListener();
         GAE_FILTER = createGaeFilter();
         GAE_FILTER_MAPPING = createGaeFilterMapping();
-        SINGLE_THREAD_FILTER = createSingleThreadFilter();
+        SINGLE_THREAD_FILTER = createSingleThreadFilter(1); // TODO - per deployment #
         SINGLE_THREAD_FILTER_MAPPING = createSingleThreadFilterMapping();
         GAE_SERVLET = createAuthServlet();
         GAE_SERVLET_MAPPING = createAuthServletMapping();
@@ -101,13 +101,14 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
             getListeners(webMetaData).add(CDI_LISTENER);
             getListeners(webMetaData).add(CDAS_LISTENER);
 
-            getFilters(webMetaData).add(GAE_FILTER);
             getFilterMappings(webMetaData).add(0, GAE_FILTER_MAPPING);
 
-            if (!CapedwarfDeploymentMarker.isThreadsafe(unit)) {
+            if (CapedwarfDeploymentMarker.isThreadsafe(unit) == false) {
                 getFilters(webMetaData).add(SINGLE_THREAD_FILTER);
                 getFilterMappings(webMetaData).add(0, SINGLE_THREAD_FILTER_MAPPING);
             }
+
+            getFilters(webMetaData).add(GAE_FILTER);
 
             getServlets(webMetaData).add(GAE_SERVLET);
             getServletMappings(webMetaData).add(GAE_SERVLET_MAPPING);
@@ -181,10 +182,15 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         return filter;
     }
 
-    private FilterMetaData createSingleThreadFilter() {
+    private FilterMetaData createSingleThreadFilter(int maxConcurrentRequests) {
         FilterMetaData filter = new FilterMetaData();
         filter.setFilterName(SINGLE_THREAD_FILTER_NAME);
         filter.setFilterClass("org.jboss.capedwarf.common.singlethread.SingleThreadFilter");
+        ParamValueMetaData initParam = new ParamValueMetaData();
+        initParam.setParamName("max-concurrent-requests");
+        initParam.setParamValue(String.valueOf(maxConcurrentRequests));
+        List<ParamValueMetaData> initParams = Collections.singletonList(initParam);
+        filter.setInitParam(initParams);
         return filter;
     }
 
