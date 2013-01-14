@@ -61,5 +61,6 @@
         <module name="com.google.guava"/>
         <module name="org.datanucleus" optional="true"/>
         <module name="org.jboss.maven.plugins.transformer" optional="true"/>
+        <module name="org.jboss.capedwarf.shared"/>
     </dependencies>
 </module>

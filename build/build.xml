@@ -109,6 +109,10 @@
 
         </module-def>
 
+        <module-def name="org.jboss.capedwarf.shared">
+            <maven-resource group="org.jboss.capedwarf.shared" artifact="capedwarf-shared"/>
+        </module-def>
+
         <module-def name="org.jboss.capedwarf">
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-admin"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-appidentity"/>

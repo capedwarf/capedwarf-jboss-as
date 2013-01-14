@@ -22,8 +22,6 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.io.Closeable;
-
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -53,13 +51,4 @@ public abstract class CapedwarfAppEngineWebXmlParseProcessor extends CapedwarfDe
     }
 
     protected abstract void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception;
-
-    protected static void safeClose(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (Exception ignored) {
-            }
-        }
-    }
 }

@@ -31,7 +31,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Handler;
 
-import org.jboss.as.capedwarf.api.Constants;
+import org.jboss.as.capedwarf.utils.Constants;
 import org.jboss.as.logging.CommonAttributes;
 import org.jboss.as.logging.LoggingDeploymentUnitProcessor;
 import org.jboss.as.logging.LoggingExtension;
@@ -113,8 +113,8 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
                 fixed.put(rootHandlersKey, capedwarfLogger);
             }
             // Configure the capedwarf handler
-            fixed.put(getPropertyKey("handler", capedwarfLogger), org.jboss.as.capedwarf.api.Logger.class.getName());
-            fixed.put(getPropertyKey("handler", capedwarfLogger, "module"), "org.jboss.as.capedwarf");
+            fixed.put(getPropertyKey("handler", capedwarfLogger), org.jboss.capedwarf.shared.log.Logger.class.getName());
+            fixed.put(getPropertyKey("handler", capedwarfLogger, "module"), "org.jboss.capedwarf.shared");
             fixed.put(getPropertyKey("handler", capedwarfLogger, "level"), "ALL");
             // exclude AS7, CapeDwarf internals
             buildExcludedLoggers(fixed);

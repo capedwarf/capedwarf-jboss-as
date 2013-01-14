@@ -22,13 +22,15 @@
 
 package org.jboss.as.capedwarf.services;
 
+import java.io.IOException;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
+import org.jboss.capedwarf.shared.components.ComponentRegistry;
+import org.jboss.capedwarf.shared.components.SimpleKey;
 
 /**
  * Execute servlet from an async invocation.
@@ -36,21 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class ServletExecutor {
-
-    private static Map<String, ServletContext> contexts = new ConcurrentHashMap<String, ServletContext>();
-
-    public static ServletContext registerContext(final String appId, final ServletContext context) {
-        return contexts.put(appId, context);
-    }
-
-    public static ServletContext unregisterContext(final String appId) {
-        return contexts.remove(appId);
-    }
-
-    static ServletContext getContext(final String appId) {
-        return contexts.get(appId);
-    }
-
     /**
      * Dispatch custom request.
      *
@@ -61,7 +48,9 @@ public class ServletExecutor {
      * @throws ServletException for any servlet exception
      */
     static void dispatch(final String appId, final String path, final HttpServletRequest request) throws IOException, ServletException {
-        dispatch(appId, path, getContext(appId), request);
+        SimpleKey<ServletContext> key = new SimpleKey<ServletContext>(ServletContext.class, appId);
+        ServletContext context = ComponentRegistry.getInstance().getComponent(key);
+        dispatch(appId, path, context, request);
     }
 
     /**

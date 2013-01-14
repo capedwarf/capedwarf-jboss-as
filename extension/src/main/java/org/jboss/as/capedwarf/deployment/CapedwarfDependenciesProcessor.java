@@ -22,8 +22,8 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import org.jboss.as.capedwarf.api.Constants;
 import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
+import org.jboss.as.capedwarf.utils.Constants;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.msc.service.ServiceTarget;

@@ -39,7 +39,7 @@ import org.jboss.as.server.deployment.module.ResourceRoot;
 public abstract class CapedwarfPersistenceProcessor extends CapedwarfDeploymentUnitProcessor {
 
     static final String METADATA_SCANNER_KEY = "datanucleus.metadata.scanner";
-    static final String METADATA_SCANNER_CLASS = "org.jboss.capedwarf.datastore.datancleus.JndiMetaDataScanner"; // TODO - configurable?
+    static final String METADATA_SCANNER_CLASS = "org.jboss.capedwarf.datastore.datancleus.BaseMetaDataScanner";
 
     static final String DIALECT_PROPERTY_KEY = "hibernate.dialect";
     static final String DEFAULT_DIALECT = "org.hibernate.dialect.H2Dialect";

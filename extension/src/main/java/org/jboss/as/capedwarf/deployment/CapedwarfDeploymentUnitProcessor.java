@@ -22,6 +22,8 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.io.Closeable;
+
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -61,5 +63,14 @@ public abstract class CapedwarfDeploymentUnitProcessor implements DeploymentUnit
     }
 
     protected void doUndeploy(DeploymentUnit unit) {
+    }
+
+    protected static void safeClose(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (Exception ignored) {
+            }
+        }
     }
 }

@@ -22,7 +22,7 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.0" name="org.jboss.as.capedwarf">
+<module xmlns="urn:jboss:module:1.0" name="org.jboss.capedwarf.shared">
     <resources>
         <!-- Insert resources here -->
     </resources>
@@ -31,39 +31,16 @@
         <module name="javax.api"/>
         <module name="javax.enterprise.api"/>
         <module name="javax.jms.api"/>
-        <module name="javax.servlet.api"/>
         <module name="javax.transaction.api"/>
-        <module name="org.jboss.staxmapper"/>
-        <module name="org.jboss.as.controller"/>
-        <module name="org.jboss.as.clustering.common"/>
-        <module name="org.jboss.as.clustering.infinispan"/>
-        <module name="org.jboss.as.clustering.jgroups"/>
-        <module name="org.jboss.as.clustering.singleton"/>
-        <module name="org.jboss.as.server"/>
-        <module name="org.jboss.as.ee"/>
-        <module name="org.jboss.as.jpa"/>
-        <module name="org.jboss.as.jpa.spi"/>
-        <module name="org.jboss.as.logging"/>
-        <module name="org.jboss.as.naming"/>
-        <module name="org.jboss.as.web"/>
-        <module name="org.jboss.as.weld"/>
-        <module name="org.jboss.as.threads"/>
-        <module name="org.jboss.as.transactions"/>
-        <module name="org.jboss.jandex"/>
-        <module name="org.jboss.logging"/>
-        <module name="org.jboss.logmanager"/>
-        <module name="org.jboss.metadata"/>
+        <module name="javax.activation.api"/>
+        <module name="javax.mail.api"/>
+        <module name="javax.servlet.api"/>
         <module name="org.jboss.modules"/>
-        <module name="org.jboss.msc"/>
-        <module name="org.jboss.stdio"/>
-        <module name="org.jboss.vfs"/>
-        <module name="org.jboss.weld.spi"/>
-        <module name="org.jboss.weld.api"/>
-        <module name="org.jboss.weld.core"/>
+        <module name="org.javassist"/>
         <module name="org.jgroups"/>
+        <module name="org.jboss.common-core"/>
+        <module name="org.jboss.logmanager"/>
         <module name="org.infinispan"/>
-        <module name="org.infinispan.query"/>
-        <module name="org.hibernate.search"/>
-        <module name="org.jboss.capedwarf.shared"/>
+        <module name="com.google.guava"/>
     </dependencies>
 </module>

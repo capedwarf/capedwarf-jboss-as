@@ -68,6 +68,7 @@
         <version.compiler.plugin>2.5.1-jboss-2</version.compiler.plugin>
 
         <version.jboss.as>7.2.0.Alpha1-SNAPSHOT</version.jboss.as>
+        <version.org.jboss.capedwarf.shared>1.0.0-SNAPSHOT</version.org.jboss.capedwarf.shared>
         <version.org.jboss.capedwarf>1.0.0-SNAPSHOT</version.org.jboss.capedwarf>
         <version.com.google.appengine>1.7.4</version.com.google.appengine>
         <version.com.google.guava>11.0.2</version.com.google.guava>
@@ -188,10 +189,17 @@
         <dependencies>
 
             <!-- Modules in this project -->
+
             <dependency>
                 <groupId>org.jboss.capedwarf</groupId>
                 <artifactId>jboss-as-capedwarf</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.shared</groupId>
+                <artifactId>capedwarf-shared</artifactId>
+                <version>${version.org.jboss.capedwarf.shared}</version>
             </dependency>
 
             <dependency>

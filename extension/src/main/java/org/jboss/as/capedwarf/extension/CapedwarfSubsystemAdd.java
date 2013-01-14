@@ -30,7 +30,6 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.jms.Connection;
 
-import org.jboss.as.capedwarf.api.Constants;
 import org.jboss.as.capedwarf.deployment.CapedwarfAppInfoParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCDIExtensionProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCacheProcessor;
@@ -57,6 +56,7 @@ import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
 import org.jboss.as.capedwarf.services.SimpleThreadsHandler;
 import org.jboss.as.capedwarf.services.ThreadsHandler;
 import org.jboss.as.capedwarf.utils.CapedwarfProperties;
+import org.jboss.as.capedwarf.utils.Constants;
 import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;

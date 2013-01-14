@@ -33,6 +33,15 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.SetupAction;
+import org.jboss.capedwarf.shared.config.AppEngineWebXml;
+import org.jboss.capedwarf.shared.config.AppEngineWebXmlParser;
+import org.jboss.capedwarf.shared.config.BackendsXml;
+import org.jboss.capedwarf.shared.config.BackendsXmlParser;
+import org.jboss.capedwarf.shared.config.CapedwarfConfiguration;
+import org.jboss.capedwarf.shared.config.CapedwarfConfigurationParser;
+import org.jboss.capedwarf.shared.config.ConfigurationAware;
+import org.jboss.capedwarf.shared.config.QueueXml;
+import org.jboss.capedwarf.shared.config.QueueXmlParser;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.vfs.VirtualFile;
@@ -56,19 +65,39 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
         try {
             // appengine-web.xml
             final InputStream appIs = getInputStream(deploymentRoot, "WEB-INF/appengine-web.xml", true);
-            Object appConfig = read(appIs, classLoader, "org.jboss.capedwarf.common.config.AppEngineWebXmlParser");
+            AppEngineWebXml appConfig;
+            try {
+                appConfig = AppEngineWebXmlParser.parse(appIs);
+            } finally {
+                safeClose(appIs);
+            }
 
             // capedwarf-web.xml
             final InputStream cdIs = getInputStream(deploymentRoot, "WEB-INF/capedwarf-web.xml", false);
-            Object cdConfig = read(cdIs, classLoader, "org.jboss.capedwarf.common.config.CapedwarfConfigurationParser");
+            CapedwarfConfiguration cdConfig;
+            try {
+                cdConfig = CapedwarfConfigurationParser.parse(cdIs);
+            } finally {
+                safeClose(cdIs);
+            }
 
             // queue.xml
             final InputStream queueIs = getInputStream(deploymentRoot, "WEB-INF/queue.xml", false);
-            Object queueConfig = read(queueIs, classLoader, "org.jboss.capedwarf.common.config.QueueXmlParser");
+            QueueXml queueConfig;
+            try {
+                queueConfig = QueueXmlParser.parse(queueIs);
+            } finally {
+                safeClose(queueIs);
+            }
 
             // backends.xml
             final InputStream backendsIs = getInputStream(deploymentRoot, "WEB-INF/backends.xml", false);
-            Object backendsConfig = read(backendsIs, classLoader, "org.jboss.capedwarf.common.config.BackendsXmlParser");
+            BackendsXml backendsConfig;
+            try {
+                backendsConfig = BackendsXmlParser.parse(backendsIs);
+            } finally {
+                safeClose(backendsIs);
+            }
 
             final CapedwarfSetupAction cas = new CapedwarfSetupAction(classLoader, appConfig, cdConfig, queueConfig, backendsConfig);
             unit.addToAttachmentList(org.jboss.as.ee.component.Attachments.WEB_SETUP_ACTIONS, cas);
@@ -93,38 +122,19 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
         return child.openStream();
     }
 
-    protected static Object read(InputStream is, ClassLoader appCL, String parserClassName) throws Exception {
-        Class<?> parserClass = appCL.loadClass(parserClassName);
-        Method parse = parserClass.getDeclaredMethod("parse", InputStream.class);
-        try {
-            return parse.invoke(null, is);
-        } finally {
-            if (is != null) {
-                is.close();
-            }
-        }
-    }
-
-    private static class CapedwarfSetupAction implements SetupAction {
+    private static class CapedwarfSetupAction extends ConfigurationAware implements SetupAction {
         private final ClassLoader appCL;
-        private final Object appConfig;
-        private final Object cdConfig;
-        private final Object queueConfig;
-        private final Object backendsConfig;
 
-        private CapedwarfSetupAction(ClassLoader appCL, Object appConfig, Object cdConfig, Object queueConfig, Object backendsConfig) {
+        private CapedwarfSetupAction(ClassLoader appCL, AppEngineWebXml appEngineWebXml, CapedwarfConfiguration capedwarfConfiguration, QueueXml queueXml, BackendsXml backendsXml) {
+            super(appEngineWebXml, capedwarfConfiguration, queueXml, backendsXml);
             this.appCL = appCL;
-            this.appConfig = appConfig;
-            this.cdConfig = cdConfig;
-            this.queueConfig = queueConfig;
-            this.backendsConfig = backendsConfig;
         }
 
         public void setup(Map<String, Object> properties) {
-            setTL(appCL, "setAppEngineWebXml", appConfig);
-            setTL(appCL, "setCapedwarfConfiguration", cdConfig);
-            setTL(appCL, "setQueueXml", queueConfig);
-            setTL(appCL, "setBackends", backendsConfig);
+            setTL(appCL, "setAppEngineWebXml", appEngineWebXml);
+            setTL(appCL, "setCapedwarfConfiguration", capedwarfConfiguration);
+            setTL(appCL, "setQueueXml", queueXml);
+            setTL(appCL, "setBackendsXml", backendsXml);
 
             invokeListener(appCL, "setup");
         }
@@ -136,7 +146,7 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
                 resetTL(appCL, "setAppEngineWebXml");
                 resetTL(appCL, "setCapedwarfConfiguration");
                 resetTL(appCL, "setQueueXml");
-                resetTL(appCL, "setBackends");
+                resetTL(appCL, "setBackendsXml");
             }
         }
 

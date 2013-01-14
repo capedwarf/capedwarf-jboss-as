@@ -22,7 +22,6 @@
 
 package org.jboss.as.capedwarf.services;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +30,10 @@ import javax.jms.MessageListener;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.jboss.capedwarf.shared.components.ComponentRegistry;
+import org.jboss.capedwarf.shared.components.SimpleKey;
+import org.jboss.capedwarf.shared.jms.MessageConstants;
+import org.jboss.capedwarf.shared.jms.ServletRequestCreator;
 import org.jboss.logging.Logger;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
@@ -45,9 +48,8 @@ import org.jboss.modules.ModuleLoader;
 class ServletExecutorConsumer implements MessageListener {
 
     private static final Logger log = Logger.getLogger(ServletExecutorConsumer.class);
-    private static final String PREFIX = "org_jboss_capedwarf_jms_";
 
-    private final Map<ClassLoader, Map<String, Object>> cache = new HashMap<ClassLoader, Map<String, Object>>();
+    private final Map<ClassLoader, Map<String, ServletRequestCreator>> cache = new HashMap<ClassLoader, Map<String, ServletRequestCreator>>();
     private final ModuleLoader loader;
 
     public ServletExecutorConsumer(ModuleLoader loader) {
@@ -55,35 +57,35 @@ class ServletExecutorConsumer implements MessageListener {
     }
 
     protected String getValue(final Message message, final String key) throws Exception {
-        final String value = message.getStringProperty(PREFIX + key);
+        final String value = message.getStringProperty(MessageConstants.PREFIX + key);
         if (value == null)
             throw new IllegalArgumentException("Null value for key: " + key);
         return value;
     }
 
     protected ModuleIdentifier parseModuleIdentifier(Message msg) throws Exception {
-        String mi = getValue(msg, "module");
+        String mi = getValue(msg, MessageConstants.MODULE);
         return ModuleIdentifier.fromString(mi);
     }
 
+    @SuppressWarnings("unchecked")
     private HttpServletRequest createServletRequest(ClassLoader cl, Message message, ServletContext context) throws Exception {
-        final String factoryClass = getValue(message, "factory");
-        Object factory;
+        final String factoryClass = getValue(message, MessageConstants.FACTORY);
+        ServletRequestCreator factory;
         synchronized (cache) {
-            Map<String, Object> factories = cache.get(cl);
+            Map<String, ServletRequestCreator> factories = cache.get(cl);
             if (factories == null) {
-                factories = new HashMap<String, Object>();
+                factories = new HashMap<String, ServletRequestCreator>();
                 cache.put(cl, factories);
             }
             factory = factories.get(factoryClass);
             if (factory == null) {
-                Class<?> clazz = cl.loadClass(factoryClass);
+                Class<ServletRequestCreator> clazz = (Class<ServletRequestCreator>) cl.loadClass(factoryClass);
                 factory = clazz.newInstance();
                 factories.put(factoryClass, factory);
             }
         }
-        Method m = factory.getClass().getMethod("createServletRequest", ServletContext.class, Message.class);
-        return (HttpServletRequest) m.invoke(factory, context, message);
+        return factory.createServletRequest(context, message);
     }
 
     public void onMessage(Message message) {
@@ -94,8 +96,9 @@ class ServletExecutorConsumer implements MessageListener {
                 return;
             }
 
-            final String appId = getValue(message, "appId");
-            final ServletContext context = ServletExecutor.getContext(appId);
+            final String appId = getValue(message, MessageConstants.APP_ID);
+            final SimpleKey<ServletContext> key = new SimpleKey<ServletContext>(ServletContext.class, appId);
+            final ServletContext context = ComponentRegistry.getInstance().getComponent(key);
             if (context == null) {
                 log.warn("No matching ServletContext, app (" + appId + ") already undeployed?");
                 return;
@@ -104,7 +107,7 @@ class ServletExecutorConsumer implements MessageListener {
             final ClassLoader cl = module.getClassLoader();
             final HttpServletRequest request = createServletRequest(cl, message, context);
 
-            final String path = getValue(message, "path");
+            final String path = getValue(message, MessageConstants.PATH);
             ServletExecutor.dispatch(appId, path, context, request);
         } catch (RuntimeException e) {
             log.error("Error handling servlet execution.", e);
