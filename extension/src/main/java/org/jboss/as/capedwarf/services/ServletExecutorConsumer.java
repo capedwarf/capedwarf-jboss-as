@@ -30,7 +30,10 @@ import javax.jms.MessageListener;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.jboss.capedwarf.shared.components.AbstractKey;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
+import org.jboss.capedwarf.shared.components.Key;
+import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.capedwarf.shared.components.SimpleKey;
 import org.jboss.capedwarf.shared.jms.MessageConstants;
 import org.jboss.capedwarf.shared.jms.ServletRequestCreator;
@@ -46,10 +49,8 @@ import org.jboss.modules.ModuleLoader;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 class ServletExecutorConsumer implements MessageListener {
-
     private static final Logger log = Logger.getLogger(ServletExecutorConsumer.class);
 
-    private final Map<ClassLoader, Map<String, ServletRequestCreator>> cache = new HashMap<ClassLoader, Map<String, ServletRequestCreator>>();
     private final ModuleLoader loader;
 
     public ServletExecutorConsumer(ModuleLoader loader) {
@@ -69,21 +70,29 @@ class ServletExecutorConsumer implements MessageListener {
     }
 
     @SuppressWarnings("unchecked")
-    private HttpServletRequest createServletRequest(ClassLoader cl, Message message, ServletContext context) throws Exception {
+    private HttpServletRequest createServletRequest(final String appId, ClassLoader cl, Message message, ServletContext context) throws Exception {
         final String factoryClass = getValue(message, MessageConstants.FACTORY);
         ServletRequestCreator factory;
-        synchronized (cache) {
-            Map<String, ServletRequestCreator> factories = cache.get(cl);
-            if (factories == null) {
-                factories = new HashMap<String, ServletRequestCreator>();
-                cache.put(cl, factories);
+        final Key<Map> key = new AbstractKey<Map>(Map.class) {
+            public String getAppId() {
+                return appId;
             }
-            factory = factories.get(factoryClass);
-            if (factory == null) {
-                Class<ServletRequestCreator> clazz = (Class<ServletRequestCreator>) cl.loadClass(factoryClass);
-                factory = clazz.newInstance();
-                factories.put(factoryClass, factory);
+
+            public Object getSlot() {
+                return Keys.SERVLET_REQUEST_CREATOR;
             }
+        };
+        ComponentRegistry registry = ComponentRegistry.getInstance();
+        Map<String, ServletRequestCreator> map = new HashMap();
+        Map<String, ServletRequestCreator> factories = registry.putIfAbsent(key, map);
+        if (factories == null) {
+            factories = map;
+        }
+        factory = factories.get(factoryClass);
+        if (factory == null) {
+            Class<ServletRequestCreator> clazz = (Class<ServletRequestCreator>) cl.loadClass(factoryClass);
+            factory = clazz.newInstance();
+            factories.put(factoryClass, factory);
         }
         return factory.createServletRequest(context, message);
     }
@@ -105,7 +114,7 @@ class ServletExecutorConsumer implements MessageListener {
             }
 
             final ClassLoader cl = module.getClassLoader();
-            final HttpServletRequest request = createServletRequest(cl, message, context);
+            final HttpServletRequest request = createServletRequest(appId, cl, message, context);
 
             final String path = getValue(message, MessageConstants.PATH);
             ServletExecutor.dispatch(appId, path, context, request);
@@ -124,12 +133,6 @@ class ServletExecutorConsumer implements MessageListener {
         } catch (ModuleLoadException e) {
             log.warn("Cannot load module, app (" + identifier + ") already undeployed? - " + e.getMessage());
             return null;
-        }
-    }
-
-    void removeClassLoader(ClassLoader classLoader) {
-        synchronized (cache) {
-            cache.remove(classLoader);
         }
     }
 }

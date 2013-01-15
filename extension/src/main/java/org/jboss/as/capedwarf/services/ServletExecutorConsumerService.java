@@ -25,7 +25,6 @@ package org.jboss.as.capedwarf.services;
 import javax.jms.Connection;
 import javax.jms.MessageListener;
 
-import org.jboss.modules.Module;
 import org.jboss.modules.ModuleLoader;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.value.InjectedValue;
@@ -41,17 +40,8 @@ public class ServletExecutorConsumerService extends AbstractConsumerService<Conn
 
     private InjectedValue<ModuleLoader> loader = new InjectedValue<ModuleLoader>();
 
-    private ServletExecutorConsumer sec;
-
     protected MessageListener createMessageListener() {
-        sec = new ServletExecutorConsumer(loader.getValue());
-        return sec;
-    }
-
-    public void removeModule(Module module) {
-        if (sec != null) {
-            sec.removeClassLoader(module.getClassLoader());
-        }
+        return new ServletExecutorConsumer(loader.getValue());
     }
 
     public Connection getValue() throws IllegalStateException, IllegalArgumentException {

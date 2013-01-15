@@ -22,13 +22,10 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
-import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
-import org.jboss.modules.Module;
 
 /**
  * Cleanup.
@@ -36,12 +33,6 @@ import org.jboss.modules.Module;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfCleanupProcessor extends CapedwarfDeploymentUnitProcessor {
-    private ServletExecutorConsumerService secs;
-
-    public CapedwarfCleanupProcessor(ServletExecutorConsumerService secs) {
-        this.secs = secs;
-    }
-
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
     }
@@ -54,11 +45,6 @@ public class CapedwarfCleanupProcessor extends CapedwarfDeploymentUnitProcessor 
         final String appId = CapedwarfDeploymentMarker.getAppId(unit);
         if (appId != null) {
             ComponentRegistry.getInstance().clearComponents(appId);
-        }
-
-        final Module module = unit.getAttachment(Attachments.MODULE);
-        if (module != null) {
-            secs.removeModule(module);
         }
     }
 }

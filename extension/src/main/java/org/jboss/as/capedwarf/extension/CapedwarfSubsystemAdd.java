@@ -133,7 +133,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
             public void execute(DeploymentProcessorTarget processorTarget) {
                 final ServiceTarget serviceTarget = context.getServiceTarget();
 
-                final ServletExecutorConsumerService consumerService = addQueueConsumer(serviceTarget, newControllers);
+                addQueueConsumer(serviceTarget, newControllers);
 
                 final ThreadsHandler handler = new SimpleThreadsHandler();
                 putExecutorServiceToRegistry(serviceTarget, newControllers, handler);
@@ -161,7 +161,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 20, new CapedwarfEntityProcessor()); // adjust as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 30, new CapedwarfPostModuleJPAProcessor()); // after entity processor
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 40, new CapedwarfSynchHackProcessor()); // after module, adjust as needed
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 1, new CapedwarfCleanupProcessor(consumerService)); // we still need module/CL
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 1, new CapedwarfCleanupProcessor()); // we still need module/CL
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT - 1, new CapedwarfWebContextProcessor()); // before web context lifecycle
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_MODULE_JNDI_BINDINGS - 3, new CapedwarfCacheProcessor()); // after module
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_MODULE_JNDI_BINDINGS - 2, new CapedwarfDependenciesProcessor()); // after logging
@@ -179,7 +179,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         newControllers.add(builder.install());
     }
 
-    protected static ServletExecutorConsumerService addQueueConsumer(final ServiceTarget serviceTarget, final List<ServiceController<?>> newControllers) {
+    protected static void addQueueConsumer(final ServiceTarget serviceTarget, final List<ServiceController<?>> newControllers) {
         final ServletExecutorConsumerService consumerService = new ServletExecutorConsumerService();
         final ServiceBuilder<Connection> builder = serviceTarget.addService(ServletExecutorConsumerService.NAME, consumerService);
         builder.addDependency(ContextNames.bindInfoFor("java:/ConnectionFactory").getBinderServiceName(), ManagedReferenceFactory.class, consumerService.getFactory());
@@ -187,7 +187,6 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         builder.addDependency(Services.JBOSS_SERVICE_MODULE_LOADER, ModuleLoader.class, consumerService.getLoader());
         builder.addDependency(ServiceName.JBOSS.append("messaging").append("default")); // depending on messaging sub-system impl details ...
         newControllers.add(builder.setInitialMode(ServiceController.Mode.ON_DEMAND).install());
-        return consumerService;
     }
 
     protected static void putExecutorServiceToRegistry(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers, ThreadsHandler handler) {
