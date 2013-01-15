@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.vfs.VirtualFile;
 
 /**

@@ -27,6 +27,7 @@ import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.modules.Module;
 
 /**
@@ -50,6 +51,11 @@ public class CapedwarfCleanupProcessor extends CapedwarfDeploymentUnitProcessor 
 
     @Override
     protected void doUndeploy(DeploymentUnit unit) {
+        final String appId = CapedwarfDeploymentMarker.getAppId(unit);
+        if (appId != null) {
+            ComponentRegistry.getInstance().clearComponents(appId);
+        }
+
         final Module module = unit.getAttachment(Attachments.MODULE);
         if (module != null) {
             secs.removeModule(module);
