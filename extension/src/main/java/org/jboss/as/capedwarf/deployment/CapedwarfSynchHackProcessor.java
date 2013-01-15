@@ -61,10 +61,11 @@ public class CapedwarfSynchHackProcessor extends CapedwarfDeploymentUnitProcesso
         final Module module = unit.getAttachment(Attachments.MODULE);
         if (module != null) {
             final ClassLoader cl = module.getClassLoader();
-            Set<String> callers = new HashSet<String>();
+            final Set<String> callers = new HashSet<String>();
             for (String caller : SYNC_CALLERS) {
                 try {
                     cl.loadClass(caller);
+                    callers.add(caller);
                 } catch (Exception ignore) {
                 }
             }
