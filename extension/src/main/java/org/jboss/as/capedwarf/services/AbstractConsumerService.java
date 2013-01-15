@@ -31,6 +31,8 @@ import javax.jms.Queue;
 import javax.jms.Session;
 
 import org.jboss.as.naming.ManagedReferenceFactory;
+import org.jboss.capedwarf.shared.components.ComponentRegistry;
+import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -60,10 +62,17 @@ public abstract class AbstractConsumerService<T> implements Service<T> {
 
     public void start(StartContext context) throws StartException {
         try {
-            final Connection qc = cast(ConnectionFactory.class, factory.getValue()).createConnection();
+            final ConnectionFactory cf = cast(ConnectionFactory.class, factory.getValue());
+            final Connection qc = cf.createConnection();
             final Session session = qc.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            final MessageConsumer consumer = session.createConsumer(cast(Queue.class, queue.getValue()));
+            final Queue q = cast(Queue.class, queue.getValue());
+            final MessageConsumer consumer = session.createConsumer(q);
             consumer.setMessageListener(createMessageListener());
+
+            ComponentRegistry registry = ComponentRegistry.getInstance();
+            registry.setComponent(Keys.CONNECTION_FACTORY, cf);
+            registry.setComponent(Keys.QUEUE, q);
+
             qc.start();
             connection = qc;
         } catch (Exception e) {
@@ -73,14 +82,20 @@ public abstract class AbstractConsumerService<T> implements Service<T> {
 
     public void stop(StopContext context) {
         try {
-            connection.stop();
-        } catch (JMSException e) {
-            log.error("Error stopping JMS connection.", e);
+            ComponentRegistry registry = ComponentRegistry.getInstance();
+            registry.removeComponent(Keys.CONNECTION_FACTORY);
+            registry.removeComponent(Keys.QUEUE);
         } finally {
             try {
-                connection.close();
+                connection.stop();
             } catch (JMSException e) {
-                log.warn("Error closing JMS connection.", e);
+                log.error("Error stopping JMS connection.", e);
+            } finally {
+                try {
+                    connection.close();
+                } catch (JMSException e) {
+                    log.warn("Error closing JMS connection.", e);
+                }
             }
         }
     }

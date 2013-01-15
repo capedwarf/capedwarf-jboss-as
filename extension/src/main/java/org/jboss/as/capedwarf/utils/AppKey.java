@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012, Red Hat, Inc., and individual contributors
+ * Copyright 2013, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -22,24 +22,22 @@
 
 package org.jboss.as.capedwarf.utils;
 
-import org.jboss.as.naming.deployment.ContextNames;
-import org.jboss.as.naming.deployment.JndiName;
-import org.jboss.as.server.deployment.AttachmentKey;
-import org.jboss.msc.service.ServiceName;
+import org.jboss.capedwarf.shared.components.BaseKey;
 
 /**
- * Constants.
+ * Per app key.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public final class Constants {
-    public static final String CAPEDWARF = "capedwarf";
-    public static final ServiceName CAPEDWARF_NAME = ServiceName.JBOSS.append(CAPEDWARF);
-    // JNDI names
-    static final String JMSXA_JNDI = JndiName.of("java:").append("JmsXA").getAbsoluteName();
-    static final String QUEUE_JNDI = JndiName.of("java:").append("queue").append(CAPEDWARF).getAbsoluteName();
-    public static final ContextNames.BindInfo JMSXA_BIND_INFO = ContextNames.bindInfoFor(JMSXA_JNDI);
-    public static final ContextNames.BindInfo QUEUE_BIND_INFO = ContextNames.bindInfoFor(QUEUE_JNDI);
-    // Log handler service name attachment key
-    public static final AttachmentKey<ServiceName> LOG_HANDLER_KEY = AttachmentKey.create(ServiceName.class);
+public class AppKey<T> extends BaseKey<T> {
+    private final Object slot;
+
+    public AppKey(Class<T> type, String appId, Object slot) {
+        super(type, appId);
+        this.slot = slot;
+    }
+
+    public Object getSlot() {
+        return slot;
+    }
 }

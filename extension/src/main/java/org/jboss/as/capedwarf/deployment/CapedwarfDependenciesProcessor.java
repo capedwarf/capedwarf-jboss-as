@@ -22,10 +22,15 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
 import org.jboss.as.capedwarf.utils.Constants;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.capedwarf.shared.components.Key;
+import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.msc.service.ServiceTarget;
 
 /**
@@ -34,17 +39,27 @@ import org.jboss.msc.service.ServiceTarget;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfDependenciesProcessor extends CapedwarfDeploymentUnitProcessor {
+    @SuppressWarnings("unchecked")
+    private static final List<Key<?>> KEYS = Arrays.asList(
+            Keys.TM,
+            Keys.USER_TX,
+            Keys.CHANNEL,
+            Keys.EXECUTOR_SERVICE,
+            Keys.THREAD_FACTORY,
+            Keys.CACHE_MANAGER,
+            Keys.MAIL_SESSION
+    );
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
         serviceTarget.addDependency(ServletExecutorConsumerService.NAME); // we need queue -- as default gae queue is there by default
-        // serviceTarget.addDependency(IndexingConsumerService.NAME); // we need indexing
-        serviceTarget.addDependency(Constants.CHANNEL_BIND_INFO.getBinderServiceName()); // we need indexing
-        serviceTarget.addDependency(Constants.EXECUTOR_BIND_INFO.getBinderServiceName()); // we need executor
-        serviceTarget.addDependency(Constants.TF_BIND_INFO.getBinderServiceName()); // we need thread factory
         // JMS / JCA
         serviceTarget.addDependency(Constants.JMSXA_BIND_INFO.getBinderServiceName()); // we need jms xa
         serviceTarget.addDependency(Constants.QUEUE_BIND_INFO.getBinderServiceName()); // we need queue
+        // Components
+        for (Key<?> key : KEYS) {
+            serviceTarget.addDependency(Constants.CAPEDWARF_NAME.append(String.valueOf(key.getSlot())));
+        }
     }
 
 }

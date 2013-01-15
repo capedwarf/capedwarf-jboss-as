@@ -131,10 +131,10 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
         }
 
         public void setup(Map<String, Object> properties) {
-            setTL(appCL, "setAppEngineWebXml", appEngineWebXml);
-            setTL(appCL, "setCapedwarfConfiguration", capedwarfConfiguration);
-            setTL(appCL, "setQueueXml", queueXml);
-            setTL(appCL, "setBackendsXml", backendsXml);
+            ConfigurationAware.setAppEngineWebXml(appEngineWebXml);
+            ConfigurationAware.setCapedwarfConfiguration(capedwarfConfiguration);
+            ConfigurationAware.setQueueXml(queueXml);
+            ConfigurationAware.setBackendsXml(backendsXml);
 
             invokeListener(appCL, "setup");
         }
@@ -143,10 +143,10 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
             if (isContextSetup()) {
                 invokeListener(appCL, "teardown");
 
-                resetTL(appCL, "setAppEngineWebXml");
-                resetTL(appCL, "setCapedwarfConfiguration");
-                resetTL(appCL, "setQueueXml");
-                resetTL(appCL, "setBackendsXml");
+                ConfigurationAware.setAppEngineWebXml(null);
+                ConfigurationAware.setCapedwarfConfiguration(null);
+                ConfigurationAware.setQueueXml(null);
+                ConfigurationAware.setBackendsXml(null);
             }
         }
 
@@ -160,14 +160,6 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
 
         protected boolean isContextSetup() {
             return (Boolean) invokeListener(appCL, "isSetup");
-        }
-
-        protected static void setTL(ClassLoader appCL, String method, Object value){
-            invokeListener(appCL, method, new Class[]{Object.class}, new Object[]{value});
-        }
-
-        protected static void resetTL(ClassLoader appCL, String method){
-            setTL(appCL, method, null);
         }
 
         protected static Object invokeListener(ClassLoader appCL, String method) {

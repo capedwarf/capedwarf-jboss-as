@@ -28,17 +28,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jboss.as.naming.ManagedReferenceFactory;
-import org.jboss.as.naming.ManagedReferenceInjector;
-import org.jboss.as.naming.ServiceBasedNamingStore;
-import org.jboss.as.naming.deployment.ContextNames;
-import org.jboss.as.naming.deployment.JndiName;
-import org.jboss.as.naming.service.BinderService;
+import org.jboss.as.capedwarf.utils.AppKey;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.annotation.CompositeIndex;
+import org.jboss.capedwarf.shared.components.ComponentRegistry;
+import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.AnnotationValue;
@@ -46,9 +43,6 @@ import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.FieldInfo;
 import org.jboss.jandex.MethodInfo;
-import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.value.ImmediateValue;
 
 /**
  * Read entity classes for annotations; e.g. allocationSize.
@@ -62,10 +56,6 @@ public class CapedwarfEntityProcessor extends CapedwarfDeploymentUnitProcessor {
     private static final DotName JPA_SEQUENCE_GENERATOR = DotName.createSimple("javax.persistence.SequenceGenerator");
     private static final DotName JDO_ENTITY = DotName.createSimple("javax.jdo.annotations.PersistenceCapable");
     private static final DotName JDO_SEQUENCE = DotName.createSimple("javax.jdo.annotations.Sequence");
-
-    private static JndiName JNDI_NAME = JndiName.of("java:jboss").append(CAPEDWARF).append("persistence");
-    private static JndiName ALLOCATIONS_MAP_JNDI = JNDI_NAME.append("allocationsMap");
-    private static JndiName ENTITIES_JNDI = JNDI_NAME.append("entities");
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final DeploymentUnit unit = phaseContext.getDeploymentUnit();
@@ -162,27 +152,13 @@ public class CapedwarfEntityProcessor extends CapedwarfDeploymentUnitProcessor {
         }
         addTargetClasses(index, JDO_ENTITY, entityClasses);
 
-        // push allocationsMap to JNDI
-        String jndiName = ALLOCATIONS_MAP_JNDI.append(CapedwarfDeploymentMarker.getAppId(unit)).getAbsoluteName();
-        ContextNames.BindInfo bindInfo = ContextNames.bindInfoFor(jndiName);
-        BinderService binder = new BinderService(bindInfo.getBindName());
-        ServiceBuilder<ManagedReferenceFactory> binderBuilder = phaseContext.getServiceTarget().addService(bindInfo.getBinderServiceName(), binder)
-                .addAliases(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(jndiName))
-                .addInjectionValue(new ManagedReferenceInjector<Map>(binder.getManagedObjectInjector()), new ImmediateValue<Map>(allocationsMap))
-                .addDependency(bindInfo.getParentContextServiceName(), ServiceBasedNamingStore.class, binder.getNamingStoreInjector())
-                .setInitialMode(ServiceController.Mode.ACTIVE);
-        binderBuilder.install();
+        String appId = CapedwarfDeploymentMarker.getAppId(unit);
+        ComponentRegistry registry = ComponentRegistry.getInstance();
+        // push allocationsMap to registry
+        registry.setComponent(new AppKey<Map>(Map.class, appId, Keys.ALLOCATIONS_MAP), allocationsMap);
+        // push entities to registry
+        registry.setComponent(new AppKey<Set>(Set.class, appId, Keys.METADATA_SCANNER), entityClasses);
 
-        // push entities to JNDI
-        jndiName = ENTITIES_JNDI.append(CapedwarfDeploymentMarker.getAppId(unit)).getAbsoluteName();
-        bindInfo = ContextNames.bindInfoFor(jndiName);
-        binder = new BinderService(bindInfo.getBindName());
-        binderBuilder = phaseContext.getServiceTarget().addService(bindInfo.getBinderServiceName(), binder)
-                .addAliases(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(jndiName))
-                .addInjectionValue(new ManagedReferenceInjector<Set>(binder.getManagedObjectInjector()), new ImmediateValue<Set>(entityClasses))
-                .addDependency(bindInfo.getParentContextServiceName(), ServiceBasedNamingStore.class, binder.getNamingStoreInjector())
-                .setInitialMode(ServiceController.Mode.ACTIVE);
-        binderBuilder.install();
         // attach to unit
         CapedwarfDeploymentMarker.setEntities(unit, entityClasses);
     }

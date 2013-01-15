@@ -45,11 +45,13 @@ import org.jboss.as.capedwarf.deployment.CapedwarfMuxIdProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfPersistenceModificationProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfPostModuleJPAProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfSubsystemProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfSynchHackProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWebCleanupProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWebComponentsDeploymentProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWebContextProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWeldParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWeldProcessor;
+import org.jboss.as.capedwarf.services.ComponentRegistryService;
 import org.jboss.as.capedwarf.services.OptionalExecutorService;
 import org.jboss.as.capedwarf.services.OptionalThreadFactoryService;
 import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
@@ -57,22 +59,23 @@ import org.jboss.as.capedwarf.services.SimpleThreadsHandler;
 import org.jboss.as.capedwarf.services.ThreadsHandler;
 import org.jboss.as.capedwarf.utils.CapedwarfProperties;
 import org.jboss.as.capedwarf.utils.Constants;
+import org.jboss.as.clustering.infinispan.subsystem.EmbeddedCacheManagerService;
 import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.naming.ManagedReferenceFactory;
-import org.jboss.as.naming.ManagedReferenceInjector;
-import org.jboss.as.naming.ServiceBasedNamingStore;
 import org.jboss.as.naming.deployment.ContextNames;
-import org.jboss.as.naming.service.BinderService;
 import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.Services;
 import org.jboss.as.server.deployment.Phase;
 import org.jboss.as.server.deployment.module.TempFileProviderService;
 import org.jboss.as.threads.ThreadsServices;
+import org.jboss.as.txn.service.TxnServices;
+import org.jboss.capedwarf.shared.components.Key;
+import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.dmr.ModelNode;
 import org.jboss.modules.ModuleLoader;
 import org.jboss.msc.service.Service;
@@ -85,7 +88,6 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.vfs.TempDir;
 import org.jboss.vfs.VFSUtils;
-import org.jgroups.JChannel;
 
 /**
  * Handler responsible for adding the subsystem resource to the model
@@ -132,10 +134,12 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 final ServiceTarget serviceTarget = context.getServiceTarget();
 
                 final ServletExecutorConsumerService consumerService = addQueueConsumer(serviceTarget, newControllers);
-                putChannelToJndi(serviceTarget, newControllers);
+
                 final ThreadsHandler handler = new SimpleThreadsHandler();
-                putExecutorServiceToJndi(serviceTarget, newControllers, handler);
-                putThreadFactoryToJndi(serviceTarget, newControllers, handler);
+                putExecutorServiceToRegistry(serviceTarget, newControllers, handler);
+                putThreadFactoryToRegistry(serviceTarget, newControllers, handler);
+
+                addServicesToRegistry(serviceTarget, newControllers);
 
                 final TempDir tempDir = createTempDir(serviceTarget, newControllers);
 
@@ -156,6 +160,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 10, new CapedwarfCDIExtensionProcessor()); // after Weld portable extensions lookup
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 20, new CapedwarfEntityProcessor()); // adjust as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 30, new CapedwarfPostModuleJPAProcessor()); // after entity processor
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 40, new CapedwarfSynchHackProcessor()); // after module, adjust as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT - 1, new CapedwarfWebContextProcessor()); // before web context lifecycle
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_MODULE_JNDI_BINDINGS - 3, new CapedwarfCacheProcessor()); // after module
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_MODULE_JNDI_BINDINGS - 2, new CapedwarfDependenciesProcessor()); // after logging
@@ -164,6 +169,14 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
             }
         }, OperationContext.Stage.RUNTIME);
 
+    }
+
+    protected static <T> void addComponentRegistryService(final ServiceTarget serviceTarget, final List<ServiceController<?>> newControllers, final Key<T> key, final ServiceName dependencyName) {
+        final ComponentRegistryService<T> service = new ComponentRegistryService<T>(key);
+        final ServiceBuilder<T> builder = serviceTarget.addService(Constants.CAPEDWARF_NAME.append(String.valueOf(key.getSlot())), service);
+        builder.addDependency(dependencyName, key.getType(), service.getInjectedValue());
+        builder.setInitialMode(ServiceController.Mode.ON_DEMAND);
+        newControllers.add(builder.install());
     }
 
     protected static ServletExecutorConsumerService addQueueConsumer(final ServiceTarget serviceTarget, final List<ServiceController<?>> newControllers) {
@@ -177,57 +190,45 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         return consumerService;
     }
 
-    protected void putChannelToJndi(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers) {
-        final ServiceName serviceName = ChannelService.getServiceName(Constants.CAPEDWARF);
-        final String jndiName = Constants.CHANNEL_JNDI;
-        final ContextNames.BindInfo bindInfo = Constants.CHANNEL_BIND_INFO;
-        final BinderService binder = new BinderService(bindInfo.getBindName());
-        final ServiceBuilder<ManagedReferenceFactory> binderBuilder = serviceTarget.addService(bindInfo.getBinderServiceName(), binder)
-                .addAliases(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(jndiName))
-                .addDependency(serviceName, JChannel.class, new ManagedReferenceInjector<JChannel>(binder.getManagedObjectInjector()))
-                .addDependency(bindInfo.getParentContextServiceName(), ServiceBasedNamingStore.class, binder.getNamingStoreInjector())
-                .setInitialMode(ServiceController.Mode.ON_DEMAND);
-        newControllers.add(binderBuilder.install());
-    }
-
-    protected void putExecutorServiceToJndi(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers, ThreadsHandler handler) {
+    protected static void putExecutorServiceToRegistry(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers, ThreadsHandler handler) {
         final ServiceName realExecutor = ThreadsServices.executorName(Constants.CAPEDWARF);
-        final ServiceName optionalExecutor = ServiceName.JBOSS.append(Constants.CAPEDWARF).append("OptionalExecutorService");
+        final ServiceName optionalExecutor = Constants.CAPEDWARF_NAME.append("OptionalExecutorService");
         final OptionalExecutorService oes = new OptionalExecutorService(handler);
         final ServiceBuilder<Executor> executorServiceBuilder = serviceTarget.addService(optionalExecutor, oes);
         executorServiceBuilder.addDependency(ServiceBuilder.DependencyType.OPTIONAL, realExecutor, ExecutorService.class, oes.getExecutorInjectedValue());
         executorServiceBuilder.setInitialMode(ServiceController.Mode.ON_DEMAND);
         newControllers.add(executorServiceBuilder.install());
 
-        final String jndiName = Constants.EXECUTOR_JNDI;
-        final ContextNames.BindInfo bindInfo = Constants.EXECUTOR_BIND_INFO;
-        final BinderService binder = new BinderService(bindInfo.getBindName());
-        final ServiceBuilder<ManagedReferenceFactory> binderBuilder = serviceTarget.addService(bindInfo.getBinderServiceName(), binder)
-                .addAliases(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(jndiName))
-                .addDependency(optionalExecutor, Executor.class, new ManagedReferenceInjector<Executor>(binder.getManagedObjectInjector()))
-                .addDependency(bindInfo.getParentContextServiceName(), ServiceBasedNamingStore.class, binder.getNamingStoreInjector())
-                .setInitialMode(ServiceController.Mode.ON_DEMAND);
-        newControllers.add(binderBuilder.install());
+        addComponentRegistryService(serviceTarget, newControllers, Keys.EXECUTOR_SERVICE, optionalExecutor);
     }
 
-    protected void putThreadFactoryToJndi(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers, ThreadsHandler handler) {
+    protected static void putThreadFactoryToRegistry(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers, ThreadsHandler handler) {
         final ServiceName realTF = ThreadsServices.threadFactoryName(Constants.CAPEDWARF);
-        final ServiceName optionalTF = ServiceName.JBOSS.append(Constants.CAPEDWARF).append("OptionalThreadFactory");
+        final ServiceName optionalTF = Constants.CAPEDWARF_NAME.append("OptionalThreadFactory");
         final OptionalThreadFactoryService otfs = new OptionalThreadFactoryService(handler);
         final ServiceBuilder<ThreadFactory> tfServiceBuilder = serviceTarget.addService(optionalTF, otfs);
         tfServiceBuilder.addDependency(ServiceBuilder.DependencyType.OPTIONAL, realTF, ThreadFactory.class, otfs.getThreadFactoryInjectedValue());
         tfServiceBuilder.setInitialMode(ServiceController.Mode.ON_DEMAND);
         newControllers.add(tfServiceBuilder.install());
 
-        final String jndiName = Constants.TF_JNDI;
-        final ContextNames.BindInfo bindInfo = Constants.TF_BIND_INFO;
-        final BinderService binder = new BinderService(bindInfo.getBindName());
-        final ServiceBuilder<ManagedReferenceFactory> binderBuilder = serviceTarget.addService(bindInfo.getBinderServiceName(), binder)
-                .addAliases(ContextNames.JAVA_CONTEXT_SERVICE_NAME.append(jndiName))
-                .addDependency(optionalTF, ThreadFactory.class, new ManagedReferenceInjector<ThreadFactory>(binder.getManagedObjectInjector()))
-                .addDependency(bindInfo.getParentContextServiceName(), ServiceBasedNamingStore.class, binder.getNamingStoreInjector())
-                .setInitialMode(ServiceController.Mode.ON_DEMAND);
-        newControllers.add(binderBuilder.install());
+        addComponentRegistryService(serviceTarget, newControllers, Keys.THREAD_FACTORY, optionalTF);
+    }
+
+    protected static void addServicesToRegistry(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers) {
+        ServiceName chServiceName = ChannelService.getServiceName(Constants.CAPEDWARF);
+        addComponentRegistryService(serviceTarget, newControllers, Keys.CHANNEL, chServiceName);
+
+        ServiceName tmServiceName = TxnServices.JBOSS_TXN_TRANSACTION_MANAGER;
+        addComponentRegistryService(serviceTarget, newControllers, Keys.TM, tmServiceName);
+
+        ServiceName utServiceName = TxnServices.JBOSS_TXN_USER_TRANSACTION;
+        addComponentRegistryService(serviceTarget, newControllers, Keys.USER_TX, utServiceName);
+
+        ServiceName cmServiceName = EmbeddedCacheManagerService.getServiceName(Constants.CAPEDWARF);
+        addComponentRegistryService(serviceTarget, newControllers, Keys.CACHE_MANAGER, cmServiceName);
+
+        ServiceName mailServiceName = ServiceName.JBOSS.append("mail-session").append("java:jboss/mail/Default"); // TODO
+        addComponentRegistryService(serviceTarget, newControllers, Keys.MAIL_SESSION, mailServiceName);
     }
 
     protected static TempDir createTempDir(final ServiceTarget serviceTarget, final List<ServiceController<?>> newControllers) {
@@ -238,7 +239,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
             throw new IllegalArgumentException("Cannot create temp dir for CapeDwarf sub-system!", e);
         }
 
-        final ServiceBuilder<TempDir> builder = serviceTarget.addService(ServiceName.JBOSS.append(Constants.CAPEDWARF).append("tempDir"), new Service<TempDir>() {
+        final ServiceBuilder<TempDir> builder = serviceTarget.addService(Constants.CAPEDWARF_NAME.append("tempDir"), new Service<TempDir>() {
             public void start(StartContext context) throws StartException {
             }
 
