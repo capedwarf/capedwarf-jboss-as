@@ -48,7 +48,7 @@ public class ServletExecutor {
      * @throws ServletException for any servlet exception
      */
     static void dispatch(final String appId, final String path, final HttpServletRequest request) throws IOException, ServletException {
-        SimpleKey<ServletContext> key = new SimpleKey<ServletContext>(ServletContext.class, appId);
+        SimpleKey<ServletContext> key = new SimpleKey<ServletContext>(appId, ServletContext.class);
         ServletContext context = ComponentRegistry.getInstance().getComponent(key);
         dispatch(appId, path, context, request);
     }

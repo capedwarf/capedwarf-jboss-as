@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jboss.as.capedwarf.utils.AppKey;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -36,6 +35,8 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.annotation.CompositeIndex;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.capedwarf.shared.components.Keys;
+import org.jboss.capedwarf.shared.components.MapKey;
+import org.jboss.capedwarf.shared.components.SetKey;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.AnnotationValue;
@@ -155,9 +156,9 @@ public class CapedwarfEntityProcessor extends CapedwarfDeploymentUnitProcessor {
         String appId = CapedwarfDeploymentMarker.getAppId(unit);
         ComponentRegistry registry = ComponentRegistry.getInstance();
         // push allocationsMap to registry
-        registry.setComponent(new AppKey<Map>(Map.class, appId, Keys.ALLOCATIONS_MAP), allocationsMap);
+        registry.setComponent(new MapKey<String, Integer>(appId, Keys.ALLOCATIONS_MAP), allocationsMap);
         // push entities to registry
-        registry.setComponent(new AppKey<Set>(Set.class, appId, Keys.METADATA_SCANNER), entityClasses);
+        registry.setComponent(new SetKey<String>(appId, Keys.METADATA_SCANNER), entityClasses);
 
         // attach to unit
         CapedwarfDeploymentMarker.setEntities(unit, entityClasses);

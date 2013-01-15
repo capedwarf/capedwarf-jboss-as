@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.jboss.as.capedwarf.utils.AppKey;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -35,6 +34,7 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.capedwarf.shared.components.Key;
 import org.jboss.capedwarf.shared.components.Keys;
+import org.jboss.capedwarf.shared.components.SetKey;
 import org.jboss.modules.Module;
 
 /**
@@ -71,7 +71,7 @@ public class CapedwarfSynchHackProcessor extends CapedwarfDeploymentUnitProcesso
             }
             if (callers.isEmpty() == false) {
                 String appId = CapedwarfDeploymentMarker.getAppId(unit);
-                Key<Set> key = new AppKey<Set>(Set.class, appId, Keys.SYNC_HACK);
+                Key<Set<String>> key = new SetKey<String>(appId, Keys.SYNC_HACK);
                 ComponentRegistry.getInstance().setComponent(key, callers);
             }
         }

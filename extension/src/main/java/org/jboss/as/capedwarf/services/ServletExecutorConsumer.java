@@ -30,10 +30,10 @@ import javax.jms.MessageListener;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.jboss.capedwarf.shared.components.AbstractKey;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.capedwarf.shared.components.Key;
 import org.jboss.capedwarf.shared.components.Keys;
+import org.jboss.capedwarf.shared.components.MapKey;
 import org.jboss.capedwarf.shared.components.SimpleKey;
 import org.jboss.capedwarf.shared.jms.MessageConstants;
 import org.jboss.capedwarf.shared.jms.ServletRequestCreator;
@@ -69,27 +69,19 @@ class ServletExecutorConsumer implements MessageListener {
         return ModuleIdentifier.fromString(mi);
     }
 
-    @SuppressWarnings("unchecked")
     private HttpServletRequest createServletRequest(final String appId, ClassLoader cl, Message message, ServletContext context) throws Exception {
         final String factoryClass = getValue(message, MessageConstants.FACTORY);
         ServletRequestCreator factory;
-        final Key<Map> key = new AbstractKey<Map>(Map.class) {
-            public String getAppId() {
-                return appId;
-            }
-
-            public Object getSlot() {
-                return Keys.SERVLET_REQUEST_CREATOR;
-            }
-        };
+        final Key<Map<String, ServletRequestCreator>> key = new MapKey<String, ServletRequestCreator>(appId, Keys.SERVLET_REQUEST_CREATOR);
         ComponentRegistry registry = ComponentRegistry.getInstance();
-        Map<String, ServletRequestCreator> map = new HashMap();
+        Map<String, ServletRequestCreator> map = new HashMap<String, ServletRequestCreator>();
         Map<String, ServletRequestCreator> factories = registry.putIfAbsent(key, map);
         if (factories == null) {
             factories = map;
         }
         factory = factories.get(factoryClass);
         if (factory == null) {
+            @SuppressWarnings("unchecked")
             Class<ServletRequestCreator> clazz = (Class<ServletRequestCreator>) cl.loadClass(factoryClass);
             factory = clazz.newInstance();
             factories.put(factoryClass, factory);
@@ -106,7 +98,7 @@ class ServletExecutorConsumer implements MessageListener {
             }
 
             final String appId = getValue(message, MessageConstants.APP_ID);
-            final SimpleKey<ServletContext> key = new SimpleKey<ServletContext>(ServletContext.class, appId);
+            final SimpleKey<ServletContext> key = new SimpleKey<ServletContext>(appId, ServletContext.class);
             final ServletContext context = ComponentRegistry.getInstance().getComponent(key);
             if (context == null) {
                 log.warn("No matching ServletContext, app (" + appId + ") already undeployed?");
