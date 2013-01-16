@@ -80,7 +80,7 @@
         <version.javax.jws.jsr181-api>1.0-MR1</version.javax.jws.jsr181-api>
         <version.javax.mail>1.4.4</version.javax.mail>
         <version.javax.validation>1.0.0.GA</version.javax.validation>
-        <version.org.hibernate.search>4.2.0.CR1</version.org.hibernate.search>
+        <version.org.hibernate.search>4.2.0.Final</version.org.hibernate.search>
         <version.org.bouncycastle>1.47</version.org.bouncycastle>
         <version.junit>4.10</version.junit>
         <version.org.apache.lucene>3.6.2</version.org.apache.lucene>
