@@ -32,9 +32,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.capedwarf.shared.components.Key;
-import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.capedwarf.shared.components.MapKey;
 import org.jboss.capedwarf.shared.components.SimpleKey;
+import org.jboss.capedwarf.shared.components.Slot;
 import org.jboss.capedwarf.shared.jms.MessageConstants;
 import org.jboss.capedwarf.shared.jms.ServletRequestCreator;
 import org.jboss.logging.Logger;
@@ -72,7 +72,7 @@ class ServletExecutorConsumer implements MessageListener {
     private HttpServletRequest createServletRequest(final String appId, ClassLoader cl, Message message, ServletContext context) throws Exception {
         final String factoryClass = getValue(message, MessageConstants.FACTORY);
         ServletRequestCreator factory;
-        final Key<Map<String, ServletRequestCreator>> key = new MapKey<String, ServletRequestCreator>(appId, Keys.SERVLET_REQUEST_CREATOR);
+        final Key<Map<String, ServletRequestCreator>> key = new MapKey<String, ServletRequestCreator>(appId, Slot.SERVLET_REQUEST_CREATOR);
         ComponentRegistry registry = ComponentRegistry.getInstance();
         Map<String, ServletRequestCreator> map = new HashMap<String, ServletRequestCreator>();
         Map<String, ServletRequestCreator> factories = registry.putIfAbsent(key, map);

@@ -33,8 +33,8 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.capedwarf.shared.components.Key;
-import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.capedwarf.shared.components.SetKey;
+import org.jboss.capedwarf.shared.components.Slot;
 import org.jboss.modules.Module;
 
 /**
@@ -71,7 +71,7 @@ public class CapedwarfSynchHackProcessor extends CapedwarfDeploymentUnitProcesso
             }
             if (callers.isEmpty() == false) {
                 String appId = CapedwarfDeploymentMarker.getAppId(unit);
-                Key<Set<String>> key = new SetKey<String>(appId, Keys.SYNC_HACK);
+                Key<Set<String>> key = new SetKey<String>(appId, Slot.SYNC_HACK);
                 ComponentRegistry.getInstance().setComponent(key, callers);
             }
         }

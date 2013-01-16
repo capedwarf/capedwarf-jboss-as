@@ -34,9 +34,9 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.annotation.CompositeIndex;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
-import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.capedwarf.shared.components.MapKey;
 import org.jboss.capedwarf.shared.components.SetKey;
+import org.jboss.capedwarf.shared.components.Slot;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.AnnotationValue;
@@ -156,9 +156,9 @@ public class CapedwarfEntityProcessor extends CapedwarfDeploymentUnitProcessor {
         String appId = CapedwarfDeploymentMarker.getAppId(unit);
         ComponentRegistry registry = ComponentRegistry.getInstance();
         // push allocationsMap to registry
-        registry.setComponent(new MapKey<String, Integer>(appId, Keys.ALLOCATIONS_MAP), allocationsMap);
+        registry.setComponent(new MapKey<String, Integer>(appId, Slot.ALLOCATIONS_MAP), allocationsMap);
         // push entities to registry
-        registry.setComponent(new SetKey<String>(appId, Keys.METADATA_SCANNER), entityClasses);
+        registry.setComponent(new SetKey<String>(appId, Slot.METADATA_SCANNER), entityClasses);
 
         // attach to unit
         CapedwarfDeploymentMarker.setEntities(unit, entityClasses);
