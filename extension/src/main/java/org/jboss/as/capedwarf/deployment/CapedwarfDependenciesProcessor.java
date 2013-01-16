@@ -25,12 +25,15 @@ package org.jboss.as.capedwarf.deployment;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
 import org.jboss.as.capedwarf.utils.Constants;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.capedwarf.shared.components.Key;
 import org.jboss.capedwarf.shared.components.Keys;
+import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 
 /**
@@ -50,6 +53,12 @@ public class CapedwarfDependenciesProcessor extends CapedwarfDeploymentUnitProce
             Keys.MAIL_SESSION
     );
 
+    private final List<ServiceName> keys = Lists.transform(KEYS, new Function<Key<?>, ServiceName>() {
+        public ServiceName apply(Key<?> key) {
+            return Constants.CAPEDWARF_NAME.append(String.valueOf(key.getSlot()));
+        }
+    });
+
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
         serviceTarget.addDependency(ServletExecutorConsumerService.NAME); // we need queue -- as default gae queue is there by default
@@ -57,8 +66,8 @@ public class CapedwarfDependenciesProcessor extends CapedwarfDeploymentUnitProce
         serviceTarget.addDependency(Constants.JMSXA_BIND_INFO.getBinderServiceName()); // we need jms xa
         serviceTarget.addDependency(Constants.QUEUE_BIND_INFO.getBinderServiceName()); // we need queue
         // Components
-        for (Key<?> key : KEYS) {
-            serviceTarget.addDependency(Constants.CAPEDWARF_NAME.append(String.valueOf(key.getSlot())));
+        for (ServiceName sn : keys) {
+            serviceTarget.addDependency(sn);
         }
     }
 
