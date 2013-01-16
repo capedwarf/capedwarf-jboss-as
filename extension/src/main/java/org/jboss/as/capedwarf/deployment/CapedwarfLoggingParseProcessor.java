@@ -36,6 +36,7 @@ import org.jboss.as.logging.CommonAttributes;
 import org.jboss.as.logging.LoggingDeploymentUnitProcessor;
 import org.jboss.as.logging.LoggingExtension;
 import org.jboss.as.logging.stdio.LogContextStdioContextSelector;
+import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -56,6 +57,7 @@ import org.jboss.vfs.VirtualFile;
  * Parse logging config.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
 public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlParseProcessor {
     private static final char DOT = '.';
@@ -63,6 +65,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
     private static final String LOGGER_DOT = LOGGER + DOT;
     private static final String USE_PARENT_HANDLERS = ".useParentHandlers";
     private static final String LOGGING = "\"java.util.logging.config.file\"";
+    private static final AttachmentKey<PropertyConfigurator> PROPERTY_CONFIGURATOR_KEY = AttachmentKey.create(PropertyConfigurator.class);
 
     private final static Set<String> excludedLoggers = new HashSet<String>();
     static {
@@ -146,8 +149,13 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             }
             // Create a new log context for the deployment
             final LogContext logContext = LogContext.create();
+
             // Configure the logger
-            new PropertyConfigurator(logContext).configure(fixed);
+            PropertyConfigurator propertyConfigurator = new PropertyConfigurator(logContext);
+            propertyConfigurator.configure(fixed);
+            // Must keep reference to the configurator somewhere, otherwise LoggerNodes will not be reconfigured when they are recreated
+            unit.putAttachment(PROPERTY_CONFIGURATOR_KEY, propertyConfigurator);
+
             // change stderr level
             applyStdioContext(logContext);
             // add console, file handlers
