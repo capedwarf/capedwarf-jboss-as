@@ -45,6 +45,7 @@ import org.jboss.logmanager.Level;
 import org.jboss.logmanager.LogContext;
 import org.jboss.logmanager.Logger;
 import org.jboss.logmanager.PropertyConfigurator;
+import org.jboss.logmanager.handlers.AsyncHandler;
 import org.jboss.logmanager.handlers.ConsoleHandler;
 import org.jboss.logmanager.handlers.FileHandler;
 import org.jboss.modules.Module;
@@ -65,6 +66,8 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
     private static final String LOGGER_DOT = LOGGER + DOT;
     private static final String USE_PARENT_HANDLERS = ".useParentHandlers";
     private static final String LOGGING = "\"java.util.logging.config.file\"";
+    private static final String ASYNC = "ASYNC";
+
     private static final AttachmentKey<PropertyConfigurator> PROPERTY_CONFIGURATOR_KEY = AttachmentKey.create(PropertyConfigurator.class);
 
     private final static Set<String> excludedLoggers = new HashSet<String>();
@@ -103,22 +106,29 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
     protected void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
         final Module module = unit.getAttachment(Attachments.MODULE);
         if (module != null) {
+            // async file marker
+            final VirtualFile async = root.getChild("WEB-INF/logging-async.properties");
+            final boolean asyncExists = async.exists();
             // Always set this - for CapeDwarf subsystem to control logging,
             // as there might be logging config files, but no sys property
             final Properties fixed = new Properties();
-            // Add the capedwarf handler to the root logger
             final String capedwarfLogger = Constants.CAPEDWARF.toUpperCase();
-            final String rootHandlersKey = "logger.handlers";
-            // Just add the configuration to the fixed properties and let the PropertyConfigurator handle the rest
-            if (fixed.contains(rootHandlersKey)) {
-                fixed.put(rootHandlersKey, fixed.get(rootHandlersKey) + "," + capedwarfLogger);
+            // Add the capedwarf handler to the root logger
+            if (asyncExists) {
+                fixed.put("logger.handlers", ASYNC + "," + capedwarfLogger);
+                defineHandler(fixed, ASYNC, AsyncHandler.class, "org.jboss.logmanager");
+                // additional async config
+                Properties ap = loadLoggingProperties(async);
+                addHandlerProperty(fixed, ASYNC, "properties", ap.getProperty("properties", "enabled,queueLength,overflowAction"));
+                addHandlerProperty(fixed, ASYNC, "constructorProperties", ap.getProperty("constructorProperties", "queueLength"));
+                addHandlerProperty(fixed, ASYNC, "enabled", ap.getProperty("enabled", "true"));
+                addHandlerProperty(fixed, ASYNC, "queueLength", ap.getProperty("queueLength", "1024"));
+                addHandlerProperty(fixed, ASYNC, "overflowAction", ap.getProperty("overflowAction", "BLOCK"));
             } else {
-                fixed.put(rootHandlersKey, capedwarfLogger);
+                // define root handlers
+                fixed.put("logger.handlers", capedwarfLogger);
             }
-            // Configure the capedwarf handler
-            fixed.put(getPropertyKey("handler", capedwarfLogger), org.jboss.capedwarf.shared.log.Logger.class.getName());
-            fixed.put(getPropertyKey("handler", capedwarfLogger, "module"), "org.jboss.capedwarf.shared");
-            fixed.put(getPropertyKey("handler", capedwarfLogger, "level"), "ALL");
+            defineHandler(fixed, capedwarfLogger, org.jboss.capedwarf.shared.log.Logger.class, "org.jboss.capedwarf.shared");
             // exclude AS7, CapeDwarf internals
             buildExcludedLoggers(fixed);
             // check for more fine-grained logging config
@@ -160,12 +170,23 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             applyStdioContext(logContext);
             // add console, file handlers
             //noinspection unchecked
-            addHandlers(logContext, ConsoleHandler.class, FileHandler.class);
+            addHandlers(logContext, asyncExists, ConsoleHandler.class, FileHandler.class);
             // register log context
             getContextSelector().registerLogContext(module.getClassLoader(), logContext);
             // Add as attachment / marker
             unit.putAttachment(LoggingDeploymentUnitProcessor.LOG_CONTEXT_KEY, logContext);
         }
+    }
+
+    protected void addHandlerProperty(Properties fixed, String handler, String key, String value) {
+        fixed.put(getPropertyKey("handler", handler, key), value);
+    }
+
+    protected void defineHandler(Properties fixed, String logger, Class<? extends Handler> handlerClass, String module) {
+        // Configure the handler
+        fixed.put(getPropertyKey("handler", logger), handlerClass.getName());
+        addHandlerProperty(fixed, logger, "module", module);
+        addHandlerProperty(fixed, logger, "level", "ALL");
     }
 
     protected StdioContext applyStdioContext(final LogContext logContext) {
@@ -185,12 +206,12 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         return stdioContext;
     }
 
-    protected void addHandlers(final LogContext logContext, final Class<? extends Handler>... handlerTypes) {
+    protected void addHandlers(final LogContext logContext, boolean async, final Class<? extends Handler>... handlerTypes) {
         final LogContext sysLogContext = LogContext.getSystemLogContext();
         final Logger systemRoot = sysLogContext.getLogger(CommonAttributes.ROOT_LOGGER_NAME);
         final Handler[] handlers = systemRoot.getHandlers();
         if (handlers != null && handlers.length > 0) {
-            final Logger currentRoot = logContext.getLogger(CommonAttributes.ROOT_LOGGER_NAME);
+            final Logger currentRoot = (async ? logContext.getLogger(ASYNC) : logContext.getLogger(CommonAttributes.ROOT_LOGGER_NAME));
             for (Handler handler : handlers) {
                 for (Class<? extends Handler> handlerType : handlerTypes) {
                     if (handlerType.isInstance(handler)) {
