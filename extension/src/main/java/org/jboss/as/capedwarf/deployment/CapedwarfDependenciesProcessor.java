@@ -61,7 +61,8 @@ public class CapedwarfDependenciesProcessor extends CapedwarfDeploymentUnitProce
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
-        serviceTarget.addDependency(ServletExecutorConsumerService.NAME); // we need queue -- as default gae queue is there by default
+        // we need queue -- as default gae queue is there by default
+        serviceTarget.addDependency(ServletExecutorConsumerService.NAME);
         // JMS / JCA
         serviceTarget.addDependency(Constants.JMSXA_BIND_INFO.getBinderServiceName()); // we need jms xa
         serviceTarget.addDependency(Constants.QUEUE_BIND_INFO.getBinderServiceName()); // we need queue

@@ -77,6 +77,9 @@ import org.jboss.as.txn.service.TxnServices;
 import org.jboss.capedwarf.shared.components.Key;
 import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.dmr.ModelNode;
+import org.jboss.modules.Module;
+import org.jboss.modules.ModuleIdentifier;
+import org.jboss.modules.ModuleLoadException;
 import org.jboss.modules.ModuleLoader;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceBuilder;
@@ -129,6 +132,9 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final CapedwarfProperties properties = new CapedwarfProperties(System.getProperties());
         System.setProperties(properties); // override global properties, w/o synched code ...
 
+        // register custom URLStreamHandlerFactory
+        registerURLStreamHandlerFactory();
+
         context.addStep(new AbstractDeploymentChainStep() {
             public void execute(DeploymentProcessorTarget processorTarget) {
                 final ServiceTarget serviceTarget = context.getServiceTarget();
@@ -169,6 +175,16 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
             }
         }, OperationContext.Stage.RUNTIME);
 
+    }
+
+    protected static void registerURLStreamHandlerFactory() throws OperationFailedException {
+        try {
+            ModuleLoader loader = Module.getBootModuleLoader();
+            Module capedwarf = loader.loadModule(ModuleIdentifier.create("org.jboss.capedwarf"));
+            Module.registerURLStreamHandlerFactoryModule(capedwarf);
+        } catch (ModuleLoadException e) {
+            throw new OperationFailedException(e.getMessage());
+        }
     }
 
     protected static <T> void addComponentRegistryService(final ServiceTarget serviceTarget, final List<ServiceController<?>> newControllers, final Key<T> key, final ServiceName dependencyName) {
