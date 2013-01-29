@@ -24,6 +24,7 @@ package org.jboss.as.capedwarf.extension;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -76,10 +77,10 @@ import org.jboss.as.threads.ThreadsServices;
 import org.jboss.as.txn.service.TxnServices;
 import org.jboss.capedwarf.shared.components.Key;
 import org.jboss.capedwarf.shared.components.Keys;
+import org.jboss.capedwarf.shared.url.URLHack;
 import org.jboss.dmr.ModelNode;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
-import org.jboss.modules.ModuleLoadException;
 import org.jboss.modules.ModuleLoader;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceBuilder;
@@ -179,10 +180,19 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     protected static void registerURLStreamHandlerFactory() throws OperationFailedException {
         try {
-            ModuleLoader loader = Module.getBootModuleLoader();
-            Module capedwarf = loader.loadModule(ModuleIdentifier.create("org.jboss.capedwarf"));
-            Module.registerURLStreamHandlerFactoryModule(capedwarf);
-        } catch (ModuleLoadException e) {
+            URLHack.inLock(new Callable<Void>() {
+                public Void call() throws Exception {
+                    // make sure we clear these protocols
+                    URLHack.removeHandlerNoLock("http");
+                    URLHack.removeHandlerNoLock("https");
+                    // register our custom url stream handler factory
+                    ModuleLoader loader = Module.getBootModuleLoader();
+                    Module capedwarf = loader.loadModule(ModuleIdentifier.create("org.jboss.capedwarf"));
+                    Module.registerURLStreamHandlerFactoryModule(capedwarf);
+                    return null;
+                }
+            });
+        } catch (Exception e) {
             throw new OperationFailedException(e.getMessage());
         }
     }
