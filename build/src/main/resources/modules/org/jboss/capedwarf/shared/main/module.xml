@@ -41,6 +41,7 @@
         <module name="org.jboss.common-core"/>
         <module name="org.jboss.logmanager"/>
         <module name="org.infinispan"/>
+        <module name="org.apache.httpcomponents"/>
         <module name="com.google.guava"/>
     </dependencies>
 </module>

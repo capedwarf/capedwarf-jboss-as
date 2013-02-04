@@ -31,6 +31,7 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.jms.Connection;
 
+import org.apache.http.client.HttpClient;
 import org.jboss.as.capedwarf.deployment.CapedwarfAppInfoParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCDIExtensionProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCacheProcessor;
@@ -53,6 +54,7 @@ import org.jboss.as.capedwarf.deployment.CapedwarfWebContextProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWeldParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWeldProcessor;
 import org.jboss.as.capedwarf.services.ComponentRegistryService;
+import org.jboss.as.capedwarf.services.HttpClientService;
 import org.jboss.as.capedwarf.services.OptionalExecutorService;
 import org.jboss.as.capedwarf.services.OptionalThreadFactoryService;
 import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
@@ -145,6 +147,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 final ThreadsHandler handler = new SimpleThreadsHandler();
                 putExecutorServiceToRegistry(serviceTarget, newControllers, handler);
                 putThreadFactoryToRegistry(serviceTarget, newControllers, handler);
+                addHttpClient(serviceTarget, newControllers);
 
                 addServicesToRegistry(serviceTarget, newControllers);
 
@@ -237,6 +240,13 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         newControllers.add(tfServiceBuilder.install());
 
         addComponentRegistryService(serviceTarget, newControllers, Keys.THREAD_FACTORY, optionalTF);
+    }
+
+    protected static void addHttpClient(final ServiceTarget serviceTarget, final List<ServiceController<?>> newControllers) {
+        final HttpClientService service = new HttpClientService();
+        final ServiceBuilder<HttpClient> builder = serviceTarget.addService(Constants.CAPEDWARF_NAME.append(String.valueOf(Keys.HTTP_CLIENT.getSlot())), service);
+        builder.setInitialMode(ServiceController.Mode.ON_DEMAND);
+        newControllers.add(builder.install());
     }
 
     protected static void addServicesToRegistry(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers) {

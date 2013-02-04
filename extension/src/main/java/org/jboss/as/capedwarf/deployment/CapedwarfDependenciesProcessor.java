@@ -50,7 +50,8 @@ public class CapedwarfDependenciesProcessor extends CapedwarfDeploymentUnitProce
             Keys.EXECUTOR_SERVICE,
             Keys.THREAD_FACTORY,
             Keys.CACHE_MANAGER,
-            Keys.MAIL_SESSION
+            Keys.MAIL_SESSION,
+            Keys.HTTP_CLIENT
     );
 
     private final List<ServiceName> keys = Lists.transform(KEYS, new Function<Key<?>, ServiceName>() {

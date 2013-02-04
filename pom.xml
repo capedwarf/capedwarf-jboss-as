@@ -78,6 +78,7 @@
         <version.org.hibernate.search>4.2.0.Final</version.org.hibernate.search>
         <version.org.bouncycastle>1.47</version.org.bouncycastle>
         <version.junit>4.10</version.junit>
+        <version.org.apache.httpcomponents>4.2.1</version.org.apache.httpcomponents>
         <version.org.apache.lucene>3.6.2</version.org.apache.lucene>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>1.0.1.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>
         <version.org.infinispan>5.2.0.CR1</version.org.infinispan>
@@ -272,6 +273,18 @@
             </dependency>
 
             <!-- External Dependencies -->
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${version.org.apache.httpcomponents}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 
             <dependency>
                 <groupId>com.google.guava</groupId>

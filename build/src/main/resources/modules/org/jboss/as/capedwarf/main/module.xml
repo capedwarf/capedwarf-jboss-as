@@ -65,6 +65,7 @@
         <module name="org.infinispan.query"/>
         <module name="org.hibernate.search"/>
         <module name="org.jboss.capedwarf.shared"/>
+        <module name="org.apache.httpcomponents"/>
         <module name="com.google.guava"/>
     </dependencies>
 </module>
