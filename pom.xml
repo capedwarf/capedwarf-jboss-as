@@ -66,22 +66,15 @@
         <version.org.jboss.capedwarf.shared>1.0.0-SNAPSHOT</version.org.jboss.capedwarf.shared>
         <version.org.jboss.capedwarf>1.0.0-SNAPSHOT</version.org.jboss.capedwarf>
         <version.com.google.appengine>1.7.4</version.com.google.appengine>
-        <version.com.google.guava>11.0.2</version.com.google.guava>
-        <version.javax.activation>1.1.1</version.javax.activation>
-        <version.javax.enterprise>1.0-SP4</version.javax.enterprise>
-        <version.javax.faces>1.2_15-jbossorg-2</version.javax.faces>
-        <version.javax.inject.javax.inject>1</version.javax.inject.javax.inject>
+        <version.com.google.guava>13.0.1</version.com.google.guava>
         <version.javax.jdo.api>3.0</version.javax.jdo.api>
-        <version.javax.jws.jsr181-api>1.0-MR1</version.javax.jws.jsr181-api>
-        <version.javax.mail>1.4.4</version.javax.mail>
-        <version.javax.validation>1.0.0.GA</version.javax.validation>
         <version.org.hibernate.search>4.2.0.Final</version.org.hibernate.search>
         <version.org.bouncycastle>1.47</version.org.bouncycastle>
         <version.junit>4.10</version.junit>
         <version.org.apache.httpcomponents>4.2.1</version.org.apache.httpcomponents>
         <version.org.apache.lucene>3.6.2</version.org.apache.lucene>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>1.0.1.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>
-        <version.org.infinispan>5.2.0.CR1</version.org.infinispan>
+        <version.org.infinispan>5.2.0.Final</version.org.infinispan>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
         <version.org.codehaus.exec>1.2.1</version.org.codehaus.exec>
         <version.org.jboss.maven.transformer>1.0.0.Beta4</version.org.jboss.maven.transformer>
@@ -92,10 +85,8 @@
 
         <version.org.jboss.jandex>1.0.3.Final</version.org.jboss.jandex>
         <version.org.jboss.logging.jboss-logging>3.1.2.GA</version.org.jboss.logging.jboss-logging>
-        <version.org.jboss.logging.jboss-logging-processor>1.1.0.Beta1</version.org.jboss.logging.jboss-logging-processor>
-        <version.org.jboss.logmanager.jboss-logmanager>1.4.0.Beta1</version.org.jboss.logmanager.jboss-logmanager>
-        <version.org.jboss.logmanager.log4j-jboss-logmanager>1.0.1.Final</version.org.jboss.logmanager.log4j-jboss-logmanager>
-        <version.org.jboss.spec.javax.jms.jboss-jms-api_1.1_spec>1.0.1.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_1.1_spec>
+        <version.org.jboss.logging.jboss-logging-processor>1.1.0.Final</version.org.jboss.logging.jboss-logging-processor>
+        <version.org.jboss.logmanager.jboss-logmanager>1.4.0.Final</version.org.jboss.logmanager.jboss-logmanager>
 
         <version.org.jivesoftware.smack>3.1.0</version.org.jivesoftware.smack>
         <version.org.picketbox>4.0.14.Final</version.org.picketbox>
@@ -105,18 +96,9 @@
         <version.org.openid4java>0.9.6</version.org.openid4java>
         <version.net.sourceforge.nekohtml>1.9.10</version.net.sourceforge.nekohtml>
         <version.com.google.code.guice>2.0</version.com.google.code.guice>
-
         <version.rhino.js>1.7R2</version.rhino.js>
 
-        <!-- Needs to be set explicitely to match with org.jacoco:org.jacoco.ant - see testsuite. -->
-        <version.xml.maven.plugin>1.0</version.xml.maven.plugin>
 
-        <!-- Surefire args -->
-        <surefire.jpda.args/>
-        <surefire.system.args>-da ${surefire.jpda.args}</surefire.system.args>
-
-        <!-- Checkstyle configuration -->
-        <linkXRef>false</linkXRef>
     </properties>
 
     <modules>
@@ -170,11 +152,6 @@
                     <version>${version.shade.plugin}</version>
                 </plugin>
 
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>xml-maven-plugin</artifactId>
-                    <version>${version.xml.maven.plugin}</version>
-                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -291,66 +268,6 @@
                 <artifactId>guava</artifactId>
                 <version>${version.com.google.guava}</version>
                 <scope>provided</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.code.findbugs</groupId>
-                        <artifactId>jsr305</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-
-            <dependency>
-                <groupId>javax.activation</groupId>
-                <artifactId>activation</artifactId>
-                <version>${version.javax.activation}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.enterprise</groupId>
-                <artifactId>cdi-api</artifactId>
-                <version>${version.javax.enterprise}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.jboss.interceptor</groupId>
-                        <artifactId>jboss-interceptor-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.annotation</groupId>
-                        <artifactId>jsr250-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.faces</groupId>
-                <artifactId>jsf-api</artifactId>
-                <version>${version.javax.faces}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.faces</groupId>
-                <artifactId>jsf-impl</artifactId>
-                <version>${version.javax.faces}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>${version.javax.inject.javax.inject}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.jws</groupId>
-                <artifactId>jsr181-api</artifactId>
-                <version>${version.javax.jws.jsr181-api}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
-                <version>${version.javax.mail}</version>
-                <scope>provided</scope>
             </dependency>
 
 
@@ -400,7 +317,6 @@
 
 
             <!-- This dependency needs to be managed due to the dependency convergence enforcer rule -->
-
 
             <dependency>
                 <groupId>javax.jdo</groupId>
@@ -462,65 +378,19 @@
                 <groupId>org.hibernate.javax.persistence</groupId>
                 <artifactId>hibernate-jpa-2.0-api</artifactId>
                 <version>${version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.infinispan</groupId>
                 <artifactId>infinispan-core</artifactId>
                 <version>${version.org.infinispan}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.jgroups</groupId>
-                        <artifactId>jgroups</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss.javaee</groupId>
-                        <artifactId>jboss-transaction-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss.marshalling</groupId>
-                        <artifactId>jboss-marshalling</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss.marshalling</groupId>
-                        <artifactId>jboss-marshalling-river</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss.logging</groupId>
-                        <artifactId>jboss-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss</groupId>
-                        <artifactId>jandex</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.woodstox</groupId>
-                        <artifactId>woodstox-core-asl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.woodstox</groupId>
-                        <artifactId>woodstox-core-asl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.woodstox</groupId>
-                        <artifactId>stax2-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss</groupId>
-                        <artifactId>staxmapper</artifactId>
-                    </exclusion>
-                </exclusions>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.infinispan</groupId>
                 <artifactId>infinispan-cachestore-jdbc</artifactId>
                 <version>${version.org.infinispan}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.infinispan</groupId>
-                        <artifactId>infinispan-core</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.infinispan</groupId>
@@ -569,13 +439,6 @@
 
 
             <dependency>
-                <groupId>org.jboss.spec.javax.jms</groupId>
-                <artifactId>jboss-jms-api_1.1_spec</artifactId>
-                <version>${version.org.jboss.spec.javax.jms.jboss-jms-api_1.1_spec}</version>
-            </dependency>
-
-
-            <dependency>
                 <groupId>jivesoftware</groupId>
                 <artifactId>smack</artifactId>
                 <version>${version.org.jivesoftware.smack}</version>
@@ -594,17 +457,17 @@
                 </exclusions>
             </dependency>
 
-			<dependency>
-				<groupId>net.sourceforge.nekohtml</groupId>
-				<artifactId>nekohtml</artifactId>
-				<version>${version.net.sourceforge.nekohtml}</version>				
-			</dependency>
+            <dependency>
+                <groupId>net.sourceforge.nekohtml</groupId>
+                <artifactId>nekohtml</artifactId>
+                <version>${version.net.sourceforge.nekohtml}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>com.google.code.guice</groupId>
-				<artifactId>guice</artifactId>
-				<version>${version.com.google.code.guice}</version>
-			</dependency>
+            <dependency>
+                <groupId>com.google.code.guice</groupId>
+                <artifactId>guice</artifactId>
+                <version>${version.com.google.code.guice}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.picketbox</groupId>
