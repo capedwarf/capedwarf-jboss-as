@@ -40,7 +40,7 @@ import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
-import org.jboss.logmanager.ContextClassLoaderLogContextSelector;
+import org.jboss.logmanager.ClassLoaderLogContextSelector;
 import org.jboss.logmanager.Level;
 import org.jboss.logmanager.LogContext;
 import org.jboss.logmanager.Logger;
@@ -87,15 +87,15 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         excludedLoggers.add("org.picketlink");
     }
 
-    private ContextClassLoaderLogContextSelector contextSelector;
+    private ClassLoaderLogContextSelector contextSelector;
 
-    protected synchronized ContextClassLoaderLogContextSelector getContextSelector() {
+    protected synchronized ClassLoaderLogContextSelector getContextSelector() {
         if (contextSelector == null) {
             try {
                 Class<LoggingExtension> cle = LoggingExtension.class;
                 Field cs = cle.getDeclaredField("CONTEXT_SELECTOR");
                 cs.setAccessible(true);
-                contextSelector = (ContextClassLoaderLogContextSelector) cs.get(null);
+                contextSelector = (ClassLoaderLogContextSelector) cs.get(null);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
