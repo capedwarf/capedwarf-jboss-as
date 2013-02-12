@@ -19,6 +19,7 @@ import org.jboss.metadata.web.spec.FilterMetaData;
 import org.jboss.metadata.web.spec.FiltersMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.LoginConfigMetaData;
+import org.jboss.metadata.web.spec.MultipartConfigMetaData;
 import org.jboss.metadata.web.spec.SecurityConstraintMetaData;
 import org.jboss.metadata.web.spec.ServletMappingMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
@@ -47,7 +48,11 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String AUTH_SERVLET_NAME = "authservlet";
     private static final String ADMIN_SERVLET_NAME = "CapedwarfAdminServlet";
     private static final String CHANNEL_SERVLET_NAME = "ChannelServlet";
+    private static final String UPLOAD_SERVLET_NAME = "UploadServlet";
     private static final String[] ADMIN_SERVLET_URL_MAPPING = {"/_ah/admin/*", "/_ah/admin/"};
+    private static final String[] AUTH_SERVLET_URL_MAPPING = {"/_ah/auth/*"};
+    private static final String[] CHANNEL_SERVLET_URL_MAPPING = {"/_ah/channel/*", "/_ah/channel/"};
+    private static final String[] UPLOAD_SERVLET_URL_MAPPING = {"/_ah/blobstore/upload"};
 
     private final ListenerMetaData GAE_LISTENER;
     private final ListenerMetaData CDI_LISTENER;
@@ -56,12 +61,14 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final FilterMetaData GAE_FILTER;
     private final FilterMappingMetaData SINGLE_THREAD_FILTER_MAPPING;
     private final FilterMappingMetaData GAE_FILTER_MAPPING;
-    private final ServletMetaData GAE_SERVLET;
+    private final ServletMetaData AUTH_SERVLET;
     private final ServletMetaData ADMIN_SERVLET;
     private final ServletMetaData CHANNEL_SERVLET;
-    private final ServletMappingMetaData GAE_SERVLET_MAPPING;
+    private final ServletMetaData UPLOAD_SERVLET;
+    private final ServletMappingMetaData AUTH_SERVLET_MAPPING;
     private final ServletMappingMetaData ADMIN_SERVLET_MAPPING;
     private final ServletMappingMetaData CHANNEL_SERVLET_MAPPING;
+    private final ServletMappingMetaData UPLOAD_SERVLET_MAPPING;
     private final ResourceReferenceMetaData INFINISPAN_REF;
     private SecurityConstraintMetaData ADMIN_SERVLET_CONSTRAINT;
     private LoginConfigMetaData ADMIN_SERVLET_CONFIG;
@@ -73,19 +80,23 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     public CapedwarfWebComponentsDeploymentProcessor(boolean adminAuth) {
         this.adminAuth = adminAuth;
 
-        GAE_LISTENER = createGaeListener();
-        CDI_LISTENER = createCdiListener();
-        CDAS_LISTENER = createAsListener();
-        GAE_FILTER = createGaeFilter();
-        GAE_FILTER_MAPPING = createGaeFilterMapping();
+        GAE_LISTENER = createListener("org.jboss.capedwarf.appidentity.GAEListener");
+        CDI_LISTENER = createListener("org.jboss.capedwarf.appidentity.CDIListener");
+        CDAS_LISTENER = createListener("org.jboss.capedwarf.shared.servlet.CapedwarfListener");
+
+        GAE_FILTER = createFilter(GAE_FILTER_NAME, "org.jboss.capedwarf.appidentity.GAEFilter");
         SINGLE_THREAD_FILTER = createSingleThreadFilter(1); // TODO - per deployment #
-        SINGLE_THREAD_FILTER_MAPPING = createSingleThreadFilterMapping();
-        GAE_SERVLET = createAuthServlet();
-        GAE_SERVLET_MAPPING = createAuthServletMapping();
-        ADMIN_SERVLET = createAdminServlet();
-        ADMIN_SERVLET_MAPPING = createAdminServletMapping();
-        CHANNEL_SERVLET = createChannelServlet();
-        CHANNEL_SERVLET_MAPPING = createChannelServletMapping();
+        GAE_FILTER_MAPPING = createFilterMapping(GAE_FILTER_NAME, "/*");
+        SINGLE_THREAD_FILTER_MAPPING = createFilterMapping(SINGLE_THREAD_FILTER_NAME, "/*");
+
+        AUTH_SERVLET = createServlet(AUTH_SERVLET_NAME, "org.jboss.capedwarf.users.AuthServlet");
+        ADMIN_SERVLET = createServlet(ADMIN_SERVLET_NAME, "org.jboss.capedwarf.admin.AdminServlet");
+        CHANNEL_SERVLET = createServlet(CHANNEL_SERVLET_NAME, "org.jboss.capedwarf.channel.servlet.ChannelServlet");
+        UPLOAD_SERVLET = createUploadServlet();
+        AUTH_SERVLET_MAPPING = createServletMapping(AUTH_SERVLET_NAME, AUTH_SERVLET_URL_MAPPING);
+        ADMIN_SERVLET_MAPPING = createServletMapping(ADMIN_SERVLET_NAME, ADMIN_SERVLET_URL_MAPPING);
+        CHANNEL_SERVLET_MAPPING = createServletMapping(CHANNEL_SERVLET_NAME, CHANNEL_SERVLET_URL_MAPPING);
+        UPLOAD_SERVLET_MAPPING = createServletMapping(UPLOAD_SERVLET_NAME, UPLOAD_SERVLET_URL_MAPPING);
 
         INFINISPAN_REF = createInfinispanRef();
 
@@ -110,14 +121,17 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
             getFilters(webMetaData).add(GAE_FILTER);
 
-            getServlets(webMetaData).add(GAE_SERVLET);
-            getServletMappings(webMetaData).add(GAE_SERVLET_MAPPING);
+            getServlets(webMetaData).add(AUTH_SERVLET);
+            getServletMappings(webMetaData).add(AUTH_SERVLET_MAPPING);
 
             getServlets(webMetaData).add(ADMIN_SERVLET);
             getServletMappings(webMetaData).add(ADMIN_SERVLET_MAPPING);
 
             getServlets(webMetaData).add(CHANNEL_SERVLET);
             getServletMappings(webMetaData).add(CHANNEL_SERVLET_MAPPING);
+
+            getServlets(webMetaData).add(UPLOAD_SERVLET);
+            getServletMappings(webMetaData).add(UPLOAD_SERVLET_MAPPING);
 
             replaceRemoteApiServlet(webMetaData);
 
@@ -148,21 +162,9 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         contextParams.add(param);
     }
 
-    private ListenerMetaData createCdiListener() {
+    private ListenerMetaData createListener(String listenerClass) {
         ListenerMetaData listener = new ListenerMetaData();
-        listener.setListenerClass("org.jboss.capedwarf.appidentity.CDIListener");
-        return listener;
-    }
-
-    private ListenerMetaData createGaeListener() {
-        ListenerMetaData listener = new ListenerMetaData();
-        listener.setListenerClass("org.jboss.capedwarf.appidentity.GAEListener");
-        return listener;
-    }
-
-    private ListenerMetaData createAsListener() {
-        ListenerMetaData listener = new ListenerMetaData();
-        listener.setListenerClass("org.jboss.capedwarf.shared.servlet.CapedwarfListener");
+        listener.setListenerClass(listenerClass);
         return listener;
     }
 
@@ -175,17 +177,15 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         return listeners;
     }
 
-    private FilterMetaData createGaeFilter() {
+    private FilterMetaData createFilter(String filterName, String filterClass) {
         FilterMetaData filter = new FilterMetaData();
-        filter.setFilterName(GAE_FILTER_NAME);
-        filter.setFilterClass("org.jboss.capedwarf.appidentity.GAEFilter");
+        filter.setFilterName(filterName);
+        filter.setFilterClass(filterClass);
         return filter;
     }
 
     private FilterMetaData createSingleThreadFilter(int maxConcurrentRequests) {
-        FilterMetaData filter = new FilterMetaData();
-        filter.setFilterName(SINGLE_THREAD_FILTER_NAME);
-        filter.setFilterClass("org.jboss.capedwarf.common.singlethread.SingleThreadFilter");
+        FilterMetaData filter = createFilter(SINGLE_THREAD_FILTER_NAME, "org.jboss.capedwarf.common.singlethread.SingleThreadFilter");
         ParamValueMetaData initParam = new ParamValueMetaData();
         initParam.setParamName("max-concurrent-requests");
         initParam.setParamValue(String.valueOf(maxConcurrentRequests));
@@ -203,18 +203,10 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         return filters;
     }
 
-    private FilterMappingMetaData createGaeFilterMapping() {
+    private FilterMappingMetaData createFilterMapping(String filterName, String urlPattern) {
         FilterMappingMetaData filterMapping = new FilterMappingMetaData();
-        filterMapping.setFilterName(GAE_FILTER_NAME);
-        filterMapping.setUrlPatterns(Collections.singletonList("/*"));
-        filterMapping.setDispatchers(Arrays.asList(DispatcherType.REQUEST, DispatcherType.FORWARD));
-        return filterMapping;
-    }
-
-    private FilterMappingMetaData createSingleThreadFilterMapping() {
-        FilterMappingMetaData filterMapping = new FilterMappingMetaData();
-        filterMapping.setFilterName(SINGLE_THREAD_FILTER_NAME);
-        filterMapping.setUrlPatterns(Collections.singletonList("/*"));
+        filterMapping.setFilterName(filterName);
+        filterMapping.setUrlPatterns(Collections.singletonList(urlPattern));
         filterMapping.setDispatchers(Arrays.asList(DispatcherType.REQUEST, DispatcherType.FORWARD));
         return filterMapping;
     }
@@ -237,27 +229,17 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         return servletsMetaData;
     }
 
-    private ServletMetaData createAuthServlet() {
+    private ServletMetaData createServlet(String servletName, String servletClass) {
         ServletMetaData servlet = new ServletMetaData();
-        servlet.setServletName(AUTH_SERVLET_NAME);
-        servlet.setServletClass("org.jboss.capedwarf.users.AuthServlet");
+        servlet.setServletName(servletName);
+        servlet.setServletClass(servletClass);
         servlet.setEnabled(true);
         return servlet;
     }
 
-    private ServletMetaData createAdminServlet() {
-        ServletMetaData servlet = new ServletMetaData();
-        servlet.setServletName(ADMIN_SERVLET_NAME);
-        servlet.setServletClass("org.jboss.capedwarf.admin.AdminServlet");
-        servlet.setEnabled(true);
-        return servlet;
-    }
-
-    private ServletMetaData createChannelServlet() {
-        ServletMetaData servlet = new ServletMetaData();
-        servlet.setServletName(CHANNEL_SERVLET_NAME);
-        servlet.setServletClass("org.jboss.capedwarf.channel.servlet.ChannelServlet");
-        servlet.setEnabled(true);
+    private ServletMetaData createUploadServlet() {
+        ServletMetaData servlet = createServlet(UPLOAD_SERVLET_NAME, "org.jboss.capedwarf.blobstore.UploadServlet");
+        servlet.setMultipartConfig(new MultipartConfigMetaData());
         return servlet;
     }
 
@@ -270,24 +252,10 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         return servletMappings;
     }
 
-    private ServletMappingMetaData createAuthServletMapping() {
+    private ServletMappingMetaData createServletMapping(String servletName, String[] urlPatterns) {
         ServletMappingMetaData servletMapping = new ServletMappingMetaData();
-        servletMapping.setServletName(AUTH_SERVLET_NAME);
-        servletMapping.setUrlPatterns(Collections.singletonList("/_ah/auth/*"));   // TODO: introduce AuthServlet.URL_PATTERN
-        return servletMapping;
-    }
-
-    private ServletMappingMetaData createAdminServletMapping() {
-        ServletMappingMetaData servletMapping = new ServletMappingMetaData();
-        servletMapping.setServletName(ADMIN_SERVLET_NAME);
-        servletMapping.setUrlPatterns(Arrays.asList(ADMIN_SERVLET_URL_MAPPING));
-        return servletMapping;
-    }
-
-    private ServletMappingMetaData createChannelServletMapping() {
-        ServletMappingMetaData servletMapping = new ServletMappingMetaData();
-        servletMapping.setServletName(CHANNEL_SERVLET_NAME);
-        servletMapping.setUrlPatterns(Arrays.asList("/_ah/channel/*", "/_ah/channel/"));
+        servletMapping.setServletName(servletName);
+        servletMapping.setUrlPatterns(Arrays.asList(urlPatterns));
         return servletMapping;
     }
 
