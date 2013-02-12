@@ -48,6 +48,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String ADMIN_SERVLET_NAME = "CapedwarfAdminServlet";
     private static final String CHANNEL_SERVLET_NAME = "ChannelServlet";
     private static final String[] ADMIN_SERVLET_URL_MAPPING = {"/_ah/admin/*", "/_ah/admin/"};
+    private static final String[] AUTH_SERVLET_URL_MAPPING = {"/_ah/auth/*"};
+    private static final String[] CHANNEL_SERVLET_URL_MAPPING = {"/_ah/channel/*", "/_ah/channel/"};
 
     private final ListenerMetaData GAE_LISTENER;
     private final ListenerMetaData CDI_LISTENER;
@@ -56,10 +58,10 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final FilterMetaData GAE_FILTER;
     private final FilterMappingMetaData SINGLE_THREAD_FILTER_MAPPING;
     private final FilterMappingMetaData GAE_FILTER_MAPPING;
-    private final ServletMetaData GAE_SERVLET;
+    private final ServletMetaData AUTH_SERVLET;
     private final ServletMetaData ADMIN_SERVLET;
     private final ServletMetaData CHANNEL_SERVLET;
-    private final ServletMappingMetaData GAE_SERVLET_MAPPING;
+    private final ServletMappingMetaData AUTH_SERVLET_MAPPING;
     private final ServletMappingMetaData ADMIN_SERVLET_MAPPING;
     private final ServletMappingMetaData CHANNEL_SERVLET_MAPPING;
     private final ResourceReferenceMetaData INFINISPAN_REF;
@@ -80,8 +82,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         GAE_FILTER_MAPPING = createGaeFilterMapping();
         SINGLE_THREAD_FILTER = createSingleThreadFilter(1); // TODO - per deployment #
         SINGLE_THREAD_FILTER_MAPPING = createSingleThreadFilterMapping();
-        GAE_SERVLET = createAuthServlet();
-        GAE_SERVLET_MAPPING = createAuthServletMapping();
+        AUTH_SERVLET = createAuthServlet();
+        AUTH_SERVLET_MAPPING = createAuthServletMapping();
         ADMIN_SERVLET = createAdminServlet();
         ADMIN_SERVLET_MAPPING = createAdminServletMapping();
         CHANNEL_SERVLET = createChannelServlet();
@@ -110,8 +112,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
             getFilters(webMetaData).add(GAE_FILTER);
 
-            getServlets(webMetaData).add(GAE_SERVLET);
-            getServletMappings(webMetaData).add(GAE_SERVLET_MAPPING);
+            getServlets(webMetaData).add(AUTH_SERVLET);
+            getServletMappings(webMetaData).add(AUTH_SERVLET_MAPPING);
 
             getServlets(webMetaData).add(ADMIN_SERVLET);
             getServletMappings(webMetaData).add(ADMIN_SERVLET_MAPPING);
@@ -273,7 +275,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private ServletMappingMetaData createAuthServletMapping() {
         ServletMappingMetaData servletMapping = new ServletMappingMetaData();
         servletMapping.setServletName(AUTH_SERVLET_NAME);
-        servletMapping.setUrlPatterns(Collections.singletonList("/_ah/auth/*"));   // TODO: introduce AuthServlet.URL_PATTERN
+        servletMapping.setUrlPatterns(Arrays.asList(AUTH_SERVLET_URL_MAPPING));   // TODO: introduce AuthServlet.URL_PATTERN
         return servletMapping;
     }
 
@@ -287,7 +289,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private ServletMappingMetaData createChannelServletMapping() {
         ServletMappingMetaData servletMapping = new ServletMappingMetaData();
         servletMapping.setServletName(CHANNEL_SERVLET_NAME);
-        servletMapping.setUrlPatterns(Arrays.asList("/_ah/channel/*", "/_ah/channel/"));
+        servletMapping.setUrlPatterns(Arrays.asList(CHANNEL_SERVLET_URL_MAPPING));
         return servletMapping;
     }
 
