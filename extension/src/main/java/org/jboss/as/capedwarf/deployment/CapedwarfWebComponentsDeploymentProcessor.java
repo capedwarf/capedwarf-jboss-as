@@ -47,9 +47,11 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String AUTH_SERVLET_NAME = "authservlet";
     private static final String ADMIN_SERVLET_NAME = "CapedwarfAdminServlet";
     private static final String CHANNEL_SERVLET_NAME = "ChannelServlet";
+    private static final String UPLOAD_SERVLET_NAME = "UploadServlet";
     private static final String[] ADMIN_SERVLET_URL_MAPPING = {"/_ah/admin/*", "/_ah/admin/"};
     private static final String[] AUTH_SERVLET_URL_MAPPING = {"/_ah/auth/*"};
     private static final String[] CHANNEL_SERVLET_URL_MAPPING = {"/_ah/channel/*", "/_ah/channel/"};
+    private static final String[] UPLOAD_SERVLET_URL_MAPPING = {"/_ah/blobstore/upload"};
 
     private final ListenerMetaData GAE_LISTENER;
     private final ListenerMetaData CDI_LISTENER;
@@ -61,9 +63,11 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ServletMetaData AUTH_SERVLET;
     private final ServletMetaData ADMIN_SERVLET;
     private final ServletMetaData CHANNEL_SERVLET;
+    private final ServletMetaData UPLOAD_SERVLET;
     private final ServletMappingMetaData AUTH_SERVLET_MAPPING;
     private final ServletMappingMetaData ADMIN_SERVLET_MAPPING;
     private final ServletMappingMetaData CHANNEL_SERVLET_MAPPING;
+    private final ServletMappingMetaData UPLOAD_SERVLET_MAPPING;
     private final ResourceReferenceMetaData INFINISPAN_REF;
     private SecurityConstraintMetaData ADMIN_SERVLET_CONSTRAINT;
     private LoginConfigMetaData ADMIN_SERVLET_CONFIG;
@@ -88,6 +92,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         ADMIN_SERVLET_MAPPING = createAdminServletMapping();
         CHANNEL_SERVLET = createChannelServlet();
         CHANNEL_SERVLET_MAPPING = createChannelServletMapping();
+        UPLOAD_SERVLET = createUploadServlet();
+        UPLOAD_SERVLET_MAPPING = createUploadServletMapping();
 
         INFINISPAN_REF = createInfinispanRef();
 
@@ -120,6 +126,9 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
             getServlets(webMetaData).add(CHANNEL_SERVLET);
             getServletMappings(webMetaData).add(CHANNEL_SERVLET_MAPPING);
+
+            getServlets(webMetaData).add(UPLOAD_SERVLET);
+            getServletMappings(webMetaData).add(UPLOAD_SERVLET_MAPPING);
 
             replaceRemoteApiServlet(webMetaData);
 
@@ -263,6 +272,14 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         return servlet;
     }
 
+    private ServletMetaData createUploadServlet() {
+        ServletMetaData servlet = new ServletMetaData();
+        servlet.setServletName(UPLOAD_SERVLET_NAME);
+        servlet.setServletClass("org.jboss.capedwarf.blobstore.UploadServlet");
+        servlet.setEnabled(true);
+        return servlet;
+    }
+
     private List<ServletMappingMetaData> getServletMappings(WebMetaData webMetaData) {
         List<ServletMappingMetaData> servletMappings = webMetaData.getServletMappings();
         if (servletMappings == null) {
@@ -290,6 +307,13 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         ServletMappingMetaData servletMapping = new ServletMappingMetaData();
         servletMapping.setServletName(CHANNEL_SERVLET_NAME);
         servletMapping.setUrlPatterns(Arrays.asList(CHANNEL_SERVLET_URL_MAPPING));
+        return servletMapping;
+    }
+
+    private ServletMappingMetaData createUploadServletMapping() {
+        ServletMappingMetaData servletMapping = new ServletMappingMetaData();
+        servletMapping.setServletName(UPLOAD_SERVLET_NAME);
+        servletMapping.setUrlPatterns(Arrays.asList(UPLOAD_SERVLET_URL_MAPPING));
         return servletMapping;
     }
 
