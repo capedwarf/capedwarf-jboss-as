@@ -19,6 +19,7 @@ import org.jboss.metadata.web.spec.FilterMetaData;
 import org.jboss.metadata.web.spec.FiltersMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.LoginConfigMetaData;
+import org.jboss.metadata.web.spec.MultipartConfigMetaData;
 import org.jboss.metadata.web.spec.SecurityConstraintMetaData;
 import org.jboss.metadata.web.spec.ServletMappingMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
@@ -277,6 +278,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         servlet.setServletName(UPLOAD_SERVLET_NAME);
         servlet.setServletClass("org.jboss.capedwarf.blobstore.UploadServlet");
         servlet.setEnabled(true);
+        servlet.setMultipartConfig(new MultipartConfigMetaData());
         return servlet;
     }
 
