@@ -9,14 +9,14 @@ import org.jboss.as.subsystem.test.AbstractSubsystemBaseTest;
  * @author Tomaz Cerar
  * @author <a href="mailto:mlazar@redhat.com">Matej Lazar</a>
  */
-public class SubsystemParsingTestCase extends AbstractSubsystemBaseTest {
+public class SubsystemParsingTest extends AbstractSubsystemBaseTest {
     private static final String SUBSYSTEM_XML =
             "<subsystem xmlns=\"urn:jboss:domain:capedwarf:1.0\">\n" +
                     "            <appengine-api>abc123</appengine-api>\n" +
                     "            <admin-auth>false</admin-auth>\n" +
                     "         </subsystem>";
 
-    public SubsystemParsingTestCase() {
+    public SubsystemParsingTest() {
         super(CapedwarfExtension.SUBSYSTEM_NAME, new CapedwarfExtension());
     }
 
