@@ -27,6 +27,7 @@
         <resource-root path="appengine-api-1.0-sdk-1.7.5.jar">
            <filter>
                <include path="com/google/**"/>
+               <include path="META-INF/**"/>
                <exclude path="**"/>
            </filter>
         </resource-root>
