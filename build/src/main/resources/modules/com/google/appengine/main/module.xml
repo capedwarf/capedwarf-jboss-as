@@ -41,5 +41,8 @@
         <!-- needed for annotations to work (@Transformable, @Indexed, ...) -->
         <module name="org.infinispan.query"/>
         <module name="org.hibernate.search"/>
+        <!-- used when creating proxies -->
+        <module name="org.javassist"/>
+        <module name="javax.servlet.api"/>
     </dependencies>
 </module>
