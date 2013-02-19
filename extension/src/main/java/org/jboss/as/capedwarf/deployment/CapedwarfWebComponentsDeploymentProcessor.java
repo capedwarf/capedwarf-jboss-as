@@ -127,20 +127,11 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
             getFilters(webMetaData).add(GAE_FILTER);
 
-            getServlets(webMetaData).add(AUTH_SERVLET);
-            getServletMappings(webMetaData).add(AUTH_SERVLET_MAPPING);
-
-            getServlets(webMetaData).add(ADMIN_SERVLET);
-            getServletMappings(webMetaData).add(ADMIN_SERVLET_MAPPING);
-
-            getServlets(webMetaData).add(CHANNEL_SERVLET);
-            getServletMappings(webMetaData).add(CHANNEL_SERVLET_MAPPING);
-
-            getServlets(webMetaData).add(UPLOAD_SERVLET);
-            getServletMappings(webMetaData).add(UPLOAD_SERVLET_MAPPING);
-
-            getServlets(webMetaData).add(IMAGE_SERVLET);
-            getServletMappings(webMetaData).add(IMAGE_SERVLET_MAPPING);
+            addServletAndMapping(webMetaData, AUTH_SERVLET, AUTH_SERVLET_MAPPING);
+            addServletAndMapping(webMetaData, ADMIN_SERVLET, ADMIN_SERVLET_MAPPING);
+            addServletAndMapping(webMetaData, CHANNEL_SERVLET, CHANNEL_SERVLET_MAPPING);
+            addServletAndMapping(webMetaData, UPLOAD_SERVLET, UPLOAD_SERVLET_MAPPING);
+            addServletAndMapping(webMetaData, IMAGE_SERVLET, IMAGE_SERVLET_MAPPING);
 
             replaceRemoteApiServlet(webMetaData);
 
@@ -152,6 +143,11 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
                 webMetaData.setLoginConfig(ADMIN_SERVLET_CONFIG);
             }
         }
+    }
+
+    private void addServletAndMapping(WebMetaData webMetaData, ServletMetaData servletMetaData, ServletMappingMetaData servletMappingMetaData) {
+        getServlets(webMetaData).add(servletMetaData);
+        getServletMappings(webMetaData).add(servletMappingMetaData);
     }
 
     private void replaceRemoteApiServlet(WebMetaData webMetaData) {
