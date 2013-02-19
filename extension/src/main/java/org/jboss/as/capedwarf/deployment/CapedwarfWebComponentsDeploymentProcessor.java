@@ -49,10 +49,12 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String ADMIN_SERVLET_NAME = "CapedwarfAdminServlet";
     private static final String CHANNEL_SERVLET_NAME = "ChannelServlet";
     private static final String UPLOAD_SERVLET_NAME = "UploadServlet";
+    private static final String IMAGE_SERVLET_NAME = "ImageServlet";
     private static final String[] ADMIN_SERVLET_URL_MAPPING = {"/_ah/admin/*", "/_ah/admin/"};
     private static final String[] AUTH_SERVLET_URL_MAPPING = {"/_ah/auth/*"};
     private static final String[] CHANNEL_SERVLET_URL_MAPPING = {"/_ah/channel/*", "/_ah/channel/"};
     private static final String[] UPLOAD_SERVLET_URL_MAPPING = {"/_ah/blobstore/upload"};
+    private static final String[] IMAGE_SERVLET_URL_MAPPING = {"/_ah/image/*"};
 
     private final ListenerMetaData GAE_LISTENER;
     private final ListenerMetaData CDI_LISTENER;
@@ -65,10 +67,12 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ServletMetaData ADMIN_SERVLET;
     private final ServletMetaData CHANNEL_SERVLET;
     private final ServletMetaData UPLOAD_SERVLET;
+    private final ServletMetaData IMAGE_SERVLET;
     private final ServletMappingMetaData AUTH_SERVLET_MAPPING;
     private final ServletMappingMetaData ADMIN_SERVLET_MAPPING;
     private final ServletMappingMetaData CHANNEL_SERVLET_MAPPING;
     private final ServletMappingMetaData UPLOAD_SERVLET_MAPPING;
+    private final ServletMappingMetaData IMAGE_SERVLET_MAPPING;
     private final ResourceReferenceMetaData INFINISPAN_REF;
     private SecurityConstraintMetaData ADMIN_SERVLET_CONSTRAINT;
     private LoginConfigMetaData ADMIN_SERVLET_CONFIG;
@@ -93,10 +97,12 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         ADMIN_SERVLET = createServlet(ADMIN_SERVLET_NAME, "org.jboss.capedwarf.admin.AdminServlet");
         CHANNEL_SERVLET = createServlet(CHANNEL_SERVLET_NAME, "org.jboss.capedwarf.channel.servlet.ChannelServlet");
         UPLOAD_SERVLET = createUploadServlet();
+        IMAGE_SERVLET = createServlet(IMAGE_SERVLET_NAME, "org.jboss.capedwarf.images.ImageServlet");
         AUTH_SERVLET_MAPPING = createServletMapping(AUTH_SERVLET_NAME, AUTH_SERVLET_URL_MAPPING);
         ADMIN_SERVLET_MAPPING = createServletMapping(ADMIN_SERVLET_NAME, ADMIN_SERVLET_URL_MAPPING);
         CHANNEL_SERVLET_MAPPING = createServletMapping(CHANNEL_SERVLET_NAME, CHANNEL_SERVLET_URL_MAPPING);
         UPLOAD_SERVLET_MAPPING = createServletMapping(UPLOAD_SERVLET_NAME, UPLOAD_SERVLET_URL_MAPPING);
+        IMAGE_SERVLET_MAPPING = createServletMapping(IMAGE_SERVLET_NAME, IMAGE_SERVLET_URL_MAPPING);
 
         INFINISPAN_REF = createInfinispanRef();
 
@@ -132,6 +138,9 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
             getServlets(webMetaData).add(UPLOAD_SERVLET);
             getServletMappings(webMetaData).add(UPLOAD_SERVLET_MAPPING);
+
+            getServlets(webMetaData).add(IMAGE_SERVLET);
+            getServletMappings(webMetaData).add(IMAGE_SERVLET_MAPPING);
 
             replaceRemoteApiServlet(webMetaData);
 
