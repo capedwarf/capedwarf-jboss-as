@@ -24,7 +24,6 @@ package org.jboss.as.capedwarf.deployment;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -99,7 +98,8 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
                 safeClose(backendsIs);
             }
 
-            final CapedwarfSetupAction cas = new CapedwarfSetupAction(classLoader, appConfig, cdConfig, queueConfig, backendsConfig);
+            final Set<ServiceName> dependecies = CapedwarfDependenciesProcessor.getDependecies(phaseContext);
+            final CapedwarfSetupAction cas = new CapedwarfSetupAction(dependecies, classLoader, appConfig, cdConfig, queueConfig, backendsConfig);
             unit.addToAttachmentList(org.jboss.as.ee.component.Attachments.WEB_SETUP_ACTIONS, cas);
         } catch (DeploymentUnitProcessingException e) {
             throw e;
@@ -123,10 +123,12 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
     }
 
     private static class CapedwarfSetupAction extends ConfigurationAware implements SetupAction {
+        private final Set<ServiceName> dependencies;
         private final ClassLoader appCL;
 
-        private CapedwarfSetupAction(ClassLoader appCL, AppEngineWebXml appEngineWebXml, CapedwarfConfiguration capedwarfConfiguration, QueueXml queueXml, BackendsXml backendsXml) {
+        private CapedwarfSetupAction(Set<ServiceName> dependencies, ClassLoader appCL, AppEngineWebXml appEngineWebXml, CapedwarfConfiguration capedwarfConfiguration, QueueXml queueXml, BackendsXml backendsXml) {
             super(appEngineWebXml, capedwarfConfiguration, queueXml, backendsXml);
+            this.dependencies = dependencies;
             this.appCL = appCL;
         }
 
@@ -155,7 +157,7 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
         }
 
         public Set<ServiceName> dependencies() {
-            return Collections.emptySet();
+            return dependencies;
         }
 
         protected boolean isContextSetup() {

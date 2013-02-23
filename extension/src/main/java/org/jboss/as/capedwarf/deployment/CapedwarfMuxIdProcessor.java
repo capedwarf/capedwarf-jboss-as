@@ -47,15 +47,20 @@ public class CapedwarfMuxIdProcessor extends CapedwarfDeploymentUnitProcessor {
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         String appId = CapedwarfDeploymentMarker.getAppId(phaseContext.getDeploymentUnit());
         ServiceTarget target = phaseContext.getServiceTarget();
+
         ServiceName name = CAPEDWARF_SERVICE_NAME.append("mux-gen").append(appId);
         MuxIdService service = new MuxIdService(appId);
         ServiceBuilder<MuxIdGenerator> builder = target.addService(name, service);
+
         ServiceName cacheName = CacheService.getServiceName(CAPEDWARF, "dist");
         builder.addDependency(cacheName, Cache.class, service.getCacheInjectedValue());
+
         ServiceName channelName = ChannelService.getServiceName(CAPEDWARF);
         builder.addDependency(channelName, Channel.class, service.getChannelInjectedValue());
+
         ServiceName tmName = TxnServices.JBOSS_TXN_TRANSACTION_MANAGER;
         builder.addDependency(tmName, TransactionManager.class, service.getTmInjectedValue());
+
         builder.setInitialMode(ServiceController.Mode.ACTIVE).install();
     }
 }

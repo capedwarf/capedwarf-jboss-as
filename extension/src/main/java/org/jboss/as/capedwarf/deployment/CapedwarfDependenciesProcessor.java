@@ -23,7 +23,10 @@
 package org.jboss.as.capedwarf.deployment;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -34,7 +37,6 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.capedwarf.shared.components.Key;
 import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.msc.service.ServiceName;
-import org.jboss.msc.service.ServiceTarget;
 
 /**
  * Define any MSC dependencies.
@@ -42,6 +44,8 @@ import org.jboss.msc.service.ServiceTarget;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfDependenciesProcessor extends CapedwarfDeploymentUnitProcessor {
+    private static final Set<ServiceName> STATIC_DEPENDECIES;
+
     @SuppressWarnings("unchecked")
     private static final List<Key<?>> KEYS = Arrays.asList(
             Keys.TM,
@@ -54,23 +58,31 @@ public class CapedwarfDependenciesProcessor extends CapedwarfDeploymentUnitProce
             Keys.HTTP_CLIENT
     );
 
-    private final List<ServiceName> keys = Lists.transform(KEYS, new Function<Key<?>, ServiceName>() {
+    private static final List<ServiceName> keys = Lists.transform(KEYS, new Function<Key<?>, ServiceName>() {
         public ServiceName apply(Key<?> key) {
             return Constants.CAPEDWARF_NAME.append(String.valueOf(key.getSlot()));
         }
     });
 
-    protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-        final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
-        // we need queue -- as default gae queue is there by default
-        serviceTarget.addDependency(ServletExecutorConsumerService.NAME);
-        // JMS / JCA
-        serviceTarget.addDependency(Constants.JMSXA_BIND_INFO.getBinderServiceName()); // we need jms xa
-        serviceTarget.addDependency(Constants.QUEUE_BIND_INFO.getBinderServiceName()); // we need queue
+    static {
+        STATIC_DEPENDECIES = new HashSet<ServiceName>();
+        STATIC_DEPENDECIES.add(ServletExecutorConsumerService.NAME); // default queue
+        STATIC_DEPENDECIES.add(Constants.JMSXA_BIND_INFO.getBinderServiceName()); // we need jms xa
+        STATIC_DEPENDECIES.add(Constants.QUEUE_BIND_INFO.getBinderServiceName()); // we need queue
         // Components
         for (ServiceName sn : keys) {
-            serviceTarget.addDependency(sn);
+            STATIC_DEPENDECIES.add(sn);
         }
     }
 
+    protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
+        // no need for explicit dependencies, web app deployment service depends on them
+    }
+
+    static Set<ServiceName> getDependecies(DeploymentPhaseContext context) {
+        Set<ServiceName> set = new HashSet<ServiceName>();
+        set.addAll(STATIC_DEPENDECIES);
+        set.addAll(CapedwarfCacheProcessor.getDependencies(context));
+        return Collections.unmodifiableSet(set);
+    }
 }

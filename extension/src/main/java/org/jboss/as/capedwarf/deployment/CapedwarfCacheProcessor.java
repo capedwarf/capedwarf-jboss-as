@@ -23,6 +23,8 @@
 package org.jboss.as.capedwarf.deployment;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.infinispan.Cache;
 import org.infinispan.configuration.cache.Configuration;
@@ -58,12 +60,27 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
     private static final ServiceName CLS_SERVICE_NAME = CAPEDWARF_SERVICE_NAME.append("cache-lifecycle");
     private static final ServiceName CACHE_CONTAINER = EmbeddedCacheManagerService.getServiceName(CAPEDWARF);
 
-    protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-        final DeploymentUnit unit = phaseContext.getDeploymentUnit();
+    private static ServiceName toServiceName(String appId, CacheName cn) {
+        return CLS_SERVICE_NAME.append(cn.getName()).append(appId);
+    }
+
+    static Set<ServiceName> getDependencies(DeploymentPhaseContext context) {
+        final DeploymentUnit unit = context.getDeploymentUnit();
+        final String appId = CapedwarfDeploymentMarker.getAppId(unit);
+        final Set<ServiceName> set = new HashSet<ServiceName>();
+        for (CacheName cn : CacheName.values()) {
+            if (cn == CacheName.DIST) continue; // mux-gen has dep on it already
+            set.add(toServiceName(appId, cn));
+        }
+        return set;
+    }
+
+    protected void doDeploy(DeploymentPhaseContext context) throws DeploymentUnitProcessingException {
+        final DeploymentUnit unit = context.getDeploymentUnit();
         final String appId = CapedwarfDeploymentMarker.getAppId(unit);
         final ClassLoader classLoader = unit.getAttachment(Attachments.MODULE).getClassLoader();
 
-        final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
+        final ServiceTarget serviceTarget = context.getServiceTarget();
         // default
         createBuilder(serviceTarget, CacheName.DEFAULT, appId, new DefaultConfigurationCallback(appId, classLoader));
         // search, ps cache
@@ -82,7 +99,7 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
 
     protected ServiceController<Cache> createBuilder(ServiceTarget serviceTarget, CacheName cacheName, String appId, ConfigurationCallback callback) {
         final CacheLifecycleService cls = new CacheLifecycleService(cacheName.getName(), appId, callback);
-        final ServiceBuilder<Cache> builder = serviceTarget.addService(CLS_SERVICE_NAME.append(cacheName.getName()).append(appId), cls);
+        final ServiceBuilder<Cache> builder = serviceTarget.addService(toServiceName(appId, cacheName), cls);
         if (callback instanceof IndexableConfigurationCallback) {
             IndexableConfigurationCallback icb = (IndexableConfigurationCallback) callback;
             builder.addDependency(ChannelService.getServiceName(CAPEDWARF), JChannel.class, icb.getChannel());
