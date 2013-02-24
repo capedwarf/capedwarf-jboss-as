@@ -44,11 +44,20 @@ import org.jgroups.Channel;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfMuxIdProcessor extends CapedwarfDeploymentUnitProcessor {
+    static ServiceName toServiceName(String appId) {
+        return CAPEDWARF_SERVICE_NAME.append("mux-gen").append(appId);
+    }
+
+    static ServiceName getDependency(DeploymentPhaseContext context) {
+        String appId = CapedwarfDeploymentMarker.getAppId(context.getDeploymentUnit());
+        return toServiceName(appId);
+    }
+
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         String appId = CapedwarfDeploymentMarker.getAppId(phaseContext.getDeploymentUnit());
         ServiceTarget target = phaseContext.getServiceTarget();
 
-        ServiceName name = CAPEDWARF_SERVICE_NAME.append("mux-gen").append(appId);
+        ServiceName name = toServiceName(appId);
         MuxIdService service = new MuxIdService(appId);
         ServiceBuilder<MuxIdGenerator> builder = target.addService(name, service);
 

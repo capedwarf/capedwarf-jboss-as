@@ -69,7 +69,6 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
         final String appId = CapedwarfDeploymentMarker.getAppId(unit);
         final Set<ServiceName> set = new HashSet<ServiceName>();
         for (CacheName cn : CacheName.values()) {
-            if (cn == CacheName.DIST) continue; // mux-gen has dep on it already
             set.add(toServiceName(appId, cn));
         }
         return set;
@@ -103,7 +102,7 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
         if (callback instanceof IndexableConfigurationCallback) {
             IndexableConfigurationCallback icb = (IndexableConfigurationCallback) callback;
             builder.addDependency(ChannelService.getServiceName(CAPEDWARF), JChannel.class, icb.getChannel());
-            builder.addDependency(CAPEDWARF_SERVICE_NAME.append("mux-gen").append(appId), MuxIdGenerator.class, icb.getGenerator());
+            builder.addDependency(CapedwarfMuxIdProcessor.toServiceName(appId), MuxIdGenerator.class, icb.getGenerator());
         }
         builder.addDependency(CACHE_CONTAINER, EmbeddedCacheManager.class, cls.getEcmiv());
         builder.addDependency(CacheConfigurationService.getServiceName(CAPEDWARF, cacheName.getName()), Configuration.class, cls.getCiv());
