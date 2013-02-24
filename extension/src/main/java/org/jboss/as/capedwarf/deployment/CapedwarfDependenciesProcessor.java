@@ -79,11 +79,11 @@ public class CapedwarfDependenciesProcessor extends CapedwarfDeploymentUnitProce
         // no need for explicit dependencies, web app deployment service depends on them
     }
 
-    static Set<ServiceName> getDependecies(DeploymentPhaseContext context) {
+    static Set<ServiceName> getDependecies(String appId) {
         Set<ServiceName> set = new HashSet<ServiceName>();
         set.addAll(STATIC_DEPENDECIES);
-        set.addAll(CapedwarfCacheProcessor.getDependencies(context));
-        set.add(CapedwarfMuxIdProcessor.getDependency(context));
+        set.addAll(CapedwarfCacheProcessor.getDependencies(appId));
+        set.add(CapedwarfMuxIdProcessor.getDependency(appId));
         return Collections.unmodifiableSet(set);
     }
 }

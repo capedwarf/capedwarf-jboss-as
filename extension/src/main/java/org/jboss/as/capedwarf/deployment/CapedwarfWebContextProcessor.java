@@ -98,7 +98,8 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
                 safeClose(backendsIs);
             }
 
-            final Set<ServiceName> dependecies = CapedwarfDependenciesProcessor.getDependecies(phaseContext);
+            final String appId = CapedwarfDeploymentMarker.getAppId(unit);
+            final Set<ServiceName> dependecies = CapedwarfDependenciesProcessor.getDependecies(appId);
             final CapedwarfSetupAction cas = new CapedwarfSetupAction(dependecies, classLoader, appConfig, cdConfig, queueConfig, backendsConfig);
             unit.addToAttachmentList(org.jboss.as.ee.component.Attachments.WEB_SETUP_ACTIONS, cas);
         } catch (DeploymentUnitProcessingException e) {

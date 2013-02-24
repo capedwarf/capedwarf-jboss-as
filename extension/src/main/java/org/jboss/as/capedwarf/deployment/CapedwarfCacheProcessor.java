@@ -64,9 +64,7 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
         return CLS_SERVICE_NAME.append(cn.getName()).append(appId);
     }
 
-    static Set<ServiceName> getDependencies(DeploymentPhaseContext context) {
-        final DeploymentUnit unit = context.getDeploymentUnit();
-        final String appId = CapedwarfDeploymentMarker.getAppId(unit);
+    static Set<ServiceName> getDependencies(String appId) {
         final Set<ServiceName> set = new HashSet<ServiceName>();
         for (CacheName cn : CacheName.values()) {
             set.add(toServiceName(appId, cn));

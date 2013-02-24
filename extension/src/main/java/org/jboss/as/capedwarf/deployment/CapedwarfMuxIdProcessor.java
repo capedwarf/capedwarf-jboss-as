@@ -48,8 +48,7 @@ public class CapedwarfMuxIdProcessor extends CapedwarfDeploymentUnitProcessor {
         return CAPEDWARF_SERVICE_NAME.append("mux-gen").append(appId);
     }
 
-    static ServiceName getDependency(DeploymentPhaseContext context) {
-        String appId = CapedwarfDeploymentMarker.getAppId(context.getDeploymentUnit());
+    static ServiceName getDependency(String appId) {
         return toServiceName(appId);
     }
 
