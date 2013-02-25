@@ -12,6 +12,9 @@ import org.jboss.metadata.javaee.spec.ResourceReferenceMetaData;
 import org.jboss.metadata.javaee.spec.ResourceReferencesMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
+import org.jboss.metadata.web.jboss.JBoss70WebMetaData;
+import org.jboss.metadata.web.jboss.JBossWebMetaData;
+import org.jboss.metadata.web.jboss.ValveMetaData;
 import org.jboss.metadata.web.spec.AuthConstraintMetaData;
 import org.jboss.metadata.web.spec.DispatcherType;
 import org.jboss.metadata.web.spec.FilterMappingMetaData;
@@ -74,10 +77,11 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ServletMappingMetaData UPLOAD_SERVLET_MAPPING;
     private final ServletMappingMetaData IMAGE_SERVLET_MAPPING;
     private final ResourceReferenceMetaData INFINISPAN_REF;
-    private SecurityConstraintMetaData ADMIN_SERVLET_CONSTRAINT;
-    private LoginConfigMetaData ADMIN_SERVLET_CONFIG;
-    private SecurityRoleMetaData ADMIN_SERVLET_ROLE;
+    private final SecurityConstraintMetaData ADMIN_SERVLET_CONSTRAINT;
+    private final LoginConfigMetaData ADMIN_SERVLET_CONFIG;
+    private final SecurityRoleMetaData ADMIN_SERVLET_ROLE;
 
+    private ValveMetaData AUTH_VALVE;
 
     private final boolean adminAuth;
 
@@ -109,6 +113,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         ADMIN_SERVLET_CONSTRAINT = createAdminServletSecurityConstraint();
         ADMIN_SERVLET_CONFIG = createAdminServletLogin();
         ADMIN_SERVLET_ROLE = createAdminServletSecurityRole();
+
+        AUTH_VALVE = createAuthValve();
     }
 
     @Override
@@ -142,6 +148,18 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
                 getSecurityRoles(webMetaData).add(ADMIN_SERVLET_ROLE);
                 webMetaData.setLoginConfig(ADMIN_SERVLET_CONFIG);
             }
+        }
+    }
+
+    protected JBossWebMetaData createJBossWebMetaData(Type type) {
+        return (type == Type.JBOSS) ? new JBoss70WebMetaData() : null;
+    }
+
+    @Override
+    protected void doDeploy(DeploymentUnit unit, JBossWebMetaData webMetaData, Type type) {
+        if (type == Type.JBOSS) {
+            List<ValveMetaData> valves = getValves(webMetaData);
+            valves.add(0, AUTH_VALVE);
         }
     }
 
@@ -337,4 +355,18 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         return configMetaData;
     }
 
+    private List<ValveMetaData> getValves(JBossWebMetaData webMetaData) {
+        List<ValveMetaData> valves = webMetaData.getValves();
+        if (valves == null) {
+            valves = new ArrayList<ValveMetaData>();
+            webMetaData.setValves(valves);
+        }
+        return valves;
+    }
+
+    private ValveMetaData createAuthValve() {
+        ValveMetaData vmd = new ValveMetaData();
+        vmd.setValveClass("org.jboss.capedwarf.users.CapedwarfAuthenticator");
+        return vmd;
+    }
 }

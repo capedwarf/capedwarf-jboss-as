@@ -62,5 +62,6 @@
         <module name="org.datanucleus" optional="true"/>
         <module name="org.jboss.maven.plugins.transformer" optional="true"/>
         <module name="org.jboss.capedwarf.shared"/>
+        <module name="org.jboss.as.web"/>
     </dependencies>
 </module>

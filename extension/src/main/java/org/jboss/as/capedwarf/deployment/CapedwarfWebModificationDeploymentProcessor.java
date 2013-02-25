@@ -56,12 +56,28 @@ public abstract class CapedwarfWebModificationDeploymentProcessor extends Capedw
             doDeploy(unit, webMetaData, Type.SHARED);
 
         JBossWebMetaData jBossWebMetaData = warMetaData.getJBossWebMetaData();
+        if (jBossWebMetaData == null) {
+            jBossWebMetaData = createJBossWebMetaData(Type.JBOSS);
+            if (jBossWebMetaData != null) {
+                warMetaData.setJBossWebMetaData(jBossWebMetaData);
+            }
+        }
         if (jBossWebMetaData != null)
             doDeploy(unit, jBossWebMetaData, Type.JBOSS);
 
         jBossWebMetaData = warMetaData.getMergedJBossWebMetaData();
+        if (jBossWebMetaData == null) {
+            jBossWebMetaData = createJBossWebMetaData(Type.MERGED);
+            if (jBossWebMetaData != null) {
+                warMetaData.setMergedJBossWebMetaData(jBossWebMetaData);
+            }
+        }
         if (jBossWebMetaData != null)
             doDeploy(unit, jBossWebMetaData, Type.MERGED);
+    }
+
+    protected JBossWebMetaData createJBossWebMetaData(Type type) {
+        return null;
     }
 
     protected void doDeploy(DeploymentUnit unit, WebMetaData webMetaData, Type type) {
