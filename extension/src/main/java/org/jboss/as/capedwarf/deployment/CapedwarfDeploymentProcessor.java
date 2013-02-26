@@ -81,6 +81,8 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier BOUNCY_CASTLE_PROV = ModuleIdentifier.create("org.bouncycastle.bcprov");
     private static final ModuleIdentifier COMMON_CORE = ModuleIdentifier.create("org.jboss.common-core");
     private static final ModuleIdentifier WEB = ModuleIdentifier.create("org.jboss.as.web");
+    private static final ModuleIdentifier MARSHALLING = ModuleIdentifier.create("org.jboss.marshalling");
+    private static final ModuleIdentifier MARSHALLING_RIVER = ModuleIdentifier.create("org.jboss.marshalling.river");
     // inline this module deps, if running with bundled
     private static final ModuleIdentifier[] INLINE = {
             MODULES,
@@ -102,7 +104,9 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
             BOUNCY_CASTLE_PKIX,
             BOUNCY_CASTLE_PROV,
             COMMON_CORE,
-            WEB
+            WEB,
+            MARSHALLING,
+            MARSHALLING_RIVER
     };
 
     private static final FilenameFilter JARS_SDK = new FilenameFilter() {

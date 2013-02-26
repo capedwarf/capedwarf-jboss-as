@@ -63,5 +63,7 @@
         <module name="org.jboss.maven.plugins.transformer" optional="true"/>
         <module name="org.jboss.capedwarf.shared"/>
         <module name="org.jboss.as.web"/>
+        <module name="org.jboss.marshalling"/>
+        <module name="org.jboss.marshalling.river" services="import"/>
     </dependencies>
 </module>
