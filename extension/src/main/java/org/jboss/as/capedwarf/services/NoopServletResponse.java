@@ -22,9 +22,6 @@
 
 package org.jboss.as.capedwarf.services;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -32,15 +29,22 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Execute servlet from an async invocation.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
 class NoopServletResponse implements HttpServletResponse {
 
     private static ServletOutputStream NOOP_SOS = new NoopServletOutputStream();
     private static PrintWriter NOOP_PW = new PrintWriter(new NoopOutputStream());
+
+    private int status = SC_OK;
 
     public String getCharacterEncoding() {
         return "UTF-8";
@@ -128,9 +132,11 @@ class NoopServletResponse implements HttpServletResponse {
     }
 
     public void sendError(int sc, String msg) throws IOException {
+        setStatus(sc, msg);
     }
 
     public void sendError(int sc) throws IOException {
+        setStatus(sc);
     }
 
     public void sendRedirect(String location) throws IOException {
@@ -155,13 +161,15 @@ class NoopServletResponse implements HttpServletResponse {
     }
 
     public void setStatus(int sc) {
+        this.status = sc;
     }
 
     public void setStatus(int sc, String sm) {
+        setStatus(sc);
     }
 
     public int getStatus() {
-        return 0;
+        return status;
     }
 
     public String getHeader(String name) {

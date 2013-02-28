@@ -28,6 +28,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.capedwarf.shared.components.SimpleKey;
@@ -36,6 +37,7 @@ import org.jboss.capedwarf.shared.components.SimpleKey;
  * Execute servlet from an async invocation.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
 public class ServletExecutor {
     /**
@@ -47,10 +49,10 @@ public class ServletExecutor {
      * @throws IOException for any I/O exception
      * @throws ServletException for any servlet exception
      */
-    static void dispatch(final String appId, final String path, final HttpServletRequest request) throws IOException, ServletException {
+    static HttpServletResponse dispatch(final String appId, final String path, final HttpServletRequest request) throws IOException, ServletException {
         SimpleKey<ServletContext> key = new SimpleKey<ServletContext>(appId, ServletContext.class);
         ServletContext context = ComponentRegistry.getInstance().getComponent(key);
-        dispatch(appId, path, context, request);
+        return dispatch(appId, path, context, request);
     }
 
     /**
@@ -63,7 +65,7 @@ public class ServletExecutor {
      * @throws IOException for any I/O exception
      * @throws ServletException for any servlet exception
      */
-    static void dispatch(final String appId, final String path, final ServletContext context, final HttpServletRequest request) throws IOException, ServletException {
+    static HttpServletResponse dispatch(final String appId, final String path, final ServletContext context, final HttpServletRequest request) throws IOException, ServletException {
         if (appId == null)
             throw new IllegalArgumentException("Null appId");
         if (path == null)
@@ -77,6 +79,6 @@ public class ServletExecutor {
         if (dispatcher == null)
             throw new IllegalArgumentException("No dispatcher for path: " + path);
 
-        Hack.invoke(dispatcher, request);
+        return Hack.invoke(dispatcher, request);
     }
 }
