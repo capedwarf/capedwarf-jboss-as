@@ -71,7 +71,7 @@ class ServletExecutorConsumer implements MessageListener {
         return ModuleIdentifier.fromString(mi);
     }
 
-    private HttpServletRequest createServletRequest(final String appId, ClassLoader cl, Message message, ServletContext context) throws Exception {
+    private ServletRequestCreator getServletRequestCreator(final String appId, ClassLoader cl, Message message) throws Exception {
         final String factoryClass = getValue(message, MessageConstants.FACTORY);
         ServletRequestCreator factory;
         final Key<Map<String, ServletRequestCreator>> key = new MapKey<String, ServletRequestCreator>(appId, Slot.SERVLET_REQUEST_CREATOR);
@@ -88,7 +88,7 @@ class ServletExecutorConsumer implements MessageListener {
             factory = clazz.newInstance();
             factories.put(factoryClass, factory);
         }
-        return factory.createServletRequest(context, message);
+        return factory;
     }
 
     public void onMessage(Message message) {
@@ -108,12 +108,18 @@ class ServletExecutorConsumer implements MessageListener {
             }
 
             final ClassLoader cl = module.getClassLoader();
-            final HttpServletRequest request = createServletRequest(appId, cl, message, context);
+            final ServletRequestCreator creator = getServletRequestCreator(appId, cl, message);
+            final HttpServletRequest request = creator.createServletRequest(context, message);
             final String path = getValue(message, MessageConstants.PATH);
 
-            HttpServletResponse response = ServletExecutor.dispatch(appId, path, context, request);
-            if (!isStatus2xx(response)) {
-                throw new RuntimeException("Status was " + response.getStatus());
+            creator.prepare(request, appId);
+            try {
+                HttpServletResponse response = ServletExecutor.dispatch(appId, path, context, request);
+                if (!isStatus2xx(response)) {
+                    throw new RuntimeException("Status was " + response.getStatus());
+                }
+            } finally {
+                creator.finish();
             }
         } catch (RuntimeException e) {
             log.error("Error handling servlet execution.", e);
