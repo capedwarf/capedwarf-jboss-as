@@ -29,6 +29,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.capedwarf.shared.components.Key;
@@ -47,6 +48,7 @@ import org.jboss.modules.ModuleLoader;
  * JMS consumer for servlet executor.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
 class ServletExecutorConsumer implements MessageListener {
     private static final Logger log = Logger.getLogger(ServletExecutorConsumer.class);
@@ -107,9 +109,12 @@ class ServletExecutorConsumer implements MessageListener {
 
             final ClassLoader cl = module.getClassLoader();
             final HttpServletRequest request = createServletRequest(appId, cl, message, context);
-
             final String path = getValue(message, MessageConstants.PATH);
-            ServletExecutor.dispatch(appId, path, context, request);
+
+            HttpServletResponse response = ServletExecutor.dispatch(appId, path, context, request);
+            if (!isStatus2xx(response)) {
+                throw new RuntimeException("Status was " + response.getStatus());
+            }
         } catch (RuntimeException e) {
             log.error("Error handling servlet execution.", e);
             throw e;
@@ -117,6 +122,10 @@ class ServletExecutorConsumer implements MessageListener {
             log.error("Error handling servlet execution.", e);
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean isStatus2xx(HttpServletResponse response) {
+        return 200 <= response.getStatus() && response.getStatus() <= 299;
     }
 
     protected Module loadModule(ModuleIdentifier identifier) {

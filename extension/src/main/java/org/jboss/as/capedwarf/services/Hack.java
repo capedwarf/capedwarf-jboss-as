@@ -53,22 +53,24 @@ import org.apache.catalina.core.ApplicationFilterFactory;
  * Hack around to dispatch custom request from static view.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
 class Hack {
 
-    private static final HttpServletResponse NOOP = new NoopServletResponse();
-
-    static void invoke(final RequestDispatcher dispatcher, final HttpServletRequest delegate) throws ServletException, IOException {
-        if (dispatcher instanceof ApplicationDispatcher) {
-            ApplicationDispatcher.class.cast(dispatcher).invoke(wrap(delegate), NOOP);
-        } else {
+    static HttpServletResponse invoke(final RequestDispatcher dispatcher, final HttpServletRequest delegate) throws ServletException, IOException {
+        if (dispatcher instanceof ApplicationDispatcher == false) {
             throw new IllegalStateException("Can only invoke on " + ApplicationDispatcher.class.getSimpleName());
         }
 
+        ApplicationDispatcher applicationDispatcher = ApplicationDispatcher.class.cast(dispatcher);
+
+        NoopServletResponse response = new NoopServletResponse();
+        applicationDispatcher.invoke(wrap(delegate), response);
+
         // check for dispatch error
-        final Object attribute = delegate.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+        Object attribute = delegate.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
         if (attribute == null)
-            return;
+            return response;
 
         if (attribute instanceof RuntimeException) {
             throw RuntimeException.class.cast(attribute);
