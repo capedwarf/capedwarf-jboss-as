@@ -36,7 +36,6 @@ import org.jboss.as.capedwarf.services.ConfigurationCallback;
 import org.jboss.as.capedwarf.services.DefaultConfigurationCallback;
 import org.jboss.as.capedwarf.services.IndexableConfigurationCallback;
 import org.jboss.as.capedwarf.services.MuxIdGenerator;
-import org.jboss.as.capedwarf.services.TasksConfigurationCallback;
 import org.jboss.as.clustering.infinispan.subsystem.CacheConfigurationService;
 import org.jboss.as.clustering.infinispan.subsystem.EmbeddedCacheManagerService;
 import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
@@ -90,7 +89,7 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
             createBuilder(serviceTarget, cn, appId, null);
         }
         // tasks cache
-        final ConfigurationCallback tasksCallback = new TasksConfigurationCallback(appId, classLoader);
+        final ConfigurationCallback tasksCallback = new BasicConfigurationCallback(CacheName.TASKS, appId, classLoader);
         createBuilder(serviceTarget, CacheName.TASKS, appId, tasksCallback);
     }
 
