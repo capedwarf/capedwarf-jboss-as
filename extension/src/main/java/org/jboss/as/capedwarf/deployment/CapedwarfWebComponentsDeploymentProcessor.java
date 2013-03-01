@@ -12,6 +12,8 @@ import org.jboss.metadata.javaee.spec.ResourceReferenceMetaData;
 import org.jboss.metadata.javaee.spec.ResourceReferencesMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
+import org.jboss.metadata.web.jboss.ContainerListenerMetaData;
+import org.jboss.metadata.web.jboss.ContainerListenerType;
 import org.jboss.metadata.web.jboss.JBoss70WebMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.jboss.ValveMetaData;
@@ -85,7 +87,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final LoginConfigMetaData ADMIN_SERVLET_CONFIG;
     private final SecurityRoleMetaData ADMIN_SERVLET_ROLE;
 
-    private ValveMetaData AUTH_VALVE;
+    private final ValveMetaData AUTH_VALVE;
 
     private final boolean adminAuth;
 
@@ -121,7 +123,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         ADMIN_SERVLET_CONFIG = createAdminServletLogin();
         ADMIN_SERVLET_ROLE = createAdminServletSecurityRole();
 
-        AUTH_VALVE = createAuthValve();
+        AUTH_VALVE = createValve("org.jboss.capedwarf.users.CapedwarfAuthenticator");
     }
 
     @Override
@@ -372,9 +374,25 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         return valves;
     }
 
-    private ValveMetaData createAuthValve() {
+    private ValveMetaData createValve(String valveClass) {
         ValveMetaData vmd = new ValveMetaData();
-        vmd.setValveClass("org.jboss.capedwarf.users.CapedwarfAuthenticator");
+        vmd.setValveClass(valveClass);
         return vmd;
+    }
+
+    protected List<ContainerListenerMetaData> getContainerListeners(JBossWebMetaData webMetaData) {
+        List<ContainerListenerMetaData> cl = webMetaData.getContainerListeners();
+        if (cl == null) {
+            cl = new ArrayList<ContainerListenerMetaData>();
+            webMetaData.setContainerListeners(cl);
+        }
+        return cl;
+    }
+
+    protected ContainerListenerMetaData createContainerListenerMetaData(String clazz, ContainerListenerType type) {
+        ContainerListenerMetaData clmd = new ContainerListenerMetaData();
+        clmd.setListenerClass(clazz);
+        clmd.setListenerType(type);
+        return clmd;
     }
 }
