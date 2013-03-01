@@ -31,7 +31,7 @@ public enum CacheName {
     DEFAULT("default", true, new CacheIndexing(1).setOffset(-1).addClass("com.google.appengine.api.datastore.Entity")),
     SEARCH("search", true, new CacheIndexing(-1).setOffset(1).addClass("org.jboss.capedwarf.search.CacheValue")),
     PROSPECTIVE_SEARCH("prospective_search", true, new CacheIndexing(-1).addClass("org.jboss.capedwarf.prospectivesearch.SubscriptionHolder")),
-    TASKS("tasks", true, new CacheIndexing(1).addClass("org.jboss.capedwarf.tasks.TaskOptionsEntity")),
+    TASKS("tasks", true, new CacheIndexing(1).addClass("org.jboss.capedwarf.tasks.Task")),
     DATA("data", false),
     METADATA("metadata", false),
     MEMCACHE("memcache", false),
