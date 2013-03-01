@@ -33,7 +33,6 @@ import org.jboss.as.capedwarf.services.BasicConfigurationCallback;
 import org.jboss.as.capedwarf.services.CacheLifecycleService;
 import org.jboss.as.capedwarf.services.CacheName;
 import org.jboss.as.capedwarf.services.ConfigurationCallback;
-import org.jboss.as.capedwarf.services.DefaultConfigurationCallback;
 import org.jboss.as.capedwarf.services.IndexableConfigurationCallback;
 import org.jboss.as.capedwarf.services.MuxIdGenerator;
 import org.jboss.as.clustering.infinispan.subsystem.CacheConfigurationService;
@@ -77,10 +76,8 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
         final ClassLoader classLoader = unit.getAttachment(Attachments.MODULE).getClassLoader();
 
         final ServiceTarget serviceTarget = context.getServiceTarget();
-        // default
-        createBuilder(serviceTarget, CacheName.DEFAULT, appId, new DefaultConfigurationCallback(appId, classLoader));
-        // search, ps cache
-        for (CacheName cn : Arrays.asList(CacheName.SEARCH, CacheName.PROSPECTIVE_SEARCH)) {
+        // default, search, ps, tasks cache
+        for (CacheName cn : Arrays.asList(CacheName.DEFAULT, CacheName.SEARCH, CacheName.PROSPECTIVE_SEARCH, CacheName.TASKS)) {
             final ConfigurationCallback callback = new BasicConfigurationCallback(cn, appId, classLoader);
             createBuilder(serviceTarget, cn, appId, callback);
         }
@@ -88,9 +85,6 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
         for (CacheName cn : Arrays.asList(CacheName.DATA, CacheName.METADATA, CacheName.MEMCACHE, CacheName.DIST)) {
             createBuilder(serviceTarget, cn, appId, null);
         }
-        // tasks cache
-        final ConfigurationCallback tasksCallback = new BasicConfigurationCallback(CacheName.TASKS, appId, classLoader);
-        createBuilder(serviceTarget, CacheName.TASKS, appId, tasksCallback);
     }
 
     protected ServiceController<Cache> createBuilder(ServiceTarget serviceTarget, CacheName cacheName, String appId, ConfigurationCallback callback) {
