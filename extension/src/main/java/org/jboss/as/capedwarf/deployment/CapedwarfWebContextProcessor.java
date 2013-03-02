@@ -139,18 +139,29 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
             ConfigurationAware.setQueueXml(queueXml);
             ConfigurationAware.setBackendsXml(backendsXml);
 
-            invokeListener(appCL, "setup");
+            try {
+                invokeListener(appCL, "setup");
+            } catch (RuntimeException e) {
+                reset();
+                throw e;
+            }
         }
 
         public void teardown(Map<String, Object> properties) {
-            if (isContextSetup()) {
-                invokeListener(appCL, "teardown");
-
-                ConfigurationAware.setAppEngineWebXml(null);
-                ConfigurationAware.setCapedwarfConfiguration(null);
-                ConfigurationAware.setQueueXml(null);
-                ConfigurationAware.setBackendsXml(null);
+            try {
+                if (isContextSetup()) {
+                    invokeListener(appCL, "teardown");
+                }
+            } finally {
+                reset();
             }
+        }
+
+        private void reset() {
+            ConfigurationAware.setAppEngineWebXml(null);
+            ConfigurationAware.setCapedwarfConfiguration(null);
+            ConfigurationAware.setQueueXml(null);
+            ConfigurationAware.setBackendsXml(null);
         }
 
         public int priority() {
@@ -174,8 +185,8 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
                 Class<?> gaeListenerClass = appCL.loadClass("org.jboss.capedwarf.appidentity.GAEListener");
                 Method m = gaeListenerClass.getDeclaredMethod(method, types);
                 return m.invoke(null, args);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
             }
         }
     }
