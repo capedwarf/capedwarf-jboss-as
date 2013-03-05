@@ -53,6 +53,8 @@ import org.jboss.modules.ModuleLoader;
 class ServletExecutorConsumer implements MessageListener {
     private static final Logger log = Logger.getLogger(ServletExecutorConsumer.class);
 
+    private static final String JMSX_DELIVERY_COUNT = "JMSXDeliveryCount";
+
     private final ModuleLoader loader;
 
     public ServletExecutorConsumer(ModuleLoader loader) {
@@ -93,6 +95,12 @@ class ServletExecutorConsumer implements MessageListener {
 
     public void onMessage(Message message) {
         try {
+            int maxAttempts = message.getIntProperty(MessageConstants.MAX_ATTEMPTS);
+            int currentAttemptNumber = message.getIntProperty(JMSX_DELIVERY_COUNT); // 1-based
+            if (maxAttempts != -1 && currentAttemptNumber > maxAttempts) {
+                return;
+            }
+
             final ModuleIdentifier identifier = parseModuleIdentifier(message);
             final Module module = loadModule(identifier);
             if (module == null) {
