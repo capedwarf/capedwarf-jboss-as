@@ -38,6 +38,7 @@
             </fileset>
         </copy>
         <chmod file="${output.dir}/bin/capedwarf-bytecode.sh" perm="755"/>
+        <chmod file="${output.dir}/bin/capedwarf.sh" perm="755"/>
     </target>
 
     <target name="modules" >
