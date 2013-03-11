@@ -138,6 +138,8 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, CAPEDWARF_SHARED));
         // always add Infinispan
         moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, INFINISPAN));
+        // Always add BlackList transformer
+        moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.blacklist.BlackListTransformer");
         // GAE version
         final String version;
         // check if we bundle gae api jar
