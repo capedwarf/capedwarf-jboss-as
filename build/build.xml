@@ -189,5 +189,6 @@
         </copy>
 
         <chmod file="${jboss.dir}/bin/capedwarf-bytecode.sh" perm="755"/>
+        <chmod file="${jboss.dir}/bin/capedwarf.sh" perm="755"/>
     </target>
 </project>
