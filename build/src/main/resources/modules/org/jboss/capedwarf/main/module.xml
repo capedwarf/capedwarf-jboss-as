@@ -40,8 +40,6 @@
         <module name="javax.activation.api"/>
         <module name="javax.mail.api"/>
         <module name="javax.servlet.api"/>
-        <module name="org.apache.velocity"/>
-        <module name="org.apache.velocity.tools"/>
         <module name="org.bouncycastle.bcmail"/>
         <module name="org.bouncycastle.bcpkix"/>
         <module name="org.bouncycastle.bcprov"/>

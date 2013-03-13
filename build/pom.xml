@@ -396,11 +396,6 @@
             <artifactId>lucene-memory</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity-tools</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>

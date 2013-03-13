@@ -62,8 +62,6 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier INFINISPAN = ModuleIdentifier.create("org.infinispan");
 
     private static final ModuleIdentifier MODULES = ModuleIdentifier.create("org.jboss.modules");
-    private static final ModuleIdentifier VELOCITY = ModuleIdentifier.create("org.apache.velocity");
-    private static final ModuleIdentifier VELOCITY_TOOLS = ModuleIdentifier.create("org.apache.velocity.tools");
     private static final ModuleIdentifier TX = ModuleIdentifier.create("javax.transaction.api");
     private static final ModuleIdentifier ACTIVATION = ModuleIdentifier.create("javax.activation.api");
     private static final ModuleIdentifier MAIL = ModuleIdentifier.create("org.javassist");
@@ -87,8 +85,6 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     // inline this module deps, if running with bundled
     private static final ModuleIdentifier[] INLINE = {
             MODULES,
-            VELOCITY,
-            VELOCITY_TOOLS,
             TX,
             ACTIVATION,
             MAIL,

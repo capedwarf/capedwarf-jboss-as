@@ -61,10 +61,6 @@
             <maven-resource group="org.apache.lucene" artifact="lucene-memory"/>
         </module-def>
 
-        <module-def name="org.apache.velocity.tools">
-            <maven-resource group="org.apache.velocity" artifact="velocity-tools"/>
-        </module-def>
-
     	<module-def name="org.bouncycastle.bcmail">
             <maven-resource group="org.bouncycastle" artifact="bcmail-jdk15on"/>
         </module-def>
