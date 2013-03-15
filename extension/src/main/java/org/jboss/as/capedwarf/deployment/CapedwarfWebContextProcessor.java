@@ -39,6 +39,8 @@ import org.jboss.capedwarf.shared.config.BackendsXmlParser;
 import org.jboss.capedwarf.shared.config.CapedwarfConfiguration;
 import org.jboss.capedwarf.shared.config.CapedwarfConfigurationParser;
 import org.jboss.capedwarf.shared.config.ConfigurationAware;
+import org.jboss.capedwarf.shared.config.IndexesXml;
+import org.jboss.capedwarf.shared.config.IndexesXmlParser;
 import org.jboss.capedwarf.shared.config.QueueXml;
 import org.jboss.capedwarf.shared.config.QueueXmlParser;
 import org.jboss.modules.Module;
@@ -98,9 +100,18 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
                 safeClose(backendsIs);
             }
 
+            // datastore-indexes.xml
+            final InputStream indexesIs = getInputStream(deploymentRoot, "WEB-INF/datastore-indexes.xml", false);
+            IndexesXml indexesConfig;
+            try {
+                indexesConfig = IndexesXmlParser.parse(indexesIs);
+            } finally {
+                safeClose(indexesIs);
+            }
+
             final String appId = CapedwarfDeploymentMarker.getAppId(unit);
             final Set<ServiceName> dependecies = CapedwarfDependenciesProcessor.getDependecies(appId);
-            final CapedwarfSetupAction cas = new CapedwarfSetupAction(dependecies, classLoader, appConfig, cdConfig, queueConfig, backendsConfig);
+            final CapedwarfSetupAction cas = new CapedwarfSetupAction(dependecies, classLoader, appConfig, cdConfig, queueConfig, backendsConfig, indexesConfig);
             unit.addToAttachmentList(org.jboss.as.ee.component.Attachments.WEB_SETUP_ACTIONS, cas);
         } catch (DeploymentUnitProcessingException e) {
             throw e;
@@ -127,8 +138,8 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
         private final Set<ServiceName> dependencies;
         private final ClassLoader appCL;
 
-        private CapedwarfSetupAction(Set<ServiceName> dependencies, ClassLoader appCL, AppEngineWebXml appEngineWebXml, CapedwarfConfiguration capedwarfConfiguration, QueueXml queueXml, BackendsXml backendsXml) {
-            super(appEngineWebXml, capedwarfConfiguration, queueXml, backendsXml);
+        private CapedwarfSetupAction(Set<ServiceName> dependencies, ClassLoader appCL, AppEngineWebXml appEngineWebXml, CapedwarfConfiguration capedwarfConfiguration, QueueXml queueXml, BackendsXml backendsXml, IndexesXml indexesXml) {
+            super(appEngineWebXml, capedwarfConfiguration, queueXml, backendsXml, indexesXml);
             this.dependencies = dependencies;
             this.appCL = appCL;
         }
@@ -138,6 +149,7 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
             ConfigurationAware.setCapedwarfConfiguration(capedwarfConfiguration);
             ConfigurationAware.setQueueXml(queueXml);
             ConfigurationAware.setBackendsXml(backendsXml);
+            ConfigurationAware.setIndexesXml(indexesXml);
 
             try {
                 invokeListener(appCL, "setup");
@@ -162,6 +174,7 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
             ConfigurationAware.setCapedwarfConfiguration(null);
             ConfigurationAware.setQueueXml(null);
             ConfigurationAware.setBackendsXml(null);
+            ConfigurationAware.setIndexesXml(null);
         }
 
         public int priority() {
