@@ -22,12 +22,18 @@
 
 package org.jboss.as.capedwarf.extension;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jms.Connection;
 
@@ -77,6 +83,7 @@ import org.jboss.as.server.deployment.Phase;
 import org.jboss.as.server.deployment.module.TempFileProviderService;
 import org.jboss.as.threads.ThreadsServices;
 import org.jboss.as.txn.service.TxnServices;
+import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.capedwarf.shared.components.Key;
 import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.capedwarf.shared.url.URLHack;
@@ -138,6 +145,8 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         // register custom URLStreamHandlerFactory
         registerURLStreamHandlerFactory();
 
+        readCapedwarfConf();
+
         context.addStep(new AbstractDeploymentChainStep() {
             public void execute(DeploymentProcessorTarget processorTarget) {
                 final ServiceTarget serviceTarget = context.getServiceTarget();
@@ -198,6 +207,27 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         } catch (Exception e) {
             throw new OperationFailedException(e.getMessage());
         }
+    }
+
+    protected static void readCapedwarfConf() {
+        final Properties properties = new Properties();
+
+        try {
+            File bin = new File(System.getProperty("jboss.home.dir"), "bin");
+            File cdConf = new File(bin, "capedwarf.conf");
+            if (cdConf.exists()) {
+                InputStream is = new FileInputStream(cdConf);
+                try {
+                    properties.load(is);
+                } finally {
+                    is.close();
+                }
+            }
+        } catch (IOException e) {
+            Logger.getLogger(CapedwarfSubsystemAdd.class.getName()).log(Level.WARNING, "Cannot read capedwarf.conf.", e);
+        }
+
+        ComponentRegistry.getInstance().setComponent(Keys.CONFIGURATION, properties);
     }
 
     protected static <T> void addComponentRegistryService(final ServiceTarget serviceTarget, final List<ServiceController<?>> newControllers, final Key<T> key, final ServiceName dependencyName) {
