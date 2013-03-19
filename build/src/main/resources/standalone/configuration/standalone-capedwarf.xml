@@ -374,6 +374,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:messaging:1.2">
             <hornetq-server>
+                <jmx-management-enabled>true</jmx-management-enabled>
                 <clustered>true</clustered>
                 <cluster-password>abc123</cluster-password>
                 <persistence-enabled>false</persistence-enabled>
