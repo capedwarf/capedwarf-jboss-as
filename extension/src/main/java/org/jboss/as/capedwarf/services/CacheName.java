@@ -26,12 +26,14 @@ package org.jboss.as.capedwarf.services;
  * Available caches in CapeDwarf.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
 public enum CacheName {
     DEFAULT("default", true, new CacheIndexing(1).setOffset(-1).addClass("com.google.appengine.api.datastore.Entity")),
     SEARCH("search", true, new CacheIndexing(-1).setOffset(1).addClass("org.jboss.capedwarf.search.CacheValue")),
     PROSPECTIVE_SEARCH("prospective_search", true, new CacheIndexing(-1).addClass("org.jboss.capedwarf.prospectivesearch.SubscriptionHolder")),
     TASKS("tasks", true, new CacheIndexing(1).addClass("org.jboss.capedwarf.tasks.Task")),
+    LOGS("logs", true, new CacheIndexing(1).setOffset(2).addClass("org.jboss.capedwarf.log.CapedwarfAppLogLine").addClass("org.jboss.capedwarf.log.CapedwarfRequestLogs")),
     DATA("data", false),
     METADATA("metadata", false),
     MEMCACHE("memcache", false),
