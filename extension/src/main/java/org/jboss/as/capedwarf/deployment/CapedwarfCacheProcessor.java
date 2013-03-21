@@ -80,7 +80,7 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
         // default
         createBuilder(serviceTarget, CacheName.DEFAULT, appId, new DefaultConfigurationCallback(appId, classLoader));
         // search, ps, tasks cache
-        for (CacheName cn : Arrays.asList(CacheName.SEARCH, CacheName.PROSPECTIVE_SEARCH, CacheName.TASKS)) {
+        for (CacheName cn : Arrays.asList(CacheName.SEARCH, CacheName.PROSPECTIVE_SEARCH, CacheName.TASKS, CacheName.LOGS)) {
             final ConfigurationCallback callback = new BasicConfigurationCallback(cn, appId, classLoader);
             createBuilder(serviceTarget, cn, appId, callback);
         }
