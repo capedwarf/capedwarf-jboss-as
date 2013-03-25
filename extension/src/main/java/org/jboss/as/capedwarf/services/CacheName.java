@@ -37,7 +37,8 @@ public enum CacheName {
     DATA("data", false),
     METADATA("metadata", false),
     MEMCACHE("memcache", false),
-    DIST("dist", false);
+    DIST("dist", false),
+    DATASTORE_VERSIONS("datastore_versions", false);
 
     private String name;
     private boolean config;

@@ -26,19 +26,18 @@ import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.VersioningScheme;
-import org.infinispan.interceptors.VersionedEntryWrappingInterceptor;
-import org.infinispan.interceptors.base.CommandInterceptor;
 import org.infinispan.util.concurrent.IsolationLevel;
 import org.jboss.capedwarf.shared.compatibility.Compatibility;
 import org.jboss.capedwarf.shared.components.SimpleKey;
 
 /**
- * Default cache configuration callback.
+ * Datastore versions cache configuration callback.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
-public class DefaultConfigurationCallback extends BasicConfigurationCallback {
-    public DefaultConfigurationCallback(String appId, ClassLoader classLoader) {
+public class DatastoreVersionsConfigurationCallback extends BasicConfigurationCallback {
+    public DatastoreVersionsConfigurationCallback(String appId, ClassLoader classLoader) {
         super(CacheName.DEFAULT, appId, classLoader);
     }
 
@@ -49,17 +48,7 @@ public class DefaultConfigurationCallback extends BasicConfigurationCallback {
             builder.clustering().cacheMode(CacheMode.DIST_SYNC);
             builder.locking().isolationLevel(IsolationLevel.REPEATABLE_READ).writeSkewCheck(true);
             builder.versioning().enable().scheme(VersioningScheme.SIMPLE);
-            CommandInterceptor interceptor = newVersioningInterceptor();
-            builder.customInterceptors().addInterceptor().interceptor(interceptor).before(VersionedEntryWrappingInterceptor.class);
         }
         return builder;
-    }
-
-    protected CommandInterceptor newVersioningInterceptor() {
-        try {
-            return (CommandInterceptor) classLoader.loadClass("org.jboss.capedwarf.datastore.metadata.VersioningInterceptor").newInstance();
-        } catch (Exception e) {
-            throw new IllegalStateException("Cannot add versioning interceptor.", e);
-        }
     }
 }
