@@ -229,6 +229,11 @@
                         <property name="hibernate.search.default.worker.backend">jgroups</property>
                     </indexing>
                 </distributed-cache>
+                <distributed-cache name="datastore_versions" mode="ASYNC">
+                    <transaction mode="NON_XA"/>
+                    <eviction strategy="LIRS" max-entries="100000"/>
+                    <file-store preload="false" purge="false"/>
+                </distributed-cache>
                 <replicated-cache name="data" mode="SYNC">
                     <transaction mode="NON_XA"/>
                     <eviction strategy="LIRS" max-entries="10000"/>
