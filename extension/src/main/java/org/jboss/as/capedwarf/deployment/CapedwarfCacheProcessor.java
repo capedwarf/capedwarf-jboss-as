@@ -83,6 +83,7 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
             final ConfigurationCallback callback = new BasicConfigurationCallback(cn, appId, classLoader);
             createBuilder(serviceTarget, cn, appId, callback);
         }
+        // versions
         createBuilder(serviceTarget, CacheName.DATASTORE_VERSIONS, appId, new DatastoreVersionsConfigurationCallback(appId, classLoader));
         // data, metadata, memcache, dist
         for (CacheName cn : Arrays.asList(CacheName.DATA, CacheName.METADATA, CacheName.MEMCACHE, CacheName.DIST)) {

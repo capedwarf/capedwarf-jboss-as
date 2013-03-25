@@ -22,13 +22,9 @@
 
 package org.jboss.as.capedwarf.services;
 
-import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.VersioningScheme;
-import org.infinispan.util.concurrent.IsolationLevel;
-import org.jboss.capedwarf.shared.compatibility.Compatibility;
-import org.jboss.capedwarf.shared.components.SimpleKey;
 
 /**
  * Datastore versions cache configuration callback.
@@ -43,12 +39,8 @@ public class DatastoreVersionsConfigurationCallback extends BasicConfigurationCa
 
     public ConfigurationBuilder configure(Configuration configuration) {
         ConfigurationBuilder builder = super.configure(configuration);
-        Compatibility compatibility = Compatibility.getInstance(classLoader, new SimpleKey<Compatibility>(appId, Compatibility.class));
-        if (compatibility.isEnabled(Compatibility.Feature.DISABLE_METADATA) == false) {
-            builder.clustering().cacheMode(CacheMode.DIST_SYNC);
-            builder.locking().isolationLevel(IsolationLevel.REPEATABLE_READ).writeSkewCheck(true);
-            builder.versioning().enable().scheme(VersioningScheme.SIMPLE);
-        }
+        builder.locking().writeSkewCheck(true);
+        builder.versioning().enable().scheme(VersioningScheme.SIMPLE);
         return builder;
     }
 }
