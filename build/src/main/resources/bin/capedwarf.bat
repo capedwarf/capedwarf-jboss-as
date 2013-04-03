@@ -8,4 +8,9 @@ if "%OS%" == "Windows_NT" (
   set DIRNAME=.\
 )
 
+rem check if we need to run bytecode transformation
+if not exist %DIRNAME%..\modules\com\google\appengine\main\old-appengine-api-1.0-sdk* (
+	%DIRNAME%capedwarf-bytecode.bat
+)
+
 %DIRNAME%standalone.bat -c standalone-capedwarf.xml
