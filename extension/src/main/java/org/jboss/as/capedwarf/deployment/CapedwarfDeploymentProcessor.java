@@ -113,6 +113,8 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         }
     };
 
+    private static final Version legacyVersion = new Version(1, 7, 4);
+
     private String defaultGaeVersion;
     private Map<String, List<ResourceLoaderSpec>> capedwarfResources = new HashMap<String, List<ResourceLoaderSpec>>();
 
@@ -141,12 +143,19 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         // check if we bundle gae api jar
         final VirtualFile gae = LibUtils.findLibrary(unit, appengingAPI);
         if (gae != null && gae.exists()) {
+            version = getVersion(gae);
             // set it in marker
             CapedwarfDeploymentMarker.setBundledAppEngineApi(unit);
             // add a transformer, modifying GAE service factories and other misc classes
             moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.CapedwarfTransformer");
+            Version versionCheck = Version.parse(version);
+            if (versionCheck == null) {
+                log.debug("Cannot determine GAE version: " + version);
+            } else if (versionCheck.compareTo(legacyVersion) <= 0) {
+                // add a legacy transformer, modifying GAE service factories
+                moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.LegacyFactoriesTransformer");
+            }
             // add CapeDwarf resources directly as libs
-            version = getVersion(gae);
             for (ResourceLoaderSpec rls : getCapedwarfResources(version))
                 moduleSpecification.addResourceLoader(rls);
             // add other needed dependencies
