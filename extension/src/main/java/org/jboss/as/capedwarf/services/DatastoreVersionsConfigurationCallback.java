@@ -22,6 +22,7 @@
 
 package org.jboss.as.capedwarf.services;
 
+import org.hibernate.search.cfg.SearchMapping;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.VersioningScheme;
@@ -35,6 +36,10 @@ import org.infinispan.configuration.cache.VersioningScheme;
 public class DatastoreVersionsConfigurationCallback extends BasicConfigurationCallback {
     public DatastoreVersionsConfigurationCallback(String appId, ClassLoader classLoader) {
         super(CacheName.DATASTORE_VERSIONS, appId, classLoader);
+    }
+
+    protected SearchMapping applyIndexing(ConfigurationBuilder builder) {
+        return null; // no indexing
     }
 
     public ConfigurationBuilder configure(Configuration configuration) {
