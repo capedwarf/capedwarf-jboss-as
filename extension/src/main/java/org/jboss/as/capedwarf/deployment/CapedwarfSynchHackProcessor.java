@@ -69,7 +69,7 @@ public class CapedwarfSynchHackProcessor extends CapedwarfDeploymentUnitProcesso
                 } catch (Exception ignore) {
                 }
             }
-            if (callers.isEmpty() == false) {
+            if (callers.size() > 0) {
                 String appId = CapedwarfDeploymentMarker.getAppId(unit);
                 Key<Set<String>> key = new SetKey<String>(appId, Slot.SYNC_HACK);
                 ComponentRegistry.getInstance().setComponent(key, callers);

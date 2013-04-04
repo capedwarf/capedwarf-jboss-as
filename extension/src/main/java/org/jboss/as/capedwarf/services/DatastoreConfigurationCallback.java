@@ -22,28 +22,32 @@
 
 package org.jboss.as.capedwarf.services;
 
-import java.util.logging.Logger;
+import java.util.Set;
 
-import org.infinispan.Cache;
-import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.configuration.cache.CacheMode;
+import org.infinispan.configuration.cache.Configuration;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.jboss.capedwarf.shared.components.ComponentRegistry;
+import org.jboss.capedwarf.shared.components.SetKey;
+import org.jboss.capedwarf.shared.components.Slot;
 
 /**
- * Abstract cache callback.
+ * Datastore cache configuration callback.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public abstract class AbstractConfigurationCallback implements ConfigurationCallback {
-    protected final Logger log = Logger.getLogger(getClass().getName());
-
-    public void start(EmbeddedCacheManager manager) {
+public class DatastoreConfigurationCallback extends BasicConfigurationCallback {
+    public DatastoreConfigurationCallback(String appId, ClassLoader classLoader) {
+        super(CacheName.DEFAULT, appId, classLoader);
     }
 
-    public void stop(EmbeddedCacheManager manager) {
-    }
-
-    public void start(Cache cache) {
-    }
-
-    public void stop(Cache cache) {
+    public ConfigurationBuilder configure(Configuration configuration) {
+        ConfigurationBuilder builder = super.configure(configuration);
+        Set<String> callers = ComponentRegistry.getInstance().getComponent(new SetKey<String>(appId, Slot.SYNC_HACK));
+        if (callers != null && callers.size() > 0) {
+            log.info("Forcing sync cache mode, callers found: " + callers);
+            builder.clustering().cacheMode(CacheMode.DIST_SYNC);
+        }
+        return builder;
     }
 }

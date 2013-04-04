@@ -34,7 +34,7 @@ import org.infinispan.configuration.cache.VersioningScheme;
  */
 public class DatastoreVersionsConfigurationCallback extends BasicConfigurationCallback {
     public DatastoreVersionsConfigurationCallback(String appId, ClassLoader classLoader) {
-        super(CacheName.DEFAULT, appId, classLoader);
+        super(CacheName.DATASTORE_VERSIONS, appId, classLoader);
     }
 
     public ConfigurationBuilder configure(Configuration configuration) {
