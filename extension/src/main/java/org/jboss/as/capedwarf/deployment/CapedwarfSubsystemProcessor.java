@@ -22,6 +22,10 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -29,6 +33,9 @@ import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.as.server.deployment.module.ResourceRoot;
+import org.jboss.capedwarf.shared.compatibility.Compatibility;
+import org.jboss.vfs.VirtualFile;
 
 /**
  * Handle subsystems per deployment.
@@ -36,13 +43,45 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfSubsystemProcessor extends CapedwarfDeploymentUnitProcessor {
+    private static final Set<String> EXCLUDED_SUBSYSTEMS;
+
+    static {
+        EXCLUDED_SUBSYSTEMS = new HashSet<String>();
+        EXCLUDED_SUBSYSTEMS.add("jaxrs"); // exclude REST for now
+    }
+
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         DeploymentUnit unit = phaseContext.getDeploymentUnit();
-        Set<String> subsystems = unit.getAttachment(Attachments.EXCLUDED_SUBSYSTEMS);
-        if (subsystems == null) {
-            subsystems = new ConcurrentSkipListSet<String>();
-            unit.putAttachment(Attachments.EXCLUDED_SUBSYSTEMS, subsystems);
+
+        Set<String> excludedSubsystems = new HashSet<String>(EXCLUDED_SUBSYSTEMS);
+        excludedSubsystems.removeAll(getEnabledSubsystems(unit));
+
+        if (excludedSubsystems.size() > 0) {
+            Set<String> subsystems = unit.getAttachment(Attachments.EXCLUDED_SUBSYSTEMS);
+            if (subsystems == null) {
+                subsystems = new ConcurrentSkipListSet<String>();
+                unit.putAttachment(Attachments.EXCLUDED_SUBSYSTEMS, subsystems);
+            }
+            subsystems.addAll(excludedSubsystems);
         }
-        subsystems.add("jaxrs"); // for now just ignore REST subsystem
+    }
+
+    protected Set<String> getEnabledSubsystems(DeploymentUnit unit) throws DeploymentUnitProcessingException {
+        try {
+            ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
+            VirtualFile root = deploymentRoot.getRoot();
+            VirtualFile cf = root.getChild("WEB-INF/classes/" + Compatibility.FILENAME);
+            if (cf.exists()) {
+                Compatibility compatibility = Compatibility.readCompatibility(cf.openStream());
+                String value = compatibility.getValue(Compatibility.Feature.ENABLED_SUBSYSTEMS);
+                if (value != null) {
+                    String[] split = value.split(",");
+                    return new HashSet<String>(Arrays.asList(split));
+                }
+            }
+            return Collections.emptySet();
+        } catch (IOException e) {
+            throw new DeploymentUnitProcessingException(e);
+        }
     }
 }
