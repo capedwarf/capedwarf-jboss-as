@@ -27,8 +27,10 @@ import java.util.Set;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.jboss.capedwarf.shared.compatibility.Compatibility;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.capedwarf.shared.components.SetKey;
+import org.jboss.capedwarf.shared.components.SimpleKey;
 import org.jboss.capedwarf.shared.components.Slot;
 
 /**
@@ -43,11 +45,19 @@ public class DatastoreConfigurationCallback extends BasicConfigurationCallback {
 
     public ConfigurationBuilder configure(Configuration configuration) {
         ConfigurationBuilder builder = super.configure(configuration);
-        Set<String> callers = ComponentRegistry.getInstance().getComponent(new SetKey<String>(appId, Slot.SYNC_HACK));
-        if (callers != null && callers.size() > 0) {
-            log.info("Forcing sync cache mode, callers found: " + callers);
-            builder.clustering().cacheMode(CacheMode.DIST_SYNC);
+
+        ComponentRegistry registry = ComponentRegistry.getInstance();
+        Compatibility compatibility = registry.getComponent(new SimpleKey<Compatibility>(appId, Compatibility.class));
+        if (compatibility.isEnabled(Compatibility.Feature.FORCE_ASYNC_DATASTORE)) {
+            Set<String> callers = registry.getComponent(new SetKey<String>(appId, Slot.SYNC_HACK));
+            if (callers == null || callers.isEmpty()) {
+                log.info("Forcing async cache mode -- compatibility setting.");
+                builder.clustering().cacheMode(CacheMode.DIST_ASYNC);
+            } else {
+                log.warning("Ignoring async force, found callers: " + callers);
+            }
         }
+
         return builder;
     }
 }

@@ -9,6 +9,7 @@ import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.module.ModuleDependency;
 import org.jboss.as.server.deployment.module.ResourceRoot;
+import org.jboss.capedwarf.shared.compatibility.Compatibility;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
 import org.jboss.vfs.VirtualFile;
@@ -63,5 +64,14 @@ final class LibUtils {
 
     public static ModuleDependency createModuleDependency(ModuleLoader loader, ModuleIdentifier moduleIdentifier) {
         return new ModuleDependency(loader, moduleIdentifier, false, false, true, false);
+    }
+
+    static VirtualFile getCompatibilityFile(VirtualFile root) {
+        return root.getChild("WEB-INF/classes/" + Compatibility.FILENAME);
+    }
+
+    static Compatibility getCompatibility(VirtualFile root) throws IOException {
+        VirtualFile cf = getCompatibilityFile(root);
+        return (cf.exists()) ? Compatibility.readCompatibility(cf.openStream()) : null;
     }
 }

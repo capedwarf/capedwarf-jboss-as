@@ -213,7 +213,7 @@
             </cache-container>
             <cache-container name="capedwarf" default-cache="default">
                 <transport lock-timeout="60000"/>
-                <distributed-cache name="default" mode="ASYNC">
+                <distributed-cache name="default" mode="SYNC">
                     <transaction mode="NON_XA"/>
                     <eviction strategy="LIRS" max-entries="100000"/>
                     <file-store preload="false" purge="false"/>

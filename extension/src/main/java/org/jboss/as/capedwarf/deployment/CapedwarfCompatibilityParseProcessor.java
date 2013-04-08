@@ -23,11 +23,6 @@
 package org.jboss.as.capedwarf.deployment;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -35,50 +30,27 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.module.ResourceRoot;
 import org.jboss.capedwarf.shared.compatibility.Compatibility;
+import org.jboss.capedwarf.shared.components.ComponentRegistry;
+import org.jboss.capedwarf.shared.components.Key;
+import org.jboss.capedwarf.shared.components.SimpleKey;
 import org.jboss.vfs.VirtualFile;
 
 /**
- * Handle subsystems per deployment.
+ * Parse compatibility props.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfSubsystemProcessor extends CapedwarfDeploymentUnitProcessor {
-    private static final Set<String> EXCLUDED_SUBSYSTEMS;
-
-    static {
-        EXCLUDED_SUBSYSTEMS = new HashSet<String>();
-        EXCLUDED_SUBSYSTEMS.add("jaxrs"); // exclude REST for now
-    }
-
+public class CapedwarfCompatibilityParseProcessor extends CapedwarfDeploymentUnitProcessor {
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-        DeploymentUnit unit = phaseContext.getDeploymentUnit();
-
-        Set<String> excludedSubsystems = new HashSet<String>(EXCLUDED_SUBSYSTEMS);
-        excludedSubsystems.removeAll(getEnabledSubsystems(unit));
-
-        if (excludedSubsystems.size() > 0) {
-            Set<String> subsystems = unit.getAttachment(Attachments.EXCLUDED_SUBSYSTEMS);
-            if (subsystems == null) {
-                subsystems = new ConcurrentSkipListSet<String>();
-                unit.putAttachment(Attachments.EXCLUDED_SUBSYSTEMS, subsystems);
-            }
-            subsystems.addAll(excludedSubsystems);
-        }
-    }
-
-    protected Set<String> getEnabledSubsystems(DeploymentUnit unit) throws DeploymentUnitProcessingException {
         try {
+            DeploymentUnit unit = phaseContext.getDeploymentUnit();
             ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
             VirtualFile root = deploymentRoot.getRoot();
-            Compatibility compatibility = LibUtils.getCompatibility(root);
-            if (compatibility != null) {
-                String value = compatibility.getValue(Compatibility.Feature.ENABLED_SUBSYSTEMS);
-                if (value != null) {
-                    String[] split = value.split(",");
-                    return new HashSet<String>(Arrays.asList(split));
-                }
-            }
-            return Collections.emptySet();
+
+            VirtualFile cf = LibUtils.getCompatibilityFile(root);
+            Compatibility compatibility = Compatibility.readCompatibility(cf.exists() ? cf.openStream() : null);
+            Key<Compatibility> key = new SimpleKey<Compatibility>(CapedwarfDeploymentMarker.getAppId(unit), Compatibility.class);
+            ComponentRegistry.getInstance().setComponent(key, compatibility);
         } catch (IOException e) {
             throw new DeploymentUnitProcessingException(e);
         }
