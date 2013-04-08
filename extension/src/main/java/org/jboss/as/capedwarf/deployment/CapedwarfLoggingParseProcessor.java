@@ -131,32 +131,24 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             defineHandler(fixed, capedwarfLogger, org.jboss.capedwarf.shared.log.Logger.class, "org.jboss.capedwarf.shared");
             // exclude AS7, CapeDwarf internals
             buildExcludedLoggers(fixed);
+
+            boolean loggingPropertiesImported = false;
             // check for more fine-grained logging config
             final String path = parseLoggingConfigPath(xml);
             if (path.length() > 0) {
-                VirtualFile config = root.getChild(path);
-                if (config.exists()) {
-                    Properties properties = loadLoggingProperties(config);
-                    if (properties.containsKey(USE_PARENT_HANDLERS) == false) {
-                        fixed.setProperty(LOGGER + USE_PARENT_HANDLERS, Boolean.TRUE.toString());
-                    }
-                    for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-                        String key = entry.getKey().toString();
-                        if (key.length() == 0) continue;
-                        if (key.startsWith(LOGGER_DOT) == false) {
-                            if (key.charAt(0) == DOT) {
-                                key = LOGGER + key;
-                            } else {
-                                key = LOGGER_DOT + key;
-                            }
-                        }
-                        Object value = entry.getValue();
-                        fixed.put(key, value);
-                    }
+                VirtualFile loggingProperties = root.getChild(path);
+                if (loggingProperties.exists()) {
+                    importLoggingProperties(fixed, loggingProperties);
+                    loggingPropertiesImported = true;
                 } else {
                     log.warn("No such logging config file exists: " + path);
                 }
             }
+
+            if (!loggingPropertiesImported) {
+                fixed.setProperty(LOGGER + ".level", "INFO");
+            }
+
             // Create a new log context for the deployment
             final LogContext logContext = LogContext.create();
 
@@ -175,6 +167,26 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             getContextSelector().registerLogContext(module.getClassLoader(), logContext);
             // Add as attachment / marker
             unit.putAttachment(LoggingDeploymentUnitProcessor.LOG_CONTEXT_KEY, logContext);
+        }
+    }
+
+    private void importLoggingProperties(Properties fixed, VirtualFile config) throws IOException {
+        Properties properties = loadLoggingProperties(config);
+        if (properties.containsKey(USE_PARENT_HANDLERS) == false) {
+            fixed.setProperty(LOGGER + USE_PARENT_HANDLERS, Boolean.TRUE.toString());
+        }
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+            String key = entry.getKey().toString();
+            if (key.length() == 0) continue;
+            if (key.startsWith(LOGGER_DOT) == false) {
+                if (key.charAt(0) == DOT) {
+                    key = LOGGER + key;
+                } else {
+                    key = LOGGER_DOT + key;
+                }
+            }
+            Object value = entry.getValue();
+            fixed.put(key, value);
         }
     }
 
