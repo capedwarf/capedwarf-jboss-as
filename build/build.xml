@@ -90,6 +90,10 @@
             <maven-resource group="org.infinispan" artifact="infinispan-lucene-directory"/>
         </module-def>
 
+        <module-def name="org.jgroups">
+            <maven-resource group="org.jgroups" artifact="jgroups"/>
+        </module-def>
+
         <module-def name="org.infinispan">
             <maven-resource group="org.infinispan" artifact="infinispan-core"/>
         </module-def>
