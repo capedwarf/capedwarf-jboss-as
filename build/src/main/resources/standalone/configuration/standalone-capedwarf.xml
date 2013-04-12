@@ -260,6 +260,7 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
+                        <property name="hibernate.search.default.worker.execution">async</property>
                         <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
@@ -273,6 +274,7 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
+                        <property name="hibernate.search.default.worker.execution">async</property>
                         <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
@@ -286,6 +288,7 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
+                        <property name="hibernate.search.default.worker.execution">async</property>
                         <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
@@ -299,6 +302,7 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
+                        <property name="hibernate.search.default.worker.execution">async</property>
                         <property name="hibernate.search.default.exclusive_index_use">false</property>
                         <property name="hibernate.search.default.directory_provider">infinispan</property>
                         <property name="hibernate.search.infinispan.cachemanager_jndiname">
