@@ -245,7 +245,7 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                 </replicated-cache>
-                <replicated-cache name="memcache" mode="ASYNC">
+                <replicated-cache name="memcache" mode="SYNC">
                     <transaction mode="NON_XA" locking="PESSIMISTIC"/>
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <!-- no file-store as explicitly no persistence -->
