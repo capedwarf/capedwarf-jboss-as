@@ -25,6 +25,7 @@ package org.jboss.as.capedwarf.deployment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
@@ -130,7 +131,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             }
             defineHandler(fixed, capedwarfLogger, org.jboss.capedwarf.shared.log.Logger.class, "org.jboss.capedwarf.shared");
             // exclude AS7, CapeDwarf internals
-            buildExcludedLoggers(fixed);
+            addExcludedLoggers(fixed);
 
             boolean loggingPropertiesImported = false;
             // check for more fine-grained logging config
@@ -148,6 +149,8 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             if (!loggingPropertiesImported) {
                 fixed.setProperty(LOGGER + ".level", "INFO");
             }
+
+            addListOfLoggers(fixed);
 
             // Create a new log context for the deployment
             final LogContext logContext = LogContext.create();
@@ -206,9 +209,9 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         StdioContext stdioContext = root.getAttachment(LogContextStdioContextSelector.STDIO_CONTEXT_ATTACHMENT_KEY);
         if (stdioContext == null) {
             stdioContext = StdioContext.create(
-                    new NullInputStream(),
-                    new LoggingOutputStream(logContext.getLogger("stdout"), Level.INFO),
-                    new LoggingOutputStream(logContext.getLogger("stderr"), Level.WARN)
+                new NullInputStream(),
+                new LoggingOutputStream(logContext.getLogger("stdout"), Level.INFO),
+                new LoggingOutputStream(logContext.getLogger("stderr"), Level.WARN)
             );
             final StdioContext appearing = root.attachIfAbsent(LogContextStdioContextSelector.STDIO_CONTEXT_ATTACHMENT_KEY, stdioContext);
             if (appearing != null) {
@@ -245,16 +248,31 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         return properties;
     }
 
-    protected static void buildExcludedLoggers(Properties fixed) {
-        StringBuilder sb = new StringBuilder();
+    protected static void addExcludedLoggers(Properties properties) {
         for (String logger : excludedLoggers) {
-            fixed.put(getPropertyKey(LOGGER, logger, "level"), "OFF");
-            if (sb.length() > 0) {
-                sb.append(",");
-            }
-            sb.append(logger);
+            properties.put(getPropertyKey(LOGGER, logger, "level"), "OFF");
         }
-        fixed.put("loggers", sb.toString());
+    }
+
+    private void addListOfLoggers(Properties properties) {
+        StringBuilder builder = new StringBuilder();
+        Enumeration<?> enumeration = properties.propertyNames();
+        while (enumeration.hasMoreElements()) {
+            String key = (String) enumeration.nextElement();
+            if (key.startsWith(LOGGER_DOT)) {
+                int lastDotIndex = key.lastIndexOf('.');
+                if (lastDotIndex > LOGGER_DOT.length()) {
+                    String loggerName = key.substring(LOGGER_DOT.length(), lastDotIndex);
+                    if (builder.length() > 0) {
+                        builder.append(",");
+                    }
+                    builder.append(loggerName);
+                }
+            }
+        }
+        if (builder.length() > 0) {
+            properties.put("loggers", builder.toString());
+        }
     }
 
     protected String parseLoggingConfigPath(VirtualFile xml) throws Exception {
