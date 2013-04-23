@@ -22,6 +22,12 @@
 
 package org.jboss.as.capedwarf.services;
 
+import java.io.IOException;
+
+import org.apache.http.Header;
+import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ClientConnectionManager;
@@ -29,12 +35,14 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HttpContext;
 import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -62,7 +70,18 @@ public class HttpClientService extends ComponentRegistryService<HttpClient> {
 
         ClientConnectionManager ccm = new PoolingClientConnectionManager(schemeRegistry);
 
-        return new DefaultHttpClient(ccm, params);
+        AbstractHttpClient client = new DefaultHttpClient(ccm, params);
+
+        client.addResponseInterceptor(new HttpResponseInterceptor() {
+            public void process(HttpResponse response, HttpContext context) throws HttpException, IOException {
+                Header[] locations = response.getHeaders("Location");
+                if (locations != null && locations.length > 0) {
+                    context.setAttribute("final.url", locations[0].getValue());
+                }
+            }
+        });
+
+        return client;
     }
 
     public void start(StartContext startContext) throws StartException {
