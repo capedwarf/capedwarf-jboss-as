@@ -362,7 +362,6 @@
         <dependency>
             <groupId>org.jboss.capedwarf.blue</groupId>
             <artifactId>capedwarf-tasks</artifactId>
-
         </dependency>
 
         <dependency>
@@ -388,6 +387,11 @@
 		<dependency>
 			<groupId>com.google.code.guice</groupId>
 			<artifactId>guice</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
 		</dependency>
 
         <dependency>

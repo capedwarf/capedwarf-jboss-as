@@ -163,6 +163,10 @@
             <maven-resource group="com.google.code.guice" artifact="guice"/>
         </module-def>
 
+        <module-def name="com.google.guava">
+            <maven-resource group="com.google.guava" artifact="guava"/>
+        </module-def>
+
         <module-def name="org.picketlink.social">
             <maven-resource group="org.picketlink" artifact="picketlink-consolidated-social"/>
         </module-def>
