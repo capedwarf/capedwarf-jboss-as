@@ -123,7 +123,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
     @Override
     protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
         CapedwarfDefinition.APPENGINE_API.validateAndSet(operation, model);
-        CapedwarfDefinition.ADMIN_AUTH.validateAndSet(operation, model);
+        CapedwarfDefinition.ADMIN_TGT.validateAndSet(operation, model);
     }
 
     /**
@@ -137,8 +137,8 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode appEngineModel = CapedwarfDefinition.APPENGINE_API.resolveModelAttribute(context, model);
         final String appengineAPI = appEngineModel.isDefined() ? appEngineModel.asString() : null;
 
-        final ModelNode adminAuthModel = CapedwarfDefinition.ADMIN_AUTH.resolveModelAttribute(context, model);
-        final boolean adminAuth = adminAuthModel.isDefined() && adminAuthModel.asBoolean();
+        final ModelNode adminTGTModel = CapedwarfDefinition.ADMIN_TGT.resolveModelAttribute(context, model);
+        final String adminTGT = adminTGTModel.isDefined() ? adminTGTModel.asString() : null;
 
         final CapedwarfProperties properties = new CapedwarfProperties(System.getProperties());
         System.setProperties(properties); // override global properties, w/o synched code ...
@@ -171,7 +171,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 12, new CapedwarfCompatibilityParseProcessor()); // adjust order as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 10, new CapedwarfPersistenceModificationProcessor(tempDir)); // before persistence.xml parsing
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WEB_DEPLOYMENT + 1, new CapedwarfWebCleanupProcessor()); // right after web.xml parsing
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WEB_COMPONENTS - 1, new CapedwarfWebComponentsDeploymentProcessor(adminAuth));
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WEB_COMPONENTS - 1, new CapedwarfWebComponentsDeploymentProcessor(adminTGT));
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WELD_DEPLOYMENT + 10, new CapedwarfWeldParseProcessor()); // before Weld web integration
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_WELD - 10, new CapedwarfWeldProcessor()); // before Weld
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 10, new CapedwarfJPAProcessor()); // before default JPA processor

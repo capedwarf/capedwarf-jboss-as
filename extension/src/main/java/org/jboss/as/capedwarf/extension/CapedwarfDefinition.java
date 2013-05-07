@@ -17,7 +17,6 @@ import org.jboss.as.controller.operations.validation.StringLengthValidator;
 import org.jboss.as.controller.registry.AttributeAccess;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.controller.registry.OperationEntry;
-import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
@@ -38,11 +37,10 @@ class CapedwarfDefinition extends SimpleResourceDefinition {
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .build();
 
-    protected static final SimpleAttributeDefinition ADMIN_AUTH =
-            new SimpleAttributeDefinitionBuilder(CapedwarfModel.ADMIN_AUTH, ModelType.BOOLEAN, true)
+    protected static final SimpleAttributeDefinition ADMIN_TGT =
+            new SimpleAttributeDefinitionBuilder(CapedwarfModel.ADMIN_AUTH, ModelType.STRING, true)
                     .setAllowExpression(true)
                     .setXmlName(CapedwarfModel.ADMIN_AUTH)
-                    .setDefaultValue(new ModelNode(false))
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .build();
 
@@ -67,6 +65,6 @@ class CapedwarfDefinition extends SimpleResourceDefinition {
     @Override
     public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
         resourceRegistration.registerReadWriteAttribute(APPENGINE_API, null, new ReloadRequiredWriteAttributeHandler());
-        resourceRegistration.registerReadWriteAttribute(ADMIN_AUTH, null, new ReloadRequiredWriteAttributeHandler());
+        resourceRegistration.registerReadWriteAttribute(ADMIN_TGT, null, new ReloadRequiredWriteAttributeHandler());
     }
 }

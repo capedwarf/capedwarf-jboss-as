@@ -89,10 +89,10 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
     private final ValveMetaData AUTH_VALVE;
 
-    private final boolean adminAuth;
+    private final TransportGuaranteeType adminTGT;
 
-    public CapedwarfWebComponentsDeploymentProcessor(boolean adminAuth) {
-        this.adminAuth = adminAuth;
+    public CapedwarfWebComponentsDeploymentProcessor(String tgt) {
+        adminTGT = (tgt != null) ? TransportGuaranteeType.valueOf(tgt) : null;
 
         GAE_LISTENER = createListener("org.jboss.capedwarf.appidentity.GAEListener");
         CDI_LISTENER = createListener("org.jboss.capedwarf.appidentity.CDIListener");
@@ -153,7 +153,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
             addResourceReference(webMetaData);
 
-            if (adminAuth) {
+            if (adminTGT != null) {
                 getSecurityConstraints(webMetaData).add(ADMIN_SERVLET_CONSTRAINT);
                 getSecurityRoles(webMetaData).add(ADMIN_SERVLET_ROLE);
                 webMetaData.setLoginConfig(ADMIN_SERVLET_CONFIG);
@@ -328,7 +328,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         scMetaData.setAuthConstraint(authConstraint);
 
         UserDataConstraintMetaData userDataConstraint = new UserDataConstraintMetaData();
-        userDataConstraint.setTransportGuarantee(TransportGuaranteeType.NONE);
+        userDataConstraint.setTransportGuarantee(adminTGT);
         scMetaData.setUserDataConstraint(userDataConstraint);
 
         return scMetaData;
