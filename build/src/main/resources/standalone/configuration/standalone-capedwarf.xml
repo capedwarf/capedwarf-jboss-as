@@ -327,14 +327,14 @@
                     <eviction strategy="NONE"/>
                 </replicated-cache>
             </cache-container>
-            <cache-container name="security" default-cache="auth-cache">
+            <!-- cache-container name="security" default-cache="auth-cache">
                 <transport lock-timeout="60000"/>
                 <local-cache name="auth-cache">
                     <transaction mode="NONE"/>
                     <eviction strategy="LRU" max-entries="10"/>
                     <expiration max-idle="600"/>
                 </local-cache>
-            </cache-container>
+            </cache-container -->
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
         <subsystem xmlns="urn:jboss:domain:jca:1.1">
@@ -511,7 +511,7 @@
         <subsystem xmlns="urn:jboss:domain:resource-adapters:1.0"/>
         <subsystem xmlns="urn:jboss:domain:security:1.2">
             <security-domains>
-                <security-domain name="other" cache-type="infinispan">
+                <security-domain name="other" cache-type="none">
                     <authentication>
                         <login-module code="Remoting" flag="optional">
                             <module-option name="password-stacking" value="useFirstPass"/>
@@ -521,12 +521,12 @@
                         </login-module>
                     </authentication>
                 </security-domain>
-                <security-domain name="jboss-web-policy" cache-type="infinispan">
+                <security-domain name="jboss-web-policy" cache-type="none">
                     <authorization>
                         <policy-module code="Delegating" flag="required"/>
                     </authorization>
                 </security-domain>
-                <security-domain name="jboss-ejb-policy" cache-type="infinispan">
+                <security-domain name="jboss-ejb-policy" cache-type="none">
                     <authorization>
                         <policy-module code="Delegating" flag="required"/>
                     </authorization>
