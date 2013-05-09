@@ -22,25 +22,36 @@
 
 package org.jboss.as.capedwarf.services;
 
+import java.util.Collection;
 import java.util.Set;
 
+import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.configuration.cache.IndexingConfigurationBuilder;
+import org.jboss.as.capedwarf.CapedwarfIndexShardingStrategy;
 import org.jboss.capedwarf.shared.compatibility.Compatibility;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.capedwarf.shared.components.SetKey;
 import org.jboss.capedwarf.shared.components.SimpleKey;
 import org.jboss.capedwarf.shared.components.Slot;
+import org.jboss.capedwarf.shared.config.IndexesXml;
 
 /**
  * Datastore cache configuration callback.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
 public class DatastoreConfigurationCallback extends BasicConfigurationCallback {
-    public DatastoreConfigurationCallback(String appId, ClassLoader classLoader) {
+
+    private final Collection<IndexesXml.Index> indexes;
+
+    public DatastoreConfigurationCallback(String appId, ClassLoader classLoader, IndexesXml indexesXml) {
         super(CacheName.DEFAULT, appId, classLoader);
+        indexes = indexesXml.getIndexes().values();
     }
 
     public ConfigurationBuilder configure(Configuration configuration) {
@@ -59,5 +70,25 @@ public class DatastoreConfigurationCallback extends BasicConfigurationCallback {
         }
 
         return builder;
+    }
+
+    @Override
+    protected SearchMapping applyIndexing(ConfigurationBuilder builder) {
+        SearchMapping mapping = super.applyIndexing(builder);
+
+        String infinispanIndexName = getIndexName("com.google.appengine.api.datastore.Entity");
+        IndexingConfigurationBuilder indexing = builder.indexing();
+        indexing.setProperty("hibernate.search." + infinispanIndexName + ".sharding_strategy", CapedwarfIndexShardingStrategy.class.getName());
+        indexing.setProperty("hibernate.search." + infinispanIndexName + ".sharding_strategy.nbr_of_shards", String.valueOf(1 + indexes.size()));
+
+        int i=1;
+        for (IndexesXml.Index index : indexes) {
+            mapping.fullTextFilterDef(index.getName(), ShardSensitiveOnlyFilter.class);
+            indexing.setProperty("hibernate.search." + infinispanIndexName + "." + i + ".indexName", index.getName());
+            indexing.setProperty("hibernate.search." + infinispanIndexName + ".sharding_strategy.index_name." + i, index.getName());
+            i++;
+        }
+
+        return mapping;
     }
 }

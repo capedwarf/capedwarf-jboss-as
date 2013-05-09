@@ -40,10 +40,12 @@ import org.jboss.as.capedwarf.services.MuxIdGenerator;
 import org.jboss.as.clustering.infinispan.subsystem.CacheConfigurationService;
 import org.jboss.as.clustering.infinispan.subsystem.EmbeddedCacheManagerService;
 import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
+import org.jboss.as.server.deployment.AttachmentList;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.capedwarf.shared.config.IndexesXml;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
@@ -80,7 +82,10 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
 
         final ServiceTarget serviceTarget = context.getServiceTarget();
         // default
-        createBuilder(serviceTarget, CacheName.DEFAULT, appId, new DatastoreConfigurationCallback(appId, classLoader));
+        AttachmentList<IndexesXml> attachment = unit.getAttachment(CapedwarfWebContextProcessor.INDEXES_XML_ATTACHMENT);
+        IndexesXml indexesXml = attachment.get(0);
+
+        createBuilder(serviceTarget, CacheName.DEFAULT, appId, new DatastoreConfigurationCallback(appId, classLoader, indexesXml));
         // search, ps, tasks, log cache
         for (CacheName cn : Arrays.asList(CacheName.SEARCH, CacheName.PROSPECTIVE_SEARCH, CacheName.TASKS, CacheName.LOGS)) {
             final ConfigurationCallback callback = new BasicConfigurationCallback(cn, appId, classLoader);

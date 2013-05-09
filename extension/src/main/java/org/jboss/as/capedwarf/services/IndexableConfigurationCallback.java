@@ -35,6 +35,7 @@ import org.jgroups.JChannel;
  * Indexable configuration callback.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
 public abstract class IndexableConfigurationCallback extends AbstractConfigurationCallback {
     private static final int INDEXING_CACHES = 6;
@@ -62,7 +63,7 @@ public abstract class IndexableConfigurationCallback extends AbstractConfigurati
         final SearchMapping mapping = new SearchMapping();
         for (Class<?> clazz : ci.getClasses(classLoader)) {
             final EntityMapping entity = mapping.entity(clazz);
-            entity.indexed().indexName(config.getName() + "_" + appId + "__" + clazz.getName());
+            entity.indexed().indexName(getIndexName(clazz.getName()));
         }
         indexing.setProperty(Environment.MODEL_MAPPING, mapping);
 
@@ -73,6 +74,10 @@ public abstract class IndexableConfigurationCallback extends AbstractConfigurati
         indexing.setProperty(JGroupsChannelProvider.MUX_ID, muxId);
 
         return mapping;
+    }
+
+    protected String getIndexName(String className) {
+        return config.getName() + "_" + appId + "__" + className;
     }
 
     public InjectedValue<JChannel> getChannel() {
