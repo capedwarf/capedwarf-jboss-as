@@ -27,10 +27,13 @@ import java.util.Set;
 
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
+import org.infinispan.Cache;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.IndexingConfigurationBuilder;
+import org.infinispan.query.backend.SearchWorkCreator;
+import org.infinispan.query.impl.ComponentRegistryUtils;
 import org.jboss.as.capedwarf.CapedwarfIndexShardingStrategy;
 import org.jboss.capedwarf.shared.compatibility.Compatibility;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
@@ -90,5 +93,21 @@ public class DatastoreConfigurationCallback extends BasicConfigurationCallback {
         }
 
         return mapping;
+    }
+
+    @Override
+    public void start(Cache cache) {
+        super.start(cache);
+        ComponentRegistryUtils.getQueryInterceptor(cache).setSearchWorkCreator(createSearchWorkCreator());
+    }
+
+    @SuppressWarnings("unchecked")
+    private SearchWorkCreator<Object> createSearchWorkCreator() {
+        try {
+            Class<?> clazz = classLoader.loadClass("org.jboss.capedwarf.datastore.CapedwarfSearchWorkCreator");
+            return (SearchWorkCreator<Object>) clazz.newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

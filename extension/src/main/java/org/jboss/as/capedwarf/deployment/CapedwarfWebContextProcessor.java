@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jboss.as.server.deployment.AttachmentKey;
-import org.jboss.as.server.deployment.AttachmentList;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -56,7 +55,7 @@ import org.jboss.vfs.VirtualFile;
  */
 public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcessor {
 
-    public static final AttachmentKey<AttachmentList<IndexesXml>> INDEXES_XML_ATTACHMENT = AttachmentKey.createList(IndexesXml.class);
+    public static final AttachmentKey<IndexesXml> INDEXES_XML_ATTACHMENT = AttachmentKey.create(IndexesXml.class);
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final DeploymentUnit unit = phaseContext.getDeploymentUnit();
@@ -109,14 +108,14 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
             IndexesXml indexesConfig;
             try {
                 indexesConfig = IndexesXmlParser.parse(indexesIs);
-                unit.addToAttachmentList(INDEXES_XML_ATTACHMENT, indexesConfig);
+                unit.putAttachment(INDEXES_XML_ATTACHMENT, indexesConfig);
             } finally {
                 safeClose(indexesIs);
             }
 
             final String appId = CapedwarfDeploymentMarker.getAppId(unit);
-            final Set<ServiceName> dependecies = CapedwarfDependenciesProcessor.getDependecies(appId);
-            final CapedwarfSetupAction cas = new CapedwarfSetupAction(dependecies, classLoader, appConfig, cdConfig, queueConfig, backendsConfig, indexesConfig);
+            final Set<ServiceName> dependencies = CapedwarfDependenciesProcessor.getDependecies(appId);
+            final CapedwarfSetupAction cas = new CapedwarfSetupAction(dependencies, classLoader, appConfig, cdConfig, queueConfig, backendsConfig, indexesConfig);
             unit.addToAttachmentList(org.jboss.as.ee.component.Attachments.WEB_SETUP_ACTIONS, cas);
         } catch (DeploymentUnitProcessingException e) {
             throw e;
