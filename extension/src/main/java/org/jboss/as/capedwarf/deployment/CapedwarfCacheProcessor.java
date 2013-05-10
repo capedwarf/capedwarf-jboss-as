@@ -40,7 +40,6 @@ import org.jboss.as.capedwarf.services.MuxIdGenerator;
 import org.jboss.as.clustering.infinispan.subsystem.CacheConfigurationService;
 import org.jboss.as.clustering.infinispan.subsystem.EmbeddedCacheManagerService;
 import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
-import org.jboss.as.server.deployment.AttachmentList;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -82,8 +81,7 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
 
         final ServiceTarget serviceTarget = context.getServiceTarget();
         // default
-        AttachmentList<IndexesXml> attachment = unit.getAttachment(CapedwarfWebContextProcessor.INDEXES_XML_ATTACHMENT);
-        IndexesXml indexesXml = attachment.get(0);
+        IndexesXml indexesXml = unit.getAttachment(CapedwarfWebContextProcessor.INDEXES_XML_ATTACHMENT);
 
         createBuilder(serviceTarget, CacheName.DEFAULT, appId, new DatastoreConfigurationCallback(appId, classLoader, indexesXml));
         // search, ps, tasks, log cache
