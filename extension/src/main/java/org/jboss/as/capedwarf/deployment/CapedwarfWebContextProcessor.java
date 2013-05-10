@@ -27,6 +27,8 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
+import org.jboss.as.server.deployment.AttachmentKey;
+import org.jboss.as.server.deployment.AttachmentList;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -53,6 +55,8 @@ import org.jboss.vfs.VirtualFile;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcessor {
+
+    public static final AttachmentKey<AttachmentList<IndexesXml>> INDEXES_XML_ATTACHMENT = AttachmentKey.createList(IndexesXml.class);
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final DeploymentUnit unit = phaseContext.getDeploymentUnit();
@@ -105,6 +109,7 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
             IndexesXml indexesConfig;
             try {
                 indexesConfig = IndexesXmlParser.parse(indexesIs);
+                unit.addToAttachmentList(INDEXES_XML_ATTACHMENT, indexesConfig);
             } finally {
                 safeClose(indexesIs);
             }
