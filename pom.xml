@@ -66,8 +66,8 @@
         <version.org.apache.httpcomponents>4.2.1</version.org.apache.httpcomponents>
         <version.org.apache.lucene>3.6.2</version.org.apache.lucene>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>1.0.1.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>
-        <version.org.jgroups>3.3.0.Beta3</version.org.jgroups>
-        <version.org.infinispan>5.3.0.Beta1</version.org.infinispan>
+        <version.org.jgroups>3.3.0.Final</version.org.jgroups>
+        <version.org.infinispan>5.3.0.Beta2</version.org.infinispan>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
         <version.org.codehaus.exec>1.2.1</version.org.codehaus.exec>
         <version.org.jboss.maven.transformer>1.0.0.Beta4</version.org.jboss.maven.transformer>
@@ -103,6 +103,7 @@
     <modules>
         <module>build</module>
         <module>extension</module>
+        <module>workaround</module>
     </modules>
 
     <build>
@@ -168,6 +169,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.jboss.capedwarf</groupId>
+                <artifactId>jboss-as-capedwarf-workaround</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.jboss.capedwarf.shared</groupId>
                 <artifactId>capedwarf-shared</artifactId>
                 <version>${version.org.jboss.capedwarf.shared}</version>
@@ -175,7 +182,13 @@
 
             <dependency>
                 <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-clustering-singleton</artifactId>
+                <artifactId>jboss-as-clustering-infinispan</artifactId>
+                <version>${version.jboss.as}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-clustering-jgroups</artifactId>
                 <version>${version.jboss.as}</version>
             </dependency>
 

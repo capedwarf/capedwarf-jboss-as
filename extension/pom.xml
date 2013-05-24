@@ -29,7 +29,6 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.jboss.capedwarf</groupId>
     <artifactId>jboss-as-capedwarf</artifactId>
 
     <name>Capedwarf - JBossAS Subsystem</name>
@@ -86,7 +85,12 @@
 
         <dependency>
             <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-clustering-singleton</artifactId>
+            <artifactId>jboss-as-clustering-infinispan</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-clustering-jgroups</artifactId>
         </dependency>
 
         <dependency>

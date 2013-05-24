@@ -110,9 +110,12 @@
             <maven-resource group="org.jboss.as" artifact="jboss-as-clustering-infinispan"/>
         </module-def>
 
-        <module-def name="org.jboss.as.product" slot="capedwarf">
-
+        <module-def name="org.jboss.as.clustering.jgroups">
+            <maven-resource group="org.jboss.capedwarf" artifact="jboss-as-capedwarf-workaround"/>
+            <maven-resource group="org.jboss.as" artifact="jboss-as-clustering-jgroups"/>
         </module-def>
+
+        <module-def name="org.jboss.as.product" slot="capedwarf"/>
 
         <module-def name="org.jboss.capedwarf.shared">
             <maven-resource group="org.jboss.capedwarf.shared" artifact="capedwarf-shared"/>
