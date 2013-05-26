@@ -60,7 +60,7 @@
         <version.com.google.appengine>1.8.0</version.com.google.appengine>
         <version.com.google.guava>14.0.1</version.com.google.guava>
         <version.javax.jdo.api>3.0</version.javax.jdo.api>
-        <version.org.hibernate.search>4.3.0.Alpha1</version.org.hibernate.search>
+        <version.org.hibernate.search>4.3.0.Beta1</version.org.hibernate.search>
         <version.org.bouncycastle>1.47</version.org.bouncycastle>
         <version.junit>4.10</version.junit>
         <version.org.apache.httpcomponents>4.2.1</version.org.apache.httpcomponents>
