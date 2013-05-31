@@ -67,7 +67,7 @@
         <version.org.apache.lucene>3.6.2</version.org.apache.lucene>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>1.0.1.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>
         <version.org.jgroups>3.3.0.Final</version.org.jgroups>
-        <version.org.infinispan>5.3.0.Beta2</version.org.infinispan>
+        <version.org.infinispan>5.3.0.CR1</version.org.infinispan>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
         <version.org.codehaus.exec>1.2.1</version.org.codehaus.exec>
         <version.org.jboss.maven.transformer>1.0.0.Beta4</version.org.jboss.maven.transformer>
@@ -405,37 +405,6 @@
                 <artifactId>infinispan-core</artifactId>
                 <version>${version.org.infinispan}</version>
                 <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.infinispan</groupId>
-                <artifactId>infinispan-cachestore-jdbc</artifactId>
-                <version>${version.org.infinispan}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.infinispan</groupId>
-                <artifactId>infinispan-cachestore-remote</artifactId>
-                <version>${version.org.infinispan}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.infinispan</groupId>
-                        <artifactId>infinispan-client-hotrod</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.infinispan</groupId>
-                <artifactId>infinispan-client-hotrod</artifactId>
-                <version>${version.org.infinispan}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.infinispan</groupId>
-                        <artifactId>infinispan-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-pool</groupId>
-                        <artifactId>commons-pool</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
