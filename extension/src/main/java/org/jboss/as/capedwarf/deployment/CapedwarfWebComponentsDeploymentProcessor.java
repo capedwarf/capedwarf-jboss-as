@@ -64,6 +64,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String[] UPLOAD_SERVLET_URL_MAPPING = {"/_ah/blobstore/upload"};
     private static final String[] IMAGE_SERVLET_URL_MAPPING = {"/_ah/image/*"};
     private static final String[] DEFERRED_TASK_SERVLET_URL_MAPPING = {"/_ah/queue/__deferred__"};
+    private static final String CAPEDWARF_TGT = "CAPEDWARF";
 
     private final ListenerMetaData GAE_LISTENER;
     private final ListenerMetaData CDI_LISTENER;
@@ -93,10 +94,10 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
     private final ValveMetaData AUTH_VALVE;
 
-    private final TransportGuaranteeType adminTGT;
+    private final String adminTGT;
 
     public CapedwarfWebComponentsDeploymentProcessor(String tgt) {
-        adminTGT = (tgt != null) ? TransportGuaranteeType.valueOf(tgt) : null;
+        adminTGT = tgt;
 
         GAE_LISTENER = createListener("org.jboss.capedwarf.appidentity.GAEListener");
         CDI_LISTENER = createListener("org.jboss.capedwarf.appidentity.CDIListener");
@@ -129,7 +130,11 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         ADMIN_SERVLET_CONFIG = createAdminServletLogin();
         ADMIN_SERVLET_ROLE = createAdminServletSecurityRole();
 
-        AUTH_VALVE = createValve("org.jboss.capedwarf.users.CapedwarfAuthenticator");
+        AUTH_VALVE = createValve(isCapedwarfAuth() ? "org.jboss.capedwarf.users.CapedwarfUsersAuthenticator" : "org.jboss.capedwarf.users.CapedwarfBasicAuthenticator");
+    }
+
+    protected boolean isCapedwarfAuth() {
+        return CAPEDWARF_TGT.equalsIgnoreCase(adminTGT);
     }
 
     @Override
@@ -334,9 +339,11 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         authConstraint.setRoleNames(Arrays.asList("admin"));
         scMetaData.setAuthConstraint(authConstraint);
 
-        UserDataConstraintMetaData userDataConstraint = new UserDataConstraintMetaData();
-        userDataConstraint.setTransportGuarantee(adminTGT);
-        scMetaData.setUserDataConstraint(userDataConstraint);
+        if (adminTGT != null && isCapedwarfAuth() == false) {
+            UserDataConstraintMetaData userDataConstraint = new UserDataConstraintMetaData();
+            userDataConstraint.setTransportGuarantee(TransportGuaranteeType.valueOf(adminTGT));
+            scMetaData.setUserDataConstraint(userDataConstraint);
+        }
 
         return scMetaData;
     }
@@ -367,7 +374,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
     private LoginConfigMetaData createAdminServletLogin() {
         LoginConfigMetaData configMetaData = new LoginConfigMetaData();
-        configMetaData.setAuthMethod("BASIC");
+        configMetaData.setAuthMethod(isCapedwarfAuth() ? "OAUTH" : "BASIC");
         configMetaData.setRealmName("ApplicationRealm");
         return configMetaData;
     }
