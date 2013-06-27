@@ -60,14 +60,14 @@
         <version.com.google.appengine>1.8.1.1</version.com.google.appengine>
         <version.com.google.guava>14.0.1</version.com.google.guava>
         <version.javax.jdo.api>3.0</version.javax.jdo.api>
-        <version.org.hibernate.search>4.3.0.Beta1</version.org.hibernate.search>
+        <version.org.hibernate.search>4.3.0.Final</version.org.hibernate.search>
         <version.org.bouncycastle>1.47</version.org.bouncycastle>
         <version.junit>4.10</version.junit>
         <version.org.apache.httpcomponents>4.2.1</version.org.apache.httpcomponents>
         <version.org.apache.lucene>3.6.2</version.org.apache.lucene>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>1.0.1.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>
         <version.org.jgroups>3.3.0.Final</version.org.jgroups>
-        <version.org.infinispan>5.3.0.CR1</version.org.infinispan>
+        <version.org.infinispan>5.3.0.Final</version.org.infinispan>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
         <version.org.codehaus.exec>1.2.1</version.org.codehaus.exec>
         <version.org.jboss.maven.transformer>1.0.0.Beta4</version.org.jboss.maven.transformer>
