@@ -23,7 +23,7 @@
 package org.jboss.as.capedwarf.deployment;
 
 import org.jboss.as.server.deployment.DeploymentUnit;
-import org.jboss.as.web.deployment.WarMetaData;
+import org.jboss.as.web.common.WarMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.WebMetaData;
 

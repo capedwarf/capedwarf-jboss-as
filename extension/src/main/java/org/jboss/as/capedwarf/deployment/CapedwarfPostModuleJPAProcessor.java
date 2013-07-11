@@ -29,10 +29,10 @@ import java.util.Set;
 
 import org.jboss.as.jpa.config.Configuration;
 import org.jboss.as.jpa.config.PersistenceUnitMetadataHolder;
-import org.jboss.as.jpa.spi.PersistenceUnitMetadata;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.module.ResourceRoot;
+import org.jipijapa.plugin.spi.PersistenceUnitMetadata;
 
 /**
  * Fix CapeDwarf JPA usage - add metadata scanner.

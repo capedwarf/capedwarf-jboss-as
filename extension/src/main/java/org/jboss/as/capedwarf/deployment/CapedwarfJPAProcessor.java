@@ -30,7 +30,6 @@ import org.jboss.as.capedwarf.utils.LibUtils;
 import org.jboss.as.jpa.config.Configuration;
 import org.jboss.as.jpa.config.PersistenceUnitMetadataHolder;
 import org.jboss.as.jpa.persistenceprovider.PersistenceProviderLoader;
-import org.jboss.as.jpa.spi.PersistenceUnitMetadata;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.module.ModuleSpecification;
@@ -39,6 +38,7 @@ import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
 import org.jboss.vfs.VirtualFile;
+import org.jipijapa.plugin.spi.PersistenceUnitMetadata;
 
 /**
  * Fix CapeDwarf JPA usage - ignore PU service.
