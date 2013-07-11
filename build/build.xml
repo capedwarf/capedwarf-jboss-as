@@ -117,16 +117,11 @@
         </module-def>
 
         <module-def name="org.jboss.as.capedwarf">
-            <maven-resource group="org.jboss.capedwarf" artifact="jboss-as-capedwarf"/>
+            <maven-resource group="org.jboss.capedwarf" artifact="wildfly-capedwarf"/>
         </module-def>
 
         <module-def name="org.jboss.as.clustering.infinispan">
-            <maven-resource group="org.jboss.as" artifact="jboss-as-clustering-infinispan"/>
-        </module-def>
-
-        <module-def name="org.jboss.as.clustering.jgroups">
-            <maven-resource group="org.jboss.capedwarf" artifact="jboss-as-capedwarf-workaround"/>
-            <maven-resource group="org.jboss.as" artifact="jboss-as-clustering-jgroups"/>
+            <maven-resource group="org.wildfly" artifact="wildfly-clustering-infinispan"/>
         </module-def>
 
         <module-def name="org.jboss.as.product" slot="capedwarf"/>

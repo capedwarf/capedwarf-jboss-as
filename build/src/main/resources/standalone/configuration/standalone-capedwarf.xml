@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<server xmlns="urn:jboss:domain:1.3">
+<server xmlns="urn:jboss:domain:2.0">
     <extensions>
         <extension module="org.jboss.as.capedwarf"/>
         <extension module="org.jboss.as.clustering.infinispan"/>
@@ -12,6 +12,7 @@
         <extension module="org.jboss.as.jaxrs"/>
         <extension module="org.jboss.as.jmx"/>
         <extension module="org.jboss.as.jpa"/>
+        <extension module="org.jboss.as.jsf"/>
         <extension module="org.jboss.as.logging"/>
         <extension module="org.jboss.as.mail"/>
         <extension module="org.jboss.as.messaging"/>
@@ -20,8 +21,9 @@
         <extension module="org.jboss.as.security"/>
         <extension module="org.jboss.as.threads"/>
         <extension module="org.jboss.as.transactions"/>
-        <extension module="org.jboss.as.web"/>
         <extension module="org.jboss.as.weld"/>
+        <extension module="org.wildfly.extension.io"/>
+        <extension module="org.wildfly.extension.undertow"/>
     </extensions>
     <management>
         <security-realms>
@@ -30,6 +32,9 @@
                     <local default-user="$local"/>
                     <properties path="mgmt-users.properties" relative-to="jboss.server.config.dir"/>
                 </authentication>
+                <authorization map-groups-to-roles="false">
+                    <properties path="mgmt-groups.properties" relative-to="jboss.server.config.dir"/>
+                </authorization>
             </security-realm>
             <security-realm name="ApplicationRealm">
                 <authentication>
@@ -45,20 +50,24 @@
             <native-interface security-realm="ManagementRealm">
                 <socket-binding native="management-native"/>
             </native-interface>
-            <http-interface security-realm="ManagementRealm">
+            <http-interface security-realm="ManagementRealm" http-upgrade-enabled="true">
                 <socket-binding http="management-http"/>
             </http-interface>
         </management-interfaces>
     </management>
     <profile>
-        <subsystem xmlns="urn:jboss:domain:logging:1.1">
+        <subsystem xmlns="urn:jboss:domain:capedwarf:1.0">
+            <!-- Put TransportGuaranteeType here: NONE, INTEGRAL, CONFIDENTIAL -->
+            <!-- admin-auth>NONE</admin-auth -->
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:logging:1.2">
             <console-handler name="CONSOLE">
                 <level name="INFO"/>
                 <formatter>
-                    <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
+                    <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
                 </formatter>
             </console-handler>
-            <periodic-rotating-file-handler name="FILE">
+            <periodic-rotating-file-handler name="FILE" autoflush="true">
                 <formatter>
                     <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
                 </formatter>
@@ -71,6 +80,9 @@
             </logger>
             <logger category="org.apache.tomcat.util.modeler">
                 <level name="WARN"/>
+            </logger>
+            <logger category="org.jboss.as.config">
+                <level name="DEBUG"/>
             </logger>
             <logger category="sun.rmi">
                 <level name="WARN"/>
@@ -89,14 +101,9 @@
                 </handlers>
             </root-logger>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:capedwarf:1.0">
-            <!-- Put TransportGuaranteeType here: NONE, INTEGRAL, CONFIDENTIAL -->
-            <!-- admin-auth>NONE</admin-auth -->
-        </subsystem>
-        <subsystem xmlns="urn:jboss:domain:datasources:1.1">
+        <subsystem xmlns="urn:jboss:domain:datasources:2.0">
             <datasources>
-                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true"
-                            use-java-context="true">
+                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
                     <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
                     <driver>h2</driver>
                     <security>
@@ -114,16 +121,16 @@
         <subsystem xmlns="urn:jboss:domain:deployment-scanner:1.1">
             <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:ee:1.1">
+        <subsystem xmlns="urn:jboss:domain:ee:2.0">
             <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
             <jboss-descriptor-property-replacement>true</jboss-descriptor-property-replacement>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:ejb3:1.3">
+        <subsystem xmlns="urn:jboss:domain:ejb3:2.0">
             <session-bean>
                 <stateless>
                     <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
                 </stateless>
-                <stateful default-access-timeout="5000" cache-ref="simple" clustered-cache-ref="clustered"/>
+                <stateful default-access-timeout="5000" cache-ref="simple" clustered-cache-ref="clustered" passivation-disabled-cache-ref="simple"/>
                 <singleton default-access-timeout="5000"/>
             </session-bean>
             <mdb>
@@ -132,10 +139,8 @@
             </mdb>
             <pools>
                 <bean-instance-pools>
-                    <strict-max-pool name="slsb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5"
-                                     instance-acquisition-timeout-unit="MINUTES"/>
-                    <strict-max-pool name="mdb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5"
-                                     instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="slsb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="mdb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
                 </bean-instance-pools>
             </pools>
             <caches>
@@ -148,8 +153,10 @@
                 <cluster-passivation-store name="infinispan" cache-container="ejb"/>
             </passivation-stores>
             <async thread-pool-name="default"/>
-            <timer-service thread-pool-name="default">
-                <data-store path="timer-service-data" relative-to="jboss.server.data.dir"/>
+            <timer-service thread-pool-name="default" default-data-store="default-file-store">
+                <data-stores>
+                    <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
+                </data-stores>
             </timer-service>
             <remote connector-ref="remoting-connector" thread-pool-name="default"/>
             <thread-pools>
@@ -159,16 +166,21 @@
                 </thread-pool>
             </thread-pools>
             <iiop enable-by-default="false" use-qualified-name="false"/>
+            <default-security-domain value="other"/>
+            <default-missing-method-permissions-deny-access value="true"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:infinispan:1.4">
-            <cache-container name="cluster" aliases="ha-partition" default-cache="default">
+        <subsystem xmlns="urn:jboss:domain:io:1.0">
+            <worker name="default" io-threads="3"/>
+            <buffer-pool name="default" buffer-size="16384" buffers-per-slice="128"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:infinispan:2.0">
+            <cache-container name="singleton" aliases="cluster ha-partition" default-cache="default">
                 <transport lock-timeout="60000"/>
                 <replicated-cache name="default" mode="SYNC" batching="true">
                     <locking isolation="REPEATABLE_READ"/>
                 </replicated-cache>
             </cache-container>
-            <cache-container name="web" aliases="standard-session-cache" default-cache="repl"
-                             module="org.jboss.as.clustering.web.infinispan">
+            <cache-container name="web" aliases="standard-session-cache" default-cache="repl" module="org.wildfly.clustering.web.infinispan">
                 <transport lock-timeout="60000"/>
                 <replicated-cache name="repl" mode="ASYNC" batching="true">
                     <file-store/>
@@ -178,8 +190,7 @@
                     <file-store/>
                 </distributed-cache>
             </cache-container>
-            <cache-container name="ejb" aliases="sfsb sfsb-cache" default-cache="repl"
-                             module="org.jboss.as.clustering.ejb3.infinispan">
+            <cache-container name="ejb" aliases="sfsb sfsb-cache" default-cache="repl" module="org.jboss.as.clustering.ejb3.infinispan">
                 <transport lock-timeout="60000"/>
                 <replicated-cache name="repl" mode="ASYNC" batching="true">
                     <eviction strategy="LRU" max-entries="10000"/>
@@ -187,7 +198,7 @@
                 </replicated-cache>
                 <!--
                   ~  Clustered cache used internally by EJB subsytem for managing the client-mapping(s) of
-                  ~                 the socketbinding referenced by the EJB remoting connector 
+                  ~                 the socketbinding referenced by the EJB remoting connector
                   -->
                 <replicated-cache name="remote-connector-client-mappings" mode="SYNC" batching="true"/>
                 <distributed-cache name="dist" mode="ASYNC" batching="true" l1-lifespan="0">
@@ -195,7 +206,7 @@
                     <file-store/>
                 </distributed-cache>
             </cache-container>
-            <cache-container name="hibernate" default-cache="local-query" module="org.jboss.as.jpa.hibernate:4">
+            <cache-container name="hibernate" default-cache="local-query" module="org.hibernate">
                 <transport lock-timeout="60000"/>
                 <local-cache name="local-query">
                     <transaction mode="NONE"/>
@@ -231,7 +242,7 @@
                     </indexing>
                 </distributed-cache>
                 <distributed-cache name="datastore_versions" mode="SYNC">
-                    <transaction mode="NON_XA"/>
+                    <transaction mode="NON_XA" locking="OPTIMISTIC"/>
                     <locking isolation="REPEATABLE_READ"/>
                     <eviction strategy="LIRS" max-entries="100000"/>
                     <file-store preload="false" purge="false"/>
@@ -327,14 +338,6 @@
                     <eviction strategy="NONE"/>
                 </replicated-cache>
             </cache-container>
-            <!-- cache-container name="security" default-cache="auth-cache">
-                <transport lock-timeout="60000"/>
-                <local-cache name="auth-cache">
-                    <transaction mode="NONE"/>
-                    <eviction strategy="LRU" max-entries="10"/>
-                    <expiration max-idle="600"/>
-                </local-cache>
-            </cache-container -->
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
         <subsystem xmlns="urn:jboss:domain:jca:1.1">
@@ -356,16 +359,15 @@
             </default-workmanager>
             <cached-connection-manager/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:jgroups:1.1" default-stack="udp">
+        <subsystem xmlns="urn:jboss:domain:jgroups:2.0" default-stack="udp">
             <stack name="udp">
-                <transport type="UDP" socket-binding="jgroups-udp" diagnostics-socket-binding="jgroups-diagnostics"/>
+                <transport type="UDP" socket-binding="jgroups-udp"/>
                 <protocol type="PING"/>
-                <protocol type="MERGE2"/>
+                <protocol type="MERGE3"/>
                 <protocol type="FD_SOCK" socket-binding="jgroups-udp-fd"/>
                 <protocol type="FD"/>
                 <protocol type="VERIFY_SUSPECT"/>
-                <protocol type="BARRIER"/>
-                <protocol type="pbcast.NAKACK"/>
+                <protocol type="pbcast.NAKACK2"/>
                 <protocol type="UNICAST2"/>
                 <protocol type="pbcast.STABLE"/>
                 <protocol type="pbcast.GMS"/>
@@ -375,41 +377,40 @@
                 <protocol type="RSVP"/>
             </stack>
             <stack name="tcp">
-                <transport type="TCP" socket-binding="jgroups-tcp" diagnostics-socket-binding="jgroups-diagnostics"/>
+                <transport type="TCP" socket-binding="jgroups-tcp"/>
                 <protocol type="MPING" socket-binding="jgroups-mping"/>
                 <protocol type="MERGE2"/>
                 <protocol type="FD_SOCK" socket-binding="jgroups-tcp-fd"/>
                 <protocol type="FD"/>
                 <protocol type="VERIFY_SUSPECT"/>
-                <protocol type="BARRIER"/>
-                <protocol type="pbcast.NAKACK"/>
+                <protocol type="pbcast.NAKACK2"/>
                 <protocol type="UNICAST2"/>
                 <protocol type="pbcast.STABLE"/>
                 <protocol type="pbcast.GMS"/>
-                <protocol type="UFC"/>
                 <protocol type="MFC"/>
                 <protocol type="FRAG2"/>
                 <protocol type="RSVP"/>
             </stack>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:jmx:1.1">
-            <show-model value="true"/>
+        <subsystem xmlns="urn:jboss:domain:jmx:1.2">
+            <expose-resolved-model/>
+            <expose-expression-model/>
             <remoting-connector/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:jpa:1.0">
-            <jpa default-datasource=""/>
+        <subsystem xmlns="urn:jboss:domain:jpa:1.1">
+            <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:mail:1.0">
+        <subsystem xmlns="urn:jboss:domain:jsf:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:mail:1.1">
             <mail-session jndi-name="java:jboss/mail/Default">
                 <smtp-server outbound-socket-binding-ref="mail-smtp"/>
             </mail-session>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:messaging:1.2">
+        <subsystem xmlns="urn:jboss:domain:messaging:1.4">
             <hornetq-server>
                 <jmx-management-enabled>true</jmx-management-enabled>
-                <clustered>true</clustered>
-                <cluster-password>abc123</cluster-password>
-                <persistence-enabled>false</persistence-enabled>
+                <cluster-password>${jboss.messaging.cluster.password:CHANGE ME!!}</cluster-password>
+                <persistence-enabled>true</persistence-enabled>
                 <journal-file-size>102400</journal-file-size>
                 <journal-min-files>2</journal-min-files>
                 <connectors>
@@ -417,6 +418,7 @@
                     <netty-connector name="netty-throughput" socket-binding="messaging-throughput">
                         <param key="batch-delay" value="50"/>
                     </netty-connector>
+                    <servlet-connector name="servlet" socket-binding="http" host="default-host"/>
                     <in-vm-connector name="in-vm" server-id="0"/>
                 </connectors>
                 <acceptors>
@@ -464,6 +466,7 @@
                         <redistribution-delay>1000</redistribution-delay>
                         <max-size-bytes>10485760</max-size-bytes>
                         <address-full-policy>BLOCK</address-full-policy>
+                        <page-size-bytes>2097152</page-size-bytes>
                         <message-counter-history-day-limit>10</message-counter-history-day-limit>
                     </address-setting>
                 </address-settings>
@@ -473,7 +476,17 @@
                             <connector-ref connector-name="in-vm"/>
                         </connectors>
                         <entries>
+                            <!-- Global JNDI entry used to provide a default JMS Connection factory to EE application -->
+                            <entry name="java:jboss/DefaultJMSConnectionFactory"/>
                             <entry name="java:/ConnectionFactory"/>
+                        </entries>
+                    </connection-factory>
+                    <connection-factory name="ServletConnectionFactory">
+                        <connectors>
+                            <connector-ref connector-name="servlet"/>
+                        </connectors>
+                        <entries>
+                            <entry name="java:jboss/exported/jms/ServletConnectionFactory"/>
                         </entries>
                     </connection-factory>
                     <connection-factory name="RemoteConnectionFactory">
@@ -483,6 +496,11 @@
                         <entries>
                             <entry name="java:jboss/exported/jms/RemoteConnectionFactory"/>
                         </entries>
+                        <ha>true</ha>
+                        <block-on-acknowledge>true</block-on-acknowledge>
+                        <retry-interval>1000</retry-interval>
+                        <retry-interval-multiplier>1.0</retry-interval-multiplier>
+                        <reconnect-attempts>-1</reconnect-attempts>
                     </connection-factory>
                     <pooled-connection-factory name="hornetq-ra">
                         <transaction mode="xa"/>
@@ -502,13 +520,12 @@
                 </jms-destinations>
             </hornetq-server>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:naming:1.2">
+        <subsystem xmlns="urn:jboss:domain:naming:2.0">
             <remote-naming/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:remoting:1.1">
             <connector name="remoting-connector" socket-binding="remoting" security-realm="ApplicationRealm"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:resource-adapters:1.0"/>
         <subsystem xmlns="urn:jboss:domain:security:1.2">
             <security-domains>
                 <security-domain name="other" cache-type="none">
@@ -534,7 +551,7 @@
             </security-domains>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:threads:1.1"/>
-        <subsystem xmlns="urn:jboss:domain:transactions:1.2">
+        <subsystem xmlns="urn:jboss:domain:transactions:1.3">
             <core-environment>
                 <process-id>
                     <uuid/>
@@ -543,20 +560,23 @@
             <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
             <coordinator-environment default-timeout="300"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:web:1.1" default-virtual-server="default-host" native="false">
-            <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http" redirect-port="8443"/>
-            <connector name="ajp" protocol="AJP/1.3" scheme="http" socket-binding="ajp"/>
-            <!-- connector name="ssl" protocol="HTTP/1.1" scheme="https" socket-binding="https" secure="true" >
-                <ssl password="capedwarf" key-alias="capedwarf"
-                     certificate-key-file="${jboss.server.config.dir}/keystore.p12"
-                     ca-certificate-file="${jboss.server.config.dir}/truststore.jks"
-                     ca-certificate-password="capedwarf"
-                     keystore-type="PKCS12" truststore-type="JKS" />
-            </connector -->
-            <virtual-server name="default-host" enable-welcome-root="false">
-                <alias name="localhost"/>
-                <alias name="example.com"/>
-            </virtual-server>
+        <subsystem xmlns="urn:jboss:domain:undertow:1.0">
+            <buffer-caches>
+                <buffer-cache name="default" buffer-size="1024" buffers-per-region="1024" max-regions="10"/>
+            </buffer-caches>
+            <server name="default-server">
+                <http-listener name="default" socket-binding="http"/>
+                <ajp-listener name="ajp" socket-binding="ajp"/>
+                <host name="default-host" alias="localhost">
+                    <location name="/" handler="welcome-content"/>
+                </host>
+            </server>
+            <servlet-container name="default">
+                <jsp-config/>
+            </servlet-container>
+            <handlers>
+                <file name="welcome-content" path="${jboss.home.dir}/welcome-content" directory-listing="true"/>
+            </handlers>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
     </profile>
@@ -571,32 +591,30 @@
         <interface name="unsecure">
             <!--
               ~  Used for IIOP sockets in the standard configuration.
-              ~                  To secure JacORB you need to setup SSL 
+              ~                  To secure JacORB you need to setup SSL
               -->
             <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
         </interface>
     </interfaces>
-    <socket-binding-group name="standard-sockets" default-interface="public"
-                          port-offset="${jboss.socket.binding.port-offset:0}">
+    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
         <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>
         <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
         <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9443}"/>
-        <socket-binding name="ajp" port="8009"/>
-        <socket-binding name="http" port="8080"/>
-        <socket-binding name="https" port="8443"/>
-        <socket-binding name="jgroups-diagnostics" port="0" multicast-address="224.0.75.75" multicast-port="7500"/>
-        <socket-binding name="jgroups-mping" port="0" multicast-address="${jboss.default.multicast.address:230.0.0.4}"
-                        multicast-port="45700"/>
+        <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
+        <socket-binding name="http" port="${jboss.http.port:8080}"/>
+        <socket-binding name="https" port="${jboss.https.port:8443}"/>
+        <socket-binding name="jacorb" interface="unsecure" port="3528"/>
+        <socket-binding name="jacorb-ssl" interface="unsecure" port="3529"/>
+        <socket-binding name="jgroups-mping" port="0" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45700"/>
         <socket-binding name="jgroups-tcp" port="7600"/>
         <socket-binding name="jgroups-tcp-fd" port="57600"/>
-        <socket-binding name="jgroups-udp" port="55200" multicast-address="${jboss.default.multicast.address:230.0.0.4}"
-                        multicast-port="45688"/>
+        <socket-binding name="jgroups-udp" port="55200" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45688"/>
         <socket-binding name="jgroups-udp-fd" port="54200"/>
         <socket-binding name="messaging" port="5445"/>
-        <socket-binding name="messaging-group" port="0" multicast-address="${jboss.messaging.group.address:231.7.7.7}"
-                        multicast-port="${jboss.messaging.group.port:9876}"/>
+        <socket-binding name="messaging-group" port="0" multicast-address="${jboss.messaging.group.address:231.7.7.7}" multicast-port="${jboss.messaging.group.port:9876}"/>
         <socket-binding name="messaging-throughput" port="5455"/>
-        <socket-binding name="remoting" port="4447"/>
+        <socket-binding name="modcluster" port="0" multicast-address="224.0.1.105" multicast-port="23364"/>
+        <socket-binding name="remoting" port="${jboss.remoting.port:4447}"/>
         <socket-binding name="txn-recovery-environment" port="4712"/>
         <socket-binding name="txn-status-manager" port="4713"/>
         <outbound-socket-binding name="mail-smtp">

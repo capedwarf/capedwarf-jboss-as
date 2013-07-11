@@ -161,12 +161,7 @@
 
         <dependency>
             <groupId>org.jboss.capedwarf</groupId>
-            <artifactId>jboss-as-capedwarf</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jboss.capedwarf</groupId>
-            <artifactId>jboss-as-capedwarf-workaround</artifactId>
+            <artifactId>wildfly-capedwarf</artifactId>
         </dependency>
 
         <dependency>

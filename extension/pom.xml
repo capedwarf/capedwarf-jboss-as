@@ -28,7 +28,7 @@
         <artifactId>capedwarf-as-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>jboss-as-capedwarf</artifactId>
+    <artifactId>wildfly-capedwarf</artifactId>
     <name>Capedwarf - JBossAS Subsystem</name>
     <packaging>jar</packaging>
 
@@ -38,60 +38,56 @@
             <artifactId>capedwarf-shared</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-controller</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-controller</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-jaxrs</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-jaxrs</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-jpa</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-jpa</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-logging</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-server</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-naming</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-naming</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-web</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-undertow</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-threads</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-threads</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-weld</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-weld</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-subsystem-test</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-subsystem-test</artifactId>
+            <type>pom</type>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-ee</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-ee</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-clustering-infinispan</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-clustering-jgroups</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-clustering-infinispan</artifactId>
         </dependency>
 
         <dependency>

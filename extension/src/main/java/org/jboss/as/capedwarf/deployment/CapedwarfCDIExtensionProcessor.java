@@ -22,16 +22,15 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.lang.reflect.Constructor;
+
+import javax.enterprise.inject.spi.Extension;
+
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.reflect.DeploymentReflectionIndex;
-import org.jboss.as.weld.deployment.WeldAttachments;
-import org.jboss.weld.bootstrap.spi.Metadata;
-import org.jboss.weld.metadata.MetadataImpl;
-
-import javax.enterprise.inject.spi.Extension;
-import java.lang.reflect.Constructor;
+import org.jboss.as.weld.deployment.WeldPortableExtensions;
 
 /**
  * Enable CDI for CapeDwarf module.
@@ -49,9 +48,10 @@ public class CapedwarfCDIExtensionProcessor extends CapedwarfWebDeploymentProces
         final ClassLoader cl = unit.getAttachment(Attachments.MODULE).getClassLoader();
         for (String fqn : EXTENSIONS) {
             final Extension extension = loadExtension(fqn, index, cl);
-            final Metadata<Extension> metadata = new MetadataImpl<Extension>(extension, unit.getName());
             log.debug("Loaded portable extension " + extension);
-            unit.addToAttachmentList(WeldAttachments.PORTABLE_EXTENSIONS, metadata);
+
+            WeldPortableExtensions wpe = WeldPortableExtensions.getPortableExtensions(unit);
+            wpe.registerExtensionInstance(extension, unit);
         }
     }
 

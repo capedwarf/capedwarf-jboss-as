@@ -54,7 +54,7 @@
     </scm>
 
     <properties>
-        <version.jboss.as>7.2.0.Final</version.jboss.as>
+        <version.jboss.wildfly>8.0.0.Alpha3</version.jboss.wildfly>
         <version.org.jboss.capedwarf.shared>1.0.0-SNAPSHOT</version.org.jboss.capedwarf.shared>
         <version.org.jboss.capedwarf>1.0.0-SNAPSHOT</version.org.jboss.capedwarf>
         <version.com.google.appengine>1.8.8</version.com.google.appengine>
@@ -66,7 +66,7 @@
         <version.org.apache.httpcomponents>4.2.1</version.org.apache.httpcomponents>
         <version.org.apache.lucene>3.6.2</version.org.apache.lucene>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>1.0.1.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.0-api>
-        <version.org.jgroups>3.3.0.Final</version.org.jgroups>
+        <version.org.jgroups>3.3.2.Final</version.org.jgroups>
         <version.org.infinispan>5.3.0.Final</version.org.infinispan>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
         <version.org.codehaus.exec>1.2.1</version.org.codehaus.exec>
@@ -82,7 +82,7 @@
         <version.org.datanucleus.appengine>2.1.1</version.org.datanucleus.appengine>
         <version.org.datanucleus.cache>3.1.1</version.org.datanucleus.cache>
 
-        <version.org.jboss.jandex>1.0.3.Final</version.org.jboss.jandex>
+        <version.org.jboss.jandex>1.1.0.Alpha1</version.org.jboss.jandex>
         <version.org.jboss.logging.jboss-logging>3.1.2.GA</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.logging.jboss-logging-processor>1.1.0.Final</version.org.jboss.logging.jboss-logging-processor>
         <version.org.jboss.logmanager.jboss-logmanager>1.4.0.Final</version.org.jboss.logmanager.jboss-logmanager>
@@ -109,7 +109,6 @@
     <modules>
         <module>build</module>
         <module>extension</module>
-        <module>workaround</module>
     </modules>
 
     <build>
@@ -135,7 +134,7 @@
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>${version.checkstyle.plugin}</version>
                     <configuration>
-                        <configLocation>jboss-as-checkstyle/checkstyle.xml</configLocation>
+                        <configLocation>wildfly-checkstyle/checkstyle.xml</configLocation>
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>
                         <useFile/>
@@ -170,13 +169,7 @@
 
             <dependency>
                 <groupId>org.jboss.capedwarf</groupId>
-                <artifactId>jboss-as-capedwarf</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jboss.capedwarf</groupId>
-                <artifactId>jboss-as-capedwarf-workaround</artifactId>
+                <artifactId>wildfly-capedwarf</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -187,75 +180,64 @@
             </dependency>
 
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-clustering-infinispan</artifactId>
-                <version>${version.jboss.as}</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-clustering-infinispan</artifactId>
+                <version>${version.jboss.wildfly}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-clustering-jgroups</artifactId>
-                <version>${version.jboss.as}</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-controller</artifactId>
+                <version>${version.jboss.wildfly}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-controller</artifactId>
-                <version>${version.jboss.as}</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-ee</artifactId>
+                <version>${version.jboss.wildfly}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-ee</artifactId>
-                <version>${version.jboss.as}</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-logging</artifactId>
+                <version>${version.jboss.wildfly}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-logging</artifactId>
-                <version>${version.jboss.as}</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-naming</artifactId>
+                <version>${version.jboss.wildfly}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-naming</artifactId>
-                <version>${version.jboss.as}</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-server</artifactId>
+                <version>${version.jboss.wildfly}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-server</artifactId>
-                <version>${version.jboss.as}</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-subsystem-test</artifactId>
+                <type>pom</type>
+                <version>${version.jboss.wildfly}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-subsystem-test</artifactId>
-                <version>${version.jboss.as}</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-undertow</artifactId>
+                <version>${version.jboss.wildfly}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-web</artifactId>
-                <version>${version.jboss.as}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.jboss.logging</groupId>
-                        <artifactId>jboss-logging-spi</artifactId>
-                    </exclusion>
-                </exclusions>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-threads</artifactId>
+                <version>${version.jboss.wildfly}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-threads</artifactId>
-                <version>${version.jboss.as}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-weld</artifactId>
-                <version>${version.jboss.as}</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-weld</artifactId>
+                <version>${version.jboss.wildfly}</version>
             </dependency>
 
             <dependency>
@@ -452,15 +434,15 @@
             </dependency>
 
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-jaxrs</artifactId>
-                <version>${version.jboss.as}</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-jaxrs</artifactId>
+                <version>${version.jboss.wildfly}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-jpa</artifactId>
-                <version>${version.jboss.as}</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-jpa</artifactId>
+                <version>${version.jboss.wildfly}</version>
             </dependency>
 
             <dependency>
