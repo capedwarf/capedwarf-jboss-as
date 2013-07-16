@@ -35,9 +35,13 @@ import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.spi.IIORegistry;
+import javax.imageio.spi.ImageReaderSpi;
 import javax.jms.Connection;
 
+import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
 import org.apache.http.client.HttpClient;
+import org.geotoolkit.image.io.plugin.RawTiffImageReader;
 import org.jboss.as.capedwarf.deployment.CapedwarfAppIdProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCDIExtensionProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCacheEntriesTopProcessor;
@@ -165,6 +169,8 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 putThreadFactoryToRegistry(serviceTarget, newControllers, handler);
                 addHttpClient(serviceTarget, newControllers);
 
+                addTiffSupport();
+
                 addServicesToRegistry(serviceTarget, newControllers);
 
                 final TempDir tempDir = createTempDir(serviceTarget, newControllers);
@@ -288,6 +294,12 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ServiceBuilder<HttpClient> builder = serviceTarget.addService(Constants.CAPEDWARF_NAME.append(String.valueOf(Keys.HTTP_CLIENT.getSlot())), service);
         builder.setInitialMode(ServiceController.Mode.ON_DEMAND);
         newControllers.add(builder.install());
+    }
+
+    protected static void addTiffSupport() {
+        IIORegistry registry = IIORegistry.getDefaultInstance();
+        registry.registerServiceProvider(new TIFFImageReaderSpi(), ImageReaderSpi.class);
+        registry.registerServiceProvider(new RawTiffImageReader.Spi(), ImageReaderSpi.class);
     }
 
     protected static void addServicesToRegistry(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers) {

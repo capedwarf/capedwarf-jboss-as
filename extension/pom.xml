@@ -120,6 +120,16 @@
         </dependency>
 
         <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-coverageio</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.media</groupId>
+            <artifactId>jai_imageio</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>

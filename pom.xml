@@ -71,6 +71,8 @@
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
         <version.org.codehaus.exec>1.2.1</version.org.codehaus.exec>
         <version.org.jboss.maven.transformer>1.0.0.Beta4</version.org.jboss.maven.transformer>
+        <version.javax.jai>1.1.1</version.javax.jai>
+        <version.org.geotoolkit>3.21</version.org.geotoolkit>
 
         <version.org.datanucleus>3.1.2</version.org.datanucleus>
         <version.org.datanucleus.appengine>2.1.1</version.org.datanucleus.appengine>
@@ -198,13 +200,11 @@
                 <version>${version.jboss.as}</version>
             </dependency>
 
-
             <dependency>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>jboss-as-ee</artifactId>
                 <version>${version.jboss.as}</version>
             </dependency>
-
 
             <dependency>
                 <groupId>org.jboss.as</groupId>
@@ -217,7 +217,6 @@
                 <artifactId>jboss-as-naming</artifactId>
                 <version>${version.jboss.as}</version>
             </dependency>
-
 
             <dependency>
                 <groupId>org.jboss.as</groupId>
@@ -262,6 +261,42 @@
             </dependency>
 
             <!-- External Dependencies -->
+
+            <dependency>
+                <groupId>javax.media</groupId>
+                <artifactId>jai_imageio</artifactId>
+                <version>${version.javax.jai}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.geotoolkit</groupId>
+                <artifactId>geotk-utility</artifactId>
+                <version>${version.org.geotoolkit}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.geotoolkit</groupId>
+                <artifactId>geotk-metadata</artifactId>
+                <version>${version.org.geotoolkit}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.geotoolkit</groupId>
+                <artifactId>geotk-referencing</artifactId>
+                <version>${version.org.geotoolkit}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.geotoolkit</groupId>
+                <artifactId>geotk-coverage</artifactId>
+                <version>${version.org.geotoolkit}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.geotoolkit</groupId>
+                <artifactId>geotk-coverageio</artifactId>
+                <version>${version.org.geotoolkit}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -325,7 +360,6 @@
                 <version>${version.org.bouncycastle}</version>
             </dependency>
 
-
             <!-- This dependency needs to be managed due to the dependency convergence enforcer rule -->
 
             <dependency>
@@ -364,7 +398,6 @@
                 <version>${version.org.datanucleus.cache}</version>
             </dependency>
 
-
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-engine</artifactId>
@@ -382,7 +415,6 @@
                 <artifactId>hibernate-search-infinispan</artifactId>
                 <version>${version.org.hibernate.search}</version>
             </dependency>
-
 
             <dependency>
                 <groupId>org.hibernate.javax.persistence</groupId>
@@ -423,13 +455,11 @@
                 <version>${version.jboss.as}</version>
             </dependency>
 
-
             <dependency>
                 <groupId>jivesoftware</groupId>
                 <artifactId>smack</artifactId>
                 <version>${version.org.jivesoftware.smack}</version>
             </dependency>
-
 
             <dependency>
                 <groupId>org.openid4java</groupId>
@@ -484,7 +514,6 @@
                 <artifactId>picketlink-consolidated-social</artifactId>
                 <version>${version.org.picketlink.consolidated.social}</version>
             </dependency>
-
 
             <!-- CapeDwarf & GAE -->
 
@@ -678,6 +707,20 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>geotoolkit</id>
+            <name>GeoToolKit</name>
+            <url>http://maven.geotoolkit.org/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
                 <updatePolicy>never</updatePolicy>
             </snapshots>
         </repository>

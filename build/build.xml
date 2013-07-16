@@ -95,6 +95,15 @@
             <maven-resource group="org.jgroups" artifact="jgroups"/>
         </module-def>
 
+        <module-def name="org.geotoolkit">
+            <maven-resource group="javax.media" artifact="jai_imageio"/>
+            <maven-resource group="org.geotoolkit" artifact="geotk-utility"/>
+            <maven-resource group="org.geotoolkit" artifact="geotk-metadata"/>
+            <maven-resource group="org.geotoolkit" artifact="geotk-referencing"/>
+            <maven-resource group="org.geotoolkit" artifact="geotk-coverage"/>
+            <maven-resource group="org.geotoolkit" artifact="geotk-coverageio"/>
+        </module-def>
+
         <module-def name="org.infinispan">
             <maven-resource group="org.infinispan" artifact="infinispan-core"/>
         </module-def>
