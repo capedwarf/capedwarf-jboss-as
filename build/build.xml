@@ -142,6 +142,7 @@
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-prospectivesearch"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-quota"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-search"/>
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-sql"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-tasks"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-urlfetch"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-users"/>
