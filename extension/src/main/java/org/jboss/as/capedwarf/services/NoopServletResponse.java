@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
@@ -66,6 +67,7 @@ class NoopServletResponse implements HttpServletResponse {
     }
 
     public void setContentLength(int len) {
+        setContentLengthLong(len);
     }
 
     public void setContentType(String type) {
@@ -98,6 +100,9 @@ class NoopServletResponse implements HttpServletResponse {
         return Locale.getDefault();
     }
 
+    public void setContentLengthLong(long len) {
+    }
+
     private static class NoopOutputStream extends OutputStream {
         public void write(int b) throws IOException {
         }
@@ -105,6 +110,13 @@ class NoopServletResponse implements HttpServletResponse {
 
     private static class NoopServletOutputStream extends ServletOutputStream {
         public void write(int b) throws IOException {
+        }
+
+        public boolean isReady() {
+            return true;
+        }
+
+        public void setWriteListener(WriteListener writeListener) {
         }
     }
 
