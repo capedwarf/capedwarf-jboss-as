@@ -45,5 +45,6 @@
         <module name="org.hibernate.search"/>
         <module name="org.apache.httpcomponents"/>
         <module name="com.google.guava"/>
+        <module name="io.undertow.servlet"/>
     </dependencies>
 </module>
