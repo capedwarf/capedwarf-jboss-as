@@ -44,7 +44,7 @@ import org.jboss.modules.Module;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfSynchHackProcessor extends CapedwarfDeploymentUnitProcessor {
+public class CapedwarfSynchHackProcessor extends CapedwarfWebDeploymentUnitProcessor {
     private static final String FORCE_SYNC = "jboss.capedwarf.forceSync";
     private static final Set<String> SYNC_CALLERS = new LinkedHashSet<String>();
 

@@ -37,7 +37,7 @@ import org.jboss.modules.Module;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfEnvironmentProcessor extends CapedwarfDeploymentUnitProcessor {
+public class CapedwarfEnvironmentProcessor extends CapedwarfWebDeploymentUnitProcessor {
     private final CapedwarfProperties properties;
 
     public CapedwarfEnvironmentProcessor(CapedwarfProperties properties) {

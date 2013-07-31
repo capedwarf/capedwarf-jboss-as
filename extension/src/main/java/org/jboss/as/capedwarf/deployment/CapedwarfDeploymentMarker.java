@@ -26,8 +26,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.capedwarf.shared.modules.ModuleInfo;
 
 /**
  * Marks CapeDwarf deployment / app.
@@ -37,16 +39,22 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 public class CapedwarfDeploymentMarker {
     private static final AttachmentKey<CapedwarfDeploymentMarker> MARKER = AttachmentKey.create(CapedwarfDeploymentMarker.class);
 
+    private DeploymentType deploymentType;
     private boolean bundledAppEngineApi;
     private boolean cdiApp;
     private String version;
     private String appId;
     private String appVersion;
+    private String module = ModuleInfo.DEFAULT_MODULE_NAME;
     private boolean threadsafe;
     private Set<String> persistenceProviders;
     private Set<String> entities;
 
     private CapedwarfDeploymentMarker() {
+    }
+
+    public String getAppId() {
+        return appId;
     }
 
     /**
@@ -56,6 +64,16 @@ public class CapedwarfDeploymentMarker {
      */
     static void mark(DeploymentUnit unit) {
         unit.putAttachment(MARKER, new CapedwarfDeploymentMarker());
+    }
+
+    /**
+     * Get unit's marker.
+     *
+     * @param unit the deployment unit
+     * @return marker or null if it doesn't exist
+     */
+    private static CapedwarfDeploymentMarker getMarker(DeploymentUnit unit) {
+        return unit.getAttachment(MARKER);
     }
 
     /**
@@ -70,12 +88,58 @@ public class CapedwarfDeploymentMarker {
     }
 
     /**
+     * Get top marker.
+     *
+     * @param unit the deployment unit
+     * @return parent marker
+     */
+    public static CapedwarfDeploymentMarker getTopMarker(DeploymentUnit unit) {
+        while (unit.getParent() != null) {
+            unit = unit.getParent();
+        }
+        return getMarker(unit);
+    }
+
+    /**
+     * Is this GAE modules app?
+     *
+     * @param unit the deployment unit
+     * @return true if this is GAE modules app
+     */
+    public static boolean hasModules(DeploymentUnit unit) {
+        return ((getDeploymentType(unit) == DeploymentType.EAR) || (getTopMarker(unit) != getMarker(unit)));
+    }
+
+    /**
+     * Get deployment type.
+     *
+     * @param unit the deployment unit
+     * @return deployment type
+     */
+    public static DeploymentType getDeploymentType(DeploymentUnit unit) {
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
+        return (marker != null ? marker.deploymentType : null);
+    }
+
+    /**
+     * Set deployment type.
+     *
+     * @param unit the deployment unit
+     * @param type the deployment type
+     */
+    static void setDeploymentType(DeploymentUnit unit, DeploymentType type) {
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
+        if (marker != null)
+            marker.deploymentType = type;
+    }
+
+    /**
      * Keep info weather GAE api is bundled.
      *
      * @param unit the deployment unit
      */
     public static void setBundledAppEngineApi(DeploymentUnit unit) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         if (marker != null)
             marker.bundledAppEngineApi = true;
     }
@@ -87,7 +151,7 @@ public class CapedwarfDeploymentMarker {
      * @return true if GAE api is bundled, false otherwise
      */
     public static boolean isBundledAppEngineApi(DeploymentUnit unit) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         return marker != null && marker.bundledAppEngineApi;
     }
 
@@ -98,7 +162,7 @@ public class CapedwarfDeploymentMarker {
      * @param flag the cdi app flag
      */
     public static void setCDIApp(DeploymentUnit unit, boolean flag) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         if (marker != null)
             marker.cdiApp = flag;
     }
@@ -110,7 +174,7 @@ public class CapedwarfDeploymentMarker {
      * @return true if app was originally CDI app, false otherwise
      */
     public static boolean isCDIApp(DeploymentUnit unit) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         return marker != null && marker.cdiApp;
     }
 
@@ -121,7 +185,7 @@ public class CapedwarfDeploymentMarker {
      * @param version the version
      */
     public static void setVersion(DeploymentUnit unit, String version) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         if (marker != null)
             marker.version = version;
     }
@@ -133,7 +197,7 @@ public class CapedwarfDeploymentMarker {
      * @return app id
      */
     public static String getVersion(DeploymentUnit unit) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         return marker != null ? marker.version : null;
     }
 
@@ -144,7 +208,7 @@ public class CapedwarfDeploymentMarker {
      * @param appId the app id
      */
     public static void setAppId(DeploymentUnit unit, String appId) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         if (marker != null)
             marker.appId = appId;
     }
@@ -156,7 +220,7 @@ public class CapedwarfDeploymentMarker {
      * @return app id
      */
     public static String getAppId(DeploymentUnit unit) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         return marker != null ? marker.appId : null;
     }
 
@@ -167,7 +231,7 @@ public class CapedwarfDeploymentMarker {
      * @param appVersion the app version
      */
     public static void setAppVersion(DeploymentUnit unit, String appVersion) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         if (marker != null)
             marker.appVersion = appVersion;
     }
@@ -179,8 +243,31 @@ public class CapedwarfDeploymentMarker {
      * @return app version
      */
     public static String getAppVersion(DeploymentUnit unit) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         return marker != null ? marker.appVersion : null;
+    }
+
+    /**
+     * Set module info.
+     *
+     * @param unit  the deployment unit
+     * @param module the module
+     */
+    public static void setModule(DeploymentUnit unit, String module) {
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
+        if (marker != null && module != null)
+            marker.module = module;
+    }
+
+    /**
+     * Get module.
+     *
+     * @param unit the deployment unit
+     * @return module
+     */
+    public static String getModule(DeploymentUnit unit) {
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
+        return marker != null ? marker.module : null;
     }
 
     /**
@@ -190,7 +277,7 @@ public class CapedwarfDeploymentMarker {
      * @param threadsafe the threadsafe flag
      */
     public static void setThreadsafe(DeploymentUnit unit, boolean threadsafe) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         if (marker != null)
             marker.threadsafe = threadsafe;
     }
@@ -202,7 +289,7 @@ public class CapedwarfDeploymentMarker {
      * @return threadsafe flag
      */
     public static boolean isThreadsafe(DeploymentUnit unit) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         return marker != null && marker.threadsafe;
     }
 
@@ -213,7 +300,7 @@ public class CapedwarfDeploymentMarker {
      * @param persistenceProvider the persistence provider
      */
     public static void addPersistenceProvider(DeploymentUnit unit, String persistenceProvider) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         if (marker != null) {
             //noinspection SynchronizationOnLocalVariableOrMethodParameter
             synchronized (marker) {
@@ -231,7 +318,7 @@ public class CapedwarfDeploymentMarker {
      * @return the persistence providers or empty set if none
      */
     public static Set<String> getPersistenceProviders(DeploymentUnit unit) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         if (marker != null) {
             //noinspection SynchronizationOnLocalVariableOrMethodParameter
             synchronized (marker) {
@@ -250,7 +337,7 @@ public class CapedwarfDeploymentMarker {
      * @param entities the JPA entities
      */
     public static void setEntities(DeploymentUnit unit, Set<String> entities) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         if (marker != null) {
             marker.entities = entities;
         }
@@ -263,7 +350,7 @@ public class CapedwarfDeploymentMarker {
      * @return JPA entities
      */
     public static Set<String> getEntities(DeploymentUnit unit) {
-        final CapedwarfDeploymentMarker marker = unit.getAttachment(MARKER);
+        final CapedwarfDeploymentMarker marker = getMarker(unit);
         return (marker != null) ? marker.entities : null;
     }
 }

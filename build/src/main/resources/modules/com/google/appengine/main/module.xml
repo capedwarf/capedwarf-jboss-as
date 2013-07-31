@@ -31,6 +31,7 @@
                <exclude path="**"/>
            </filter>
         </resource-root>
+        <resource-root path="appengine-api-labs-1.8.2.jar" />
     </resources>
 
     <dependencies>

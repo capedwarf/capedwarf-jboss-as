@@ -5,7 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.jboss.as.ee.structure.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.metadata.ear.spec.EarMetaData;
+import org.jboss.metadata.ear.spec.ModuleMetaData;
 import org.jboss.metadata.javaee.spec.EnvironmentRefsGroupMetaData;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.javaee.spec.ResourceReferenceMetaData;
@@ -182,7 +185,30 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         if (type == Type.JBOSS) {
             List<ValveMetaData> valves = getValves(webMetaData);
             valves.add(0, AUTH_VALVE);
+
+            // are we running in Modules env
+            if (CapedwarfDeploymentMarker.hasModules(unit)) {
+                webMetaData.setContextRoot(""); // everything is a root
+                // map against virtual host
+                int vs = getVirtualServerNumber(unit);
+                if (vs > 0) {
+                    webMetaData.setVirtualHosts(Collections.singletonList("vs" + vs));
+                }
+            }
         }
+    }
+
+    private int getVirtualServerNumber(DeploymentUnit unit) {
+        DeploymentUnit top = getTopDeploymentUnit(unit);
+        EarMetaData emd = top.getAttachment(Attachments.EAR_METADATA);
+        int i = 0;
+        for (ModuleMetaData mmd : emd.getModules()) {
+            if (mmd.getFileName().equals(unit.getName())) {
+                return i;
+            }
+            i++;
+        }
+        throw new IllegalArgumentException("No matching module: " + emd.getModules());
     }
 
     private void addServletAndMapping(WebMetaData webMetaData, ServletMetaData servletMetaData, ServletMappingMetaData servletMappingMetaData) {
@@ -201,7 +227,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     protected void addContextParamsTo(WebMetaData webMetaData, ParamValueMetaData param) {
         List<ParamValueMetaData> contextParams = webMetaData.getContextParams();
         if (contextParams == null) {
-            contextParams = new ArrayList<ParamValueMetaData>();
+            contextParams = new ArrayList<>();
             webMetaData.setContextParams(contextParams);
         }
         contextParams.add(param);
@@ -216,7 +242,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private List<ListenerMetaData> getListeners(WebMetaData webMetaData) {
         List<ListenerMetaData> listeners = webMetaData.getListeners();
         if (listeners == null) {
-            listeners = new ArrayList<ListenerMetaData>();
+            listeners = new ArrayList<>();
             webMetaData.setListeners(listeners);
         }
         return listeners;
@@ -259,7 +285,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private List<FilterMappingMetaData> getFilterMappings(WebMetaData webMetaData) {
         List<FilterMappingMetaData> filterMappings = webMetaData.getFilterMappings();
         if (filterMappings == null) {
-            filterMappings = new ArrayList<FilterMappingMetaData>();
+            filterMappings = new ArrayList<>();
             webMetaData.setFilterMappings(filterMappings);
         }
         return filterMappings;
@@ -291,7 +317,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private List<ServletMappingMetaData> getServletMappings(WebMetaData webMetaData) {
         List<ServletMappingMetaData> servletMappings = webMetaData.getServletMappings();
         if (servletMappings == null) {
-            servletMappings = new ArrayList<ServletMappingMetaData>();
+            servletMappings = new ArrayList<>();
             webMetaData.setServletMappings(servletMappings);
         }
         return servletMappings;
@@ -351,7 +377,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private List<SecurityConstraintMetaData> getSecurityConstraints(WebMetaData webMetaData) {
         List<SecurityConstraintMetaData> securityConstraints = webMetaData.getSecurityConstraints();
         if (securityConstraints == null) {
-            securityConstraints = new ArrayList<SecurityConstraintMetaData>();
+            securityConstraints = new ArrayList<>();
             webMetaData.setSecurityConstraints(securityConstraints);
         }
         return securityConstraints;
@@ -382,7 +408,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private List<ValveMetaData> getValves(JBossWebMetaData webMetaData) {
         List<ValveMetaData> valves = webMetaData.getValves();
         if (valves == null) {
-            valves = new ArrayList<ValveMetaData>();
+            valves = new ArrayList<>();
             webMetaData.setValves(valves);
         }
         return valves;
@@ -397,7 +423,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     protected List<ContainerListenerMetaData> getContainerListeners(JBossWebMetaData webMetaData) {
         List<ContainerListenerMetaData> cl = webMetaData.getContainerListeners();
         if (cl == null) {
-            cl = new ArrayList<ContainerListenerMetaData>();
+            cl = new ArrayList<>();
             webMetaData.setContainerListeners(cl);
         }
         return cl;

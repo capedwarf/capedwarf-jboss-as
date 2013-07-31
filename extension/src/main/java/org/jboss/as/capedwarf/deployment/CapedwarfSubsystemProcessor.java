@@ -46,20 +46,20 @@ public class CapedwarfSubsystemProcessor extends CapedwarfDeploymentUnitProcesso
     private static final Set<String> EXCLUDED_SUBSYSTEMS;
 
     static {
-        EXCLUDED_SUBSYSTEMS = new HashSet<String>();
+        EXCLUDED_SUBSYSTEMS = new HashSet<>();
         EXCLUDED_SUBSYSTEMS.add("jaxrs"); // exclude REST for now
     }
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         DeploymentUnit unit = phaseContext.getDeploymentUnit();
 
-        Set<String> excludedSubsystems = new HashSet<String>(EXCLUDED_SUBSYSTEMS);
+        Set<String> excludedSubsystems = new HashSet<>(EXCLUDED_SUBSYSTEMS);
         excludedSubsystems.removeAll(getEnabledSubsystems(unit));
 
         if (excludedSubsystems.size() > 0) {
             Set<String> subsystems = unit.getAttachment(Attachments.EXCLUDED_SUBSYSTEMS);
             if (subsystems == null) {
-                subsystems = new ConcurrentSkipListSet<String>();
+                subsystems = new ConcurrentSkipListSet<>();
                 unit.putAttachment(Attachments.EXCLUDED_SUBSYSTEMS, subsystems);
             }
             subsystems.addAll(excludedSubsystems);
@@ -75,7 +75,7 @@ public class CapedwarfSubsystemProcessor extends CapedwarfDeploymentUnitProcesso
                 String value = compatibility.getValue(Compatibility.Feature.ENABLED_SUBSYSTEMS);
                 if (value != null) {
                     String[] split = value.split(",");
-                    return new HashSet<String>(Arrays.asList(split));
+                    return new HashSet<>(Arrays.asList(split));
                 }
             }
             return Collections.emptySet();

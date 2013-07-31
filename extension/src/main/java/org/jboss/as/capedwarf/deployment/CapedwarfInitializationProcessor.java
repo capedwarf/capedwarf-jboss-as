@@ -39,28 +39,42 @@ import org.jboss.vfs.VirtualFile;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfInitializationProcessor implements DeploymentUnitProcessor {
-
-    private static final String APPENGINE_WEB_XML = "WEB-INF/appengine-web.xml";
-
     private final Logger log = Logger.getLogger(CapedwarfInitializationProcessor.class);
 
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         DeploymentUnit unit = phaseContext.getDeploymentUnit();
 
-        if (unit.getParent() != null || DeploymentTypeMarker.isType(DeploymentType.WAR, unit) == false)
-            return; // Skip non top and non web deployments
-
-        if (hasAppEngineWebXml(unit)) {
-            log.info("Found GAE / CapeDwarf deployment: " + unit);
-            CapedwarfDeploymentMarker.mark(unit);
+        if (unit.getParent() == null) {
+            // allow top level .ear and .war with proper xmls
+            if (DeploymentTypeMarker.isType(DeploymentType.EAR, unit)) {
+                if (hasAppEngineXml(unit, ParseUtils.APPENGINE_APPLICATION_XML)) {
+                    log.info("Found GAE / CapeDwarf EAR deployment: " + unit);
+                    CapedwarfDeploymentMarker.mark(unit);
+                    CapedwarfDeploymentMarker.setDeploymentType(unit, DeploymentType.EAR);
+                }
+            } else if (DeploymentTypeMarker.isType(DeploymentType.WAR, unit)) {
+                handleWarDeployment(unit);
+            }
+        } else {
+            if (DeploymentTypeMarker.isType(DeploymentType.WAR, unit)) {
+                handleWarDeployment(unit);
+            }
         }
     }
 
-    protected boolean hasAppEngineWebXml(DeploymentUnit deploymentUnit) {
+    protected void handleWarDeployment(DeploymentUnit unit) {
+        if (hasAppEngineXml(unit, ParseUtils.APPENGINE_WEB_XML)) {
+            log.info("Found GAE / CapeDwarf WAR deployment: " + unit);
+            CapedwarfDeploymentMarker.mark(unit);
+            CapedwarfDeploymentMarker.setDeploymentType(unit, DeploymentType.WAR);
+        }
+    }
+
+    protected boolean hasAppEngineXml(DeploymentUnit deploymentUnit, String path) {
         ResourceRoot deploymentRoot = deploymentUnit.getAttachment(Attachments.DEPLOYMENT_ROOT);
         VirtualFile root = deploymentRoot.getRoot();
-        VirtualFile xml = root.getChild(APPENGINE_WEB_XML);
+        VirtualFile xml = root.getChild(path);
         return xml.exists();
     }
 

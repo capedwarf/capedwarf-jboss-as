@@ -34,14 +34,12 @@ import org.jboss.vfs.VirtualFile;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public abstract class CapedwarfAppEngineWebXmlParseProcessor extends CapedwarfDeploymentUnitProcessor {
-    private static final String APPENGINE_WEB_XML = "WEB-INF/appengine-web.xml";
-
+public abstract class CapedwarfAppEngineWebXmlParseProcessor extends CapedwarfWebDeploymentUnitProcessor {
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         DeploymentUnit unit = phaseContext.getDeploymentUnit();
         ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
         VirtualFile root = deploymentRoot.getRoot();
-        VirtualFile xml = root.getChild(APPENGINE_WEB_XML);
+        VirtualFile xml = root.getChild(ParseUtils.APPENGINE_WEB_XML);
 
         try {
             doParseAppEngineWebXml(phaseContext, unit, root, xml);

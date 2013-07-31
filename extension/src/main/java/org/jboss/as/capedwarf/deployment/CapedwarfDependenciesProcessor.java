@@ -43,7 +43,7 @@ import org.jboss.msc.service.ServiceName;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfDependenciesProcessor extends CapedwarfDeploymentUnitProcessor {
+public class CapedwarfDependenciesProcessor extends CapedwarfTopDeploymentUnitProcessor {
     private static final Set<ServiceName> STATIC_DEPENDECIES;
 
     @SuppressWarnings("unchecked")

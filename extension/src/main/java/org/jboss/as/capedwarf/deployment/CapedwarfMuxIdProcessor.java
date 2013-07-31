@@ -43,7 +43,7 @@ import org.jgroups.Channel;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfMuxIdProcessor extends CapedwarfDeploymentUnitProcessor {
+public class CapedwarfMuxIdProcessor extends CapedwarfTopDeploymentUnitProcessor {
     static ServiceName toServiceName(String appId) {
         return CAPEDWARF_SERVICE_NAME.append("mux-gen").append(appId);
     }

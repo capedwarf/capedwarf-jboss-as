@@ -22,44 +22,32 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
-import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.SetupAction;
 import org.jboss.capedwarf.shared.config.AppEngineWebXml;
-import org.jboss.capedwarf.shared.config.AppEngineWebXmlParser;
 import org.jboss.capedwarf.shared.config.BackendsXml;
-import org.jboss.capedwarf.shared.config.BackendsXmlParser;
 import org.jboss.capedwarf.shared.config.CapedwarfConfiguration;
-import org.jboss.capedwarf.shared.config.CapedwarfConfigurationParser;
 import org.jboss.capedwarf.shared.config.ConfigurationAware;
 import org.jboss.capedwarf.shared.config.IndexesXml;
-import org.jboss.capedwarf.shared.config.IndexesXmlParser;
 import org.jboss.capedwarf.shared.config.QueueXml;
-import org.jboss.capedwarf.shared.config.QueueXmlParser;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceName;
-import org.jboss.vfs.VirtualFile;
 
 /**
  * Prepare web context handles.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcessor {
-
-    public static final AttachmentKey<IndexesXml> INDEXES_XML_ATTACHMENT = AttachmentKey.create(IndexesXml.class);
-
+public class CapedwarfWebContextProcessor extends CapedwarfWebDeploymentUnitProcessor {
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final DeploymentUnit unit = phaseContext.getDeploymentUnit();
-        final VirtualFile deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT).getRoot();
         final Module module = unit.getAttachment(Attachments.MODULE);
         if (module == null) {
             throw new DeploymentUnitProcessingException("No CL module: " + unit);
@@ -67,75 +55,21 @@ public class CapedwarfWebContextProcessor extends CapedwarfDeploymentUnitProcess
         final ClassLoader classLoader = module.getClassLoader();
         final ClassLoader previous = SecurityActions.setTCCL(classLoader);
         try {
-            // appengine-web.xml
-            final InputStream appIs = getInputStream(deploymentRoot, "WEB-INF/appengine-web.xml", true);
-            AppEngineWebXml appConfig;
-            try {
-                appConfig = AppEngineWebXmlParser.parse(appIs);
-            } finally {
-                safeClose(appIs);
-            }
-
-            // capedwarf-web.xml
-            final InputStream cdIs = getInputStream(deploymentRoot, "WEB-INF/capedwarf-web.xml", false);
-            CapedwarfConfiguration cdConfig;
-            try {
-                cdConfig = CapedwarfConfigurationParser.parse(cdIs);
-            } finally {
-                safeClose(cdIs);
-            }
-
-            // queue.xml
-            final InputStream queueIs = getInputStream(deploymentRoot, "WEB-INF/queue.xml", false);
-            QueueXml queueConfig;
-            try {
-                queueConfig = QueueXmlParser.parse(queueIs);
-            } finally {
-                safeClose(queueIs);
-            }
-
-            // backends.xml
-            final InputStream backendsIs = getInputStream(deploymentRoot, "WEB-INF/backends.xml", false);
-            BackendsXml backendsConfig;
-            try {
-                backendsConfig = BackendsXmlParser.parse(backendsIs);
-            } finally {
-                safeClose(backendsIs);
-            }
-
-            // datastore-indexes.xml
-            final InputStream indexesIs = getInputStream(deploymentRoot, "WEB-INF/datastore-indexes.xml", false);
-            IndexesXml indexesConfig;
-            try {
-                indexesConfig = IndexesXmlParser.parse(indexesIs);
-                unit.putAttachment(INDEXES_XML_ATTACHMENT, indexesConfig);
-            } finally {
-                safeClose(indexesIs);
-            }
+            AppEngineWebXml appConfig = unit.getAttachment(CapedwarfAttachments.APP_ENGINE_WEB_XML);
+            CapedwarfConfiguration cdConfig = unit.getAttachment(CapedwarfAttachments.CAPEDWARF_WEB_XML);
+            QueueXml queueConfig = unit.getAttachment(CapedwarfAttachments.QUEUE_XML);
+            BackendsXml backendsConfig = unit.getAttachment(CapedwarfAttachments.BACKENDS_XML);
+            IndexesXml indexesConfig = unit.getAttachment(CapedwarfAttachments.INDEXES_XML);
 
             final String appId = CapedwarfDeploymentMarker.getAppId(unit);
             final Set<ServiceName> dependencies = CapedwarfDependenciesProcessor.getDependecies(appId);
             final CapedwarfSetupAction cas = new CapedwarfSetupAction(dependencies, classLoader, appConfig, cdConfig, queueConfig, backendsConfig, indexesConfig);
             unit.addToAttachmentList(org.jboss.as.ee.component.Attachments.WEB_SETUP_ACTIONS, cas);
-        } catch (DeploymentUnitProcessingException e) {
-            throw e;
         } catch (Exception e) {
             throw new DeploymentUnitProcessingException(e);
         } finally {
             SecurityActions.setTCCL(previous);
         }
-    }
-
-    protected static InputStream getInputStream(VirtualFile root, String path, boolean mandatory) throws Exception {
-        final VirtualFile child = root.getChild(path);
-        if (child == null || child.exists() == false) {
-            if (mandatory) {
-                throw new DeploymentUnitProcessingException("No such file: " + path);
-            } else {
-                return null;
-            }
-        }
-        return child.openStream();
     }
 
     private static class CapedwarfSetupAction extends ConfigurationAware implements SetupAction {

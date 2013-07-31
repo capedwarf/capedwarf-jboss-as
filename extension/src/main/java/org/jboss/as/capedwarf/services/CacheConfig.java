@@ -20,23 +20,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.capedwarf.utils;
-
-import org.jboss.as.naming.deployment.ContextNames;
-import org.jboss.as.naming.deployment.JndiName;
-import org.jboss.msc.service.ServiceName;
+package org.jboss.as.capedwarf.services;
 
 /**
- * Constants.
+ * Cache config.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public final class Constants {
-    public static final String CAPEDWARF = "capedwarf";
-    public static final ServiceName CAPEDWARF_NAME = ServiceName.JBOSS.append(CAPEDWARF);
-    // JNDI names
-    static final String JMSXA_JNDI = JndiName.of("java:").append("JmsXA").getAbsoluteName();
-    static final String QUEUE_JNDI = JndiName.of("java:").append("queue").append(CAPEDWARF).getAbsoluteName();
-    public static final ContextNames.BindInfo JMSXA_BIND_INFO = ContextNames.bindInfoFor(JMSXA_JNDI);
-    public static final ContextNames.BindInfo QUEUE_BIND_INFO = ContextNames.bindInfoFor(QUEUE_JNDI);
+public interface CacheConfig {
+    String getName();
+    CacheIndexing getIndexing();
+    boolean storeAsBinary();
 }

@@ -282,14 +282,12 @@
                 <scope>provided</scope>
             </dependency>
 
-
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${version.junit}</version>
                 <scope>test</scope>
             </dependency>
-
 
             <dependency>
                 <groupId>org.apache.lucene</groupId>
@@ -594,6 +592,12 @@
 
             <dependency>
                 <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-modules</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
                 <artifactId>capedwarf-oauth</artifactId>
                 <version>${version.org.jboss.capedwarf}</version>
             </dependency>
@@ -650,6 +654,12 @@
             <dependency>
                 <groupId>com.google.appengine</groupId>
                 <artifactId>appengine-api-1.0-sdk</artifactId>
+                <version>${version.com.google.appengine}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-api-labs</artifactId>
                 <version>${version.com.google.appengine}</version>
             </dependency>
 

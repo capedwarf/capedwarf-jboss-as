@@ -50,7 +50,7 @@ import org.jboss.jandex.MethodInfo;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfEntityProcessor extends CapedwarfDeploymentUnitProcessor {
+public class CapedwarfEntityProcessor extends CapedwarfWebDeploymentUnitProcessor {
     private static final DotName JPA_ENTITY = DotName.createSimple("javax.persistence.Entity");
     private static final DotName JPA_EMBEDDABLE = DotName.createSimple("javax.persistence.Embeddable");
     private static final DotName JPA_MAPPED_SUPERCLASS = DotName.createSimple("javax.persistence.MappedSuperclass");

@@ -22,23 +22,33 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Map;
+
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
-import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.vfs.VirtualFile;
 
 /**
- * CapeDwarf modifying web content processor.
+ * Parse WAR app info - id, version.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
- * @author <a href="mailto:marko.luksa@gmail.com">Marko Luksa</a>
  */
-public abstract class CapedwarfWebDeploymentProcessor extends CapedwarfWebDeploymentUnitProcessor {
-    @Override
-    protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-        final DeploymentUnit unit = phaseContext.getDeploymentUnit();
-        doDeploy(unit);
-    }
+public class CapedwarfWebAppInfoParseProcessor extends CapedwarfAppEngineWebXmlParseProcessor {
+    protected void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
+        final Map<String, String> results = ParseUtils.parseTokens(xml, new LinkedHashSet<>(Arrays.asList(ParseUtils.APPLICATION, ParseUtils.VERSION, ParseUtils.THREADSAFE, ParseUtils.MODULE)));
 
-    protected void doDeploy(DeploymentUnit unit) throws DeploymentUnitProcessingException {
+        final String appId;
+        if (CapedwarfDeploymentMarker.hasModules(unit)) {
+            appId = CapedwarfDeploymentMarker.getTopMarker(unit).getAppId();
+        } else {
+            appId = results.get(ParseUtils.APPLICATION);
+        }
+
+        CapedwarfDeploymentMarker.setAppId(unit, appId);
+        CapedwarfDeploymentMarker.setAppVersion(unit, results.get(ParseUtils.VERSION));
+        CapedwarfDeploymentMarker.setThreadsafe(unit, Boolean.parseBoolean(results.get(ParseUtils.THREADSAFE)));
+        CapedwarfDeploymentMarker.setModule(unit, results.get(ParseUtils.MODULE));
     }
 }

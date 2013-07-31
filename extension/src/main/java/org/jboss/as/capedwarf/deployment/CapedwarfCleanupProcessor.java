@@ -32,7 +32,7 @@ import org.jboss.capedwarf.shared.components.ComponentRegistry;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfCleanupProcessor extends CapedwarfDeploymentUnitProcessor {
+public class CapedwarfCleanupProcessor extends CapedwarfTopDeploymentUnitProcessor {
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
     }

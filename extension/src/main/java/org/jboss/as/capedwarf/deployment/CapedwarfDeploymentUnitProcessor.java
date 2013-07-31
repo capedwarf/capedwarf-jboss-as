@@ -43,34 +43,30 @@ public abstract class CapedwarfDeploymentUnitProcessor implements DeploymentUnit
     protected Logger log = Logger.getLogger(getClass());
 
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-        if (CapedwarfDeploymentMarker.isCapedwarfDeployment(phaseContext.getDeploymentUnit())) {
+        final DeploymentUnit unit = phaseContext.getDeploymentUnit();
+        if (CapedwarfDeploymentMarker.isCapedwarfDeployment(unit) && proceed(unit)) {
             doDeploy(phaseContext); // only handle CapeDwarf deployments
         }
+    }
+
+    protected boolean proceed(DeploymentUnit unit) {
+        return (unit != null);
     }
 
     /**
      * Do deploy a Capedwarf deployment.
      *
      * @param phaseContext the phase context
-     * @throws DeploymentUnitProcessingException for any deployment error
+     * @throws org.jboss.as.server.deployment.DeploymentUnitProcessingException for any deployment error
      */
     protected abstract void doDeploy(final DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException;
 
     public void undeploy(DeploymentUnit context) {
-        if (CapedwarfDeploymentMarker.isCapedwarfDeployment(context)) {
+        if (CapedwarfDeploymentMarker.isCapedwarfDeployment(context) && proceed(context)) {
             doUndeploy(context);
         }
     }
 
     protected void doUndeploy(DeploymentUnit unit) {
-    }
-
-    protected static void safeClose(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (Exception ignored) {
-            }
-        }
     }
 }

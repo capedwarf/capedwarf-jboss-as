@@ -31,7 +31,7 @@ import org.infinispan.configuration.cache.ConfigurationBuilder;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class BasicConfigurationCallback extends IndexableConfigurationCallback {
-    public BasicConfigurationCallback(CacheName config, String appId, ClassLoader classLoader) {
+    public BasicConfigurationCallback(CacheConfig config, String appId, ClassLoader classLoader) {
         super(config, appId, classLoader);
     }
 

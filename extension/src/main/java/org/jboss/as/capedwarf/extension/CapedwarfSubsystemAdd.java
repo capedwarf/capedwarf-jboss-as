@@ -38,13 +38,17 @@ import java.util.logging.Logger;
 import javax.jms.Connection;
 
 import org.apache.http.client.HttpClient;
-import org.jboss.as.capedwarf.deployment.CapedwarfAppInfoParseProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfAppIdProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCDIExtensionProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfCacheEntriesTopProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfCacheEntriesWebProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCacheProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCleanupProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfCompatibilityParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfDependenciesProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfDeploymentProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfEarAppInfoParseProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfEarDeploymentProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfEntityProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfEnvironmentProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfInitializationProcessor;
@@ -55,11 +59,13 @@ import org.jboss.as.capedwarf.deployment.CapedwarfPersistenceModificationProcess
 import org.jboss.as.capedwarf.deployment.CapedwarfPostModuleJPAProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfSubsystemProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfSynchHackProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfWebAppInfoParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWebCleanupProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWebComponentsDeploymentProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWebContextProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWeldParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfWeldProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfXmlsParserProcessor;
 import org.jboss.as.capedwarf.services.ComponentRegistryService;
 import org.jboss.as.capedwarf.services.HttpClientService;
 import org.jboss.as.capedwarf.services.OptionalExecutorService;
@@ -163,11 +169,14 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
                 final TempDir tempDir = createTempDir(serviceTarget, newControllers);
 
-                final int initialStructureOrder = Math.max(Phase.STRUCTURE_WAR, Phase.STRUCTURE_WAR_DEPLOYMENT_INIT);
+                final int initialStructureOrder = Math.max(Math.max(Phase.STRUCTURE_WAR, Phase.STRUCTURE_WAR_DEPLOYMENT_INIT), Phase.STRUCTURE_EAR);
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.STRUCTURE, initialStructureOrder + 10, new CapedwarfInitializationProcessor());
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.STRUCTURE, initialStructureOrder + 20, new CapedwarfSubsystemProcessor());
                 final int initialParseOrder = Math.min(Phase.PARSE_WEB_DEPLOYMENT, Phase.PARSE_PERSISTENCE_UNIT);
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 15, new CapedwarfAppInfoParseProcessor()); // adjust order as needed
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 20, new CapedwarfEarAppInfoParseProcessor()); // adjust order as needed
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 18, new CapedwarfWebAppInfoParseProcessor()); // adjust order as needed
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 16, new CapedwarfAppIdProcessor()); // adjust order as needed
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 14, new CapedwarfXmlsParserProcessor()); // adjust order as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 12, new CapedwarfCompatibilityParseProcessor()); // adjust order as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, initialParseOrder - 10, new CapedwarfPersistenceModificationProcessor(tempDir)); // before persistence.xml parsing
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WEB_DEPLOYMENT + 1, new CapedwarfWebCleanupProcessor()); // right after web.xml parsing
@@ -175,15 +184,18 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.PARSE, Phase.PARSE_WELD_DEPLOYMENT + 10, new CapedwarfWeldParseProcessor()); // before Weld web integration
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_WELD - 10, new CapedwarfWeldProcessor()); // before Weld
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 10, new CapedwarfJPAProcessor()); // before default JPA processor
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 5, new CapedwarfDeploymentProcessor(appengineAPI));
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 6, new CapedwarfEarDeploymentProcessor()); // ear CL deps
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 5, new CapedwarfDeploymentProcessor(appengineAPI)); // web CL deps
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 1, new CapedwarfCacheEntriesTopProcessor()); // gather cache configs
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_INJECTION_ANNOTATION - 1, new CapedwarfEnvironmentProcessor(properties)); // after module
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_LOGGING_CONFIG - 1, new CapedwarfLoggingParseProcessor()); // just before AS logging configuration
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 10, new CapedwarfCDIExtensionProcessor()); // after Weld portable extensions lookup
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 20, new CapedwarfEntityProcessor()); // adjust as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 30, new CapedwarfPostModuleJPAProcessor()); // after entity processor
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 40, new CapedwarfSynchHackProcessor()); // after module, adjust as needed
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 1, new CapedwarfCleanupProcessor()); // we still need module/CL
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT - 3, new CapedwarfWebContextProcessor()); // before web context lifecycle
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 2, new CapedwarfCacheEntriesWebProcessor()); // gather cache configs
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 4, new CapedwarfCleanupProcessor()); // we still need module/CL
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 6, new CapedwarfWebContextProcessor()); // before web context lifecycle
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT - 2, new CapedwarfCacheProcessor()); // after module
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT - 1, new CapedwarfMuxIdProcessor()); // adjust order as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_MODULE_JNDI_BINDINGS - 2, new CapedwarfDependenciesProcessor()); // after logging
@@ -218,11 +230,8 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
             File bin = new File(System.getProperty("jboss.home.dir"), "bin");
             File cdConf = new File(bin, "capedwarf.conf");
             if (cdConf.exists()) {
-                InputStream is = new FileInputStream(cdConf);
-                try {
+                try (InputStream is = new FileInputStream(cdConf)) {
                     properties.load(is);
-                } finally {
-                    is.close();
                 }
             }
         } catch (IOException e) {
@@ -233,7 +242,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
     }
 
     protected static <T> void addComponentRegistryService(final ServiceTarget serviceTarget, final List<ServiceController<?>> newControllers, final Key<T> key, final ServiceName dependencyName) {
-        final ComponentRegistryService<T> service = new ComponentRegistryService<T>(key);
+        final ComponentRegistryService<T> service = new ComponentRegistryService<>(key);
         final ServiceBuilder<T> builder = serviceTarget.addService(Constants.CAPEDWARF_NAME.append(String.valueOf(key.getSlot())), service);
         builder.addDependency(dependencyName, key.getType(), service.getInjectedValue());
         builder.setInitialMode(ServiceController.Mode.ON_DEMAND);

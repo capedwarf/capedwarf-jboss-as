@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012, Red Hat, Inc., and individual contributors
+ * Copyright 2013, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -22,47 +22,45 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.io.Closeable;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
 
+import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.as.server.deployment.module.ResourceRoot;
 import org.jboss.vfs.VirtualFile;
 
 /**
- * Parse app info - id, version.
- *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfAppInfoParseProcessor extends CapedwarfAppEngineWebXmlParseProcessor {
-    private static final String APPLICATION = "<application>";
-    private static final String VERSION = "<version>";
-    private static final String THREADSAFE = "<threadsafe>";
+final class ParseUtils {
+    static final String APPENGINE_APPLICATION_XML = "META-INF/appengine-application.xml";
+    static final String APPENGINE_WEB_XML = "WEB-INF/appengine-web.xml";
 
-    private Set<String> apps = new ConcurrentSkipListSet<String>();
+    static final String APPLICATION = "<application>";
+    static final String VERSION = "<version>";
+    static final String THREADSAFE = "<threadsafe>";
+    static final String MODULE = "<module>";
 
-    protected void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
-        final Map<String, String> results = parseTokens(xml, new LinkedHashSet<String>(Arrays.asList(APPLICATION, VERSION, THREADSAFE)));
-        final String appId = results.get(APPLICATION);
-
-        if (appId == null || appId.length() == 0)
-            throw new IllegalArgumentException("App id is null or empty!");
-
-        if (apps.add(appId) == false)
-            throw new IllegalArgumentException("App id already exists: " + appId);
-
-        CapedwarfDeploymentMarker.setAppId(unit, appId);
-        CapedwarfDeploymentMarker.setAppVersion(unit, results.get(VERSION));
-        CapedwarfDeploymentMarker.setThreadsafe(unit, Boolean.parseBoolean(results.get(THREADSAFE)));
+    ParseUtils() {
     }
 
-    private Map<String, String> parseTokens(VirtualFile xml, final Set<String> tokens) throws Exception {
-        final Map<String, String> results = new HashMap<String, String>();
+    static VirtualFile getFile(DeploymentPhaseContext context, String path) {
+        return getFile(context.getDeploymentUnit(), path);
+    }
+
+    static VirtualFile getFile(DeploymentUnit unit, String path) {
+        ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
+        VirtualFile root = deploymentRoot.getRoot();
+        return root.getChild(path);
+    }
+
+    static Map<String, String> parseTokens(VirtualFile xml, final Set<String> tokens) throws Exception {
+        final Map<String, String> results = new HashMap<>();
         InputStream is = xml.openStream();
         try {
             StringBuilder builder = new StringBuilder();
@@ -105,9 +103,12 @@ public class CapedwarfAppInfoParseProcessor extends CapedwarfAppEngineWebXmlPars
         }
     }
 
-    @Override
-    protected void doUndeploy(DeploymentUnit unit) {
-        String appId = CapedwarfDeploymentMarker.getAppId(unit);
-        apps.remove(appId);
+    static void safeClose(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (Exception ignored) {
+            }
+        }
     }
 }

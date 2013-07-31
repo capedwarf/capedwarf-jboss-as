@@ -71,7 +71,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
 
     private static final AttachmentKey<PropertyConfigurator> PROPERTY_CONFIGURATOR_KEY = AttachmentKey.create(PropertyConfigurator.class);
 
-    private final static Set<String> excludedLoggers = new HashSet<String>();
+    private final static Set<String> excludedLoggers = new HashSet<>();
     static {
         excludedLoggers.add("org.jboss.capedwarf");
         excludedLoggers.add("org.jboss.as");
@@ -221,6 +221,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         return stdioContext;
     }
 
+    @SuppressWarnings("unchecked")
     protected void addHandlers(final LogContext logContext, boolean async, final Class<? extends Handler>... handlerTypes) {
         final LogContext sysLogContext = LogContext.getSystemLogContext();
         final Logger systemRoot = sysLogContext.getLogger(CommonAttributes.ROOT_LOGGER_NAME);
@@ -243,7 +244,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         try {
             properties.load(stream);
         } finally {
-            safeClose(stream);
+            ParseUtils.safeClose(stream);
         }
         return properties;
     }
@@ -302,7 +303,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             }
             return path.toString();
         } finally {
-            safeClose(is);
+            ParseUtils.safeClose(is);
         }
     }
 

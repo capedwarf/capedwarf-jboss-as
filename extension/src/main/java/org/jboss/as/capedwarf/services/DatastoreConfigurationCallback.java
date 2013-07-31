@@ -23,8 +23,10 @@
 package org.jboss.as.capedwarf.services;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.ListMultimap;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.infinispan.Cache;
@@ -34,13 +36,13 @@ import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.IndexingConfigurationBuilder;
 import org.infinispan.query.backend.SearchWorkCreator;
 import org.infinispan.query.impl.ComponentRegistryUtils;
-import org.jboss.as.capedwarf.CapedwarfIndexShardingStrategy;
 import org.jboss.capedwarf.shared.compatibility.Compatibility;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.capedwarf.shared.components.SetKey;
 import org.jboss.capedwarf.shared.components.SimpleKey;
 import org.jboss.capedwarf.shared.components.Slot;
 import org.jboss.capedwarf.shared.config.IndexesXml;
+import org.jboss.capedwarf.shared.datastore.CapedwarfMultiSearchWorkCreator;
 
 /**
  * Datastore cache configuration callback.
@@ -49,19 +51,18 @@ import org.jboss.capedwarf.shared.config.IndexesXml;
  * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
 public class DatastoreConfigurationCallback extends BasicConfigurationCallback {
+    private final List<IndexesXml> indexes;
 
-    private final Collection<IndexesXml.Index> indexes;
-
-    public DatastoreConfigurationCallback(String appId, ClassLoader classLoader, IndexesXml indexesXml) {
-        super(CacheName.DEFAULT, appId, classLoader);
-        indexes = indexesXml.getIndexes().values();
+    public DatastoreConfigurationCallback(CacheConfig config, String appId, ClassLoader classLoader, List<IndexesXml> indexes) {
+        super(config, appId, classLoader);
+        this.indexes = indexes;
     }
 
     public ConfigurationBuilder configure(Configuration configuration) {
         ConfigurationBuilder builder = super.configure(configuration);
 
         ComponentRegistry registry = ComponentRegistry.getInstance();
-        Compatibility compatibility = registry.getComponent(new SimpleKey<Compatibility>(appId, Compatibility.class));
+        Compatibility compatibility = registry.getComponent(new SimpleKey<>(appId, Compatibility.class));
         if (compatibility.isEnabled(Compatibility.Feature.FORCE_ASYNC_DATASTORE)) {
             Set<String> callers = registry.getComponent(new SetKey<String>(appId, Slot.SYNC_HACK));
             if (callers == null || callers.isEmpty()) {
@@ -81,16 +82,25 @@ public class DatastoreConfigurationCallback extends BasicConfigurationCallback {
 
         String infinispanIndexName = getIndexName("com.google.appengine.api.datastore.Entity");
         IndexingConfigurationBuilder indexing = builder.indexing();
-        indexing.setProperty("hibernate.search." + infinispanIndexName + ".sharding_strategy", CapedwarfIndexShardingStrategy.class.getName());
-        indexing.setProperty("hibernate.search." + infinispanIndexName + ".sharding_strategy.nbr_of_shards", String.valueOf(1 + indexes.size()));
 
-        int i=1;
-        for (IndexesXml.Index index : indexes) {
-            mapping.fullTextFilterDef(index.getName(), ShardSensitiveOnlyFilter.class);
-            indexing.setProperty("hibernate.search." + infinispanIndexName + "." + i + ".indexName", index.getName());
-            indexing.setProperty("hibernate.search." + infinispanIndexName + ".sharding_strategy.index_name." + i, index.getName());
-            i++;
+        int shardSize = 0;
+
+        int i = 1;
+        for (IndexesXml index : indexes) {
+            final ListMultimap<String,IndexesXml.Index> list = index.getIndexes();
+            final Collection<IndexesXml.Index> values = list.values();
+            for (IndexesXml.Index ii : values) {
+                String name = ii.getName();
+                mapping.fullTextFilterDef(name, ShardSensitiveOnlyFilter.class);
+                indexing.setProperty("hibernate.search." + infinispanIndexName + "." + i + ".indexName", name);
+                indexing.setProperty("hibernate.search." + infinispanIndexName + ".sharding_strategy.index_name." + i, name);
+                i++;
+            }
+            shardSize += values.size();
         }
+
+        indexing.setProperty("hibernate.search." + infinispanIndexName + ".sharding_strategy", "org.jboss.capedwarf.shared.datastore.CapedwarfIndexShardingStrategy");
+        indexing.setProperty("hibernate.search." + infinispanIndexName + ".sharding_strategy.nbr_of_shards", String.valueOf(1 + shardSize));
 
         return mapping;
     }
@@ -102,12 +112,7 @@ public class DatastoreConfigurationCallback extends BasicConfigurationCallback {
     }
 
     @SuppressWarnings("unchecked")
-    private SearchWorkCreator<Object> createSearchWorkCreator() {
-        try {
-            Class<?> clazz = classLoader.loadClass("org.jboss.capedwarf.datastore.CapedwarfSearchWorkCreator");
-            return (SearchWorkCreator<Object>) clazz.newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+    protected SearchWorkCreator<Object> createSearchWorkCreator() {
+        return new CapedwarfMultiSearchWorkCreator();
     }
 }

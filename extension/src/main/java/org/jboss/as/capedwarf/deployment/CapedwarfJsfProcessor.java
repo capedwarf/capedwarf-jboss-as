@@ -35,7 +35,7 @@ import java.util.Set;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfJsfProcessor extends CapedwarfDeploymentUnitProcessor {
+public class CapedwarfJsfProcessor extends CapedwarfWebDeploymentUnitProcessor {
 
     private static final String FACES_INIT = "com.sun.faces.config.FacesInitializer";
 

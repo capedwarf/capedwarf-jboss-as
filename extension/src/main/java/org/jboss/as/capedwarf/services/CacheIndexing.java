@@ -34,7 +34,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class CacheIndexing {
     private int prefix;
     private int offset;
-    private Set<String> classes = new CopyOnWriteArraySet<String>();
+    private Set<String> classes = new CopyOnWriteArraySet<>();
+    private Set<Class<?>> exactClasses = new CopyOnWriteArraySet<>();
 
     public CacheIndexing(int prefix) {
         this.prefix = prefix;
@@ -45,9 +46,14 @@ public class CacheIndexing {
         return this;
     }
 
+    public CacheIndexing addExactClass(Class<?> clazz) {
+        exactClasses.add(clazz);
+        return this;
+    }
+
     public Iterable<Class<?>> getClasses(ClassLoader cl) {
+        final Set<Class<?>> clazzez = new LinkedHashSet<>(exactClasses);
         try {
-            final Set<Class<?>> clazzez = new LinkedHashSet<Class<?>>();
             for (String clazz : classes) {
                 clazzez.add(cl.loadClass(clazz));
             }

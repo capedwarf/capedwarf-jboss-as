@@ -29,40 +29,18 @@ package org.jboss.as.capedwarf.services;
  * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
 public enum CacheName {
-    DEFAULT("default", true, new CacheIndexing(1).setOffset(-1).addClass("com.google.appengine.api.datastore.Entity")),
-    SEARCH("search", true, new CacheIndexing(-1).setOffset(1).addClass("org.jboss.capedwarf.search.CacheValue")),
-    PROSPECTIVE_SEARCH("prospective_search", true, new CacheIndexing(-1).addClass("org.jboss.capedwarf.prospectivesearch.SubscriptionHolder")),
-    TASKS("tasks", true, new CacheIndexing(1).addClass("org.jboss.capedwarf.tasks.Task")),
-    LOGS("logs", true, new CacheIndexing(1).setOffset(2).addClass("org.jboss.capedwarf.log.CapedwarfAppLogLine").addClass("org.jboss.capedwarf.log.CapedwarfRequestLogs")),
-    DATA("data", false),
-    METADATA("metadata", false),
-    MEMCACHE("memcache", false),
-    DIST("dist", false),
-    DATASTORE_VERSIONS("datastore_versions", false);
-
-    private String name;
-    private boolean config;
-    private CacheIndexing indexing;
-
-    private CacheName(String name, boolean config) {
-        this.name = name;
-        this.config = config;
-    }
-
-    private CacheName(String name, boolean config, CacheIndexing indexing) {
-        this(name, config);
-        this.indexing = indexing;
-    }
+    DEFAULT,
+    SEARCH,
+    PROSPECTIVE_SEARCH,
+    TASKS,
+    LOGS,
+    DATA,
+    METADATA,
+    MEMCACHE,
+    DIST,
+    DATASTORE_VERSIONS;
 
     public String getName() {
-        return name;
-    }
-
-    public boolean hasConfig() {
-        return config;
-    }
-
-    public CacheIndexing getIndexing() {
-        return indexing;
+        return name().toLowerCase();
     }
 }

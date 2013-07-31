@@ -20,23 +20,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.capedwarf.utils;
+package org.jboss.as.capedwarf.deployment;
 
-import org.jboss.as.naming.deployment.ContextNames;
-import org.jboss.as.naming.deployment.JndiName;
-import org.jboss.msc.service.ServiceName;
+import org.jboss.as.server.deployment.DeploymentUnit;
 
 /**
- * Constants.
+ * Capedwarf top deployment unit processor.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public final class Constants {
-    public static final String CAPEDWARF = "capedwarf";
-    public static final ServiceName CAPEDWARF_NAME = ServiceName.JBOSS.append(CAPEDWARF);
-    // JNDI names
-    static final String JMSXA_JNDI = JndiName.of("java:").append("JmsXA").getAbsoluteName();
-    static final String QUEUE_JNDI = JndiName.of("java:").append("queue").append(CAPEDWARF).getAbsoluteName();
-    public static final ContextNames.BindInfo JMSXA_BIND_INFO = ContextNames.bindInfoFor(JMSXA_JNDI);
-    public static final ContextNames.BindInfo QUEUE_BIND_INFO = ContextNames.bindInfoFor(QUEUE_JNDI);
+public abstract class CapedwarfTopDeploymentUnitProcessor extends CapedwarfDeploymentUnitProcessor {
+    @Override
+    protected boolean proceed(DeploymentUnit unit) {
+        return (unit.getParent() == null);
+    }
 }

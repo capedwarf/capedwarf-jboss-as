@@ -53,7 +53,7 @@ import org.jboss.vfs.VirtualFile;
  * @author <a href="mailto:marko.luksa@gmail.com">Marko Luksa</a>
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcessor {
+public class CapedwarfDeploymentProcessor extends CapedwarfWebDeploymentUnitProcessor {
 
     private static final ModuleIdentifier CAPEDWARF_SHARED = ModuleIdentifier.create("org.jboss.capedwarf.shared");
 

@@ -24,12 +24,15 @@ package org.jboss.as.capedwarf.deployment;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.infinispan.Cache;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.jboss.as.capedwarf.services.BasicConfigurationCallback;
+import org.jboss.as.capedwarf.services.CacheConfig;
 import org.jboss.as.capedwarf.services.CacheLifecycleService;
 import org.jboss.as.capedwarf.services.CacheName;
 import org.jboss.as.capedwarf.services.ConfigurationCallback;
@@ -57,8 +60,7 @@ import org.jgroups.JChannel;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
-public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
-
+public class CapedwarfCacheProcessor extends CapedwarfTopDeploymentUnitProcessor {
     private static final ServiceName CLS_SERVICE_NAME = CAPEDWARF_SERVICE_NAME.append("cache-lifecycle");
     private static final ServiceName CACHE_CONTAINER = EmbeddedCacheManagerService.getServiceName(CAPEDWARF);
 
@@ -67,7 +69,7 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
     }
 
     static Set<ServiceName> getDependencies(String appId) {
-        final Set<ServiceName> set = new HashSet<ServiceName>();
+        final Set<ServiceName> set = new HashSet<>();
         for (CacheName cn : CacheName.values()) {
             set.add(toServiceName(appId, cn));
         }
@@ -80,13 +82,16 @@ public class CapedwarfCacheProcessor extends CapedwarfDeploymentUnitProcessor {
         final ClassLoader classLoader = unit.getAttachment(Attachments.MODULE).getClassLoader();
 
         final ServiceTarget serviceTarget = context.getServiceTarget();
-        // default
-        IndexesXml indexesXml = unit.getAttachment(CapedwarfWebContextProcessor.INDEXES_XML_ATTACHMENT);
+        // configs
+        Map<CacheName, CacheConfig> configs = unit.getAttachment(CapedwarfAttachments.CONFIGS);
 
-        createBuilder(serviceTarget, CacheName.DEFAULT, appId, new DatastoreConfigurationCallback(appId, classLoader, indexesXml));
+        // default
+        List<IndexesXml> indexes = unit.getAttachmentList(CapedwarfAttachments.INDEXES_LIST);
+        createBuilder(serviceTarget, CacheName.DEFAULT, appId, new DatastoreConfigurationCallback(configs.get(CacheName.DEFAULT), appId, classLoader, indexes));
+
         // search, ps, tasks, log cache
         for (CacheName cn : Arrays.asList(CacheName.SEARCH, CacheName.PROSPECTIVE_SEARCH, CacheName.TASKS, CacheName.LOGS)) {
-            final ConfigurationCallback callback = new BasicConfigurationCallback(cn, appId, classLoader);
+            final ConfigurationCallback callback = new BasicConfigurationCallback(configs.get(cn), appId, classLoader);
             createBuilder(serviceTarget, cn, appId, callback);
         }
         // versions

@@ -58,7 +58,7 @@ public class CapedwarfPersistenceModificationProcessor extends CapedwarfPersiste
     static final String LOAD_AT_RUNTIME = "<property name=\"" + LOAD_AT_RUNTIME_KEY + "\" value=\"true\"/>\n";
     static final String METADATA_SCANNER = "<property name=\"" + METADATA_SCANNER_KEY + "\" value=\"" + METADATA_SCANNER_CLASS + "\"/>\n";
 
-    static final AttachmentKey<AttachmentList<Closeable>> ASSEMBLY_HANDLE = AttachmentKey.createList(Closeable.class);
+    private static final AttachmentKey<AttachmentList<Closeable>> ASSEMBLY_HANDLE = AttachmentKey.createList(Closeable.class);
     static final Random rng = new Random();
 
     final TempDir tempDir;

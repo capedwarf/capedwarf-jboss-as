@@ -22,37 +22,41 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.io.IOException;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
-import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.as.server.deployment.module.ResourceRoot;
-import org.jboss.capedwarf.shared.compatibility.Compatibility;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
-import org.jboss.capedwarf.shared.components.Key;
-import org.jboss.capedwarf.shared.components.SimpleKey;
-import org.jboss.vfs.VirtualFile;
+import org.jboss.capedwarf.shared.components.MapKey;
+import org.jboss.capedwarf.shared.components.Slot;
+import org.jboss.capedwarf.shared.modules.ModuleInfo;
 
 /**
- * Parse compatibility props.
+ * Check app id.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfCompatibilityParseProcessor extends CapedwarfTopDeploymentUnitProcessor {
-    protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-        try {
-            DeploymentUnit unit = phaseContext.getDeploymentUnit();
-            ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
-            VirtualFile root = deploymentRoot.getRoot();
+public class CapedwarfAppIdProcessor extends CapedwarfTopDeploymentUnitProcessor {
+    private Set<String> apps = new ConcurrentSkipListSet<>();
 
-            VirtualFile cf = LibUtils.getCompatibilityFile(root);
-            Compatibility compatibility = Compatibility.readCompatibility(cf.exists() ? cf.openStream() : null);
-            Key<Compatibility> key = new SimpleKey<>(CapedwarfDeploymentMarker.getAppId(unit), Compatibility.class);
-            ComponentRegistry.getInstance().setComponent(key, compatibility);
-        } catch (IOException e) {
-            throw new DeploymentUnitProcessingException(e);
-        }
+    protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
+        final String appId = CapedwarfDeploymentMarker.getAppId(phaseContext.getDeploymentUnit());
+
+        if (appId == null || appId.length() == 0)
+            throw new IllegalArgumentException("App id is null or empty!");
+
+        if (apps.add(appId) == false)
+            throw new IllegalArgumentException("App id already exists: " + appId);
+
+        // put any per-app prepared components
+        final ComponentRegistry registry = ComponentRegistry.getInstance();
+        registry.setComponent(new MapKey<String, ModuleInfo>(appId, Slot.MODULES), new ConcurrentHashMap<String, ModuleInfo>());
+    }
+
+    protected void doUndeploy(DeploymentUnit unit) {
+        apps.remove(CapedwarfDeploymentMarker.getAppId(unit));
     }
 }

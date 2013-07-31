@@ -22,37 +22,32 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.jboss.as.server.deployment.Attachments;
+import org.jboss.as.capedwarf.services.CacheConfig;
+import org.jboss.as.capedwarf.services.CacheConfigs;
+import org.jboss.as.capedwarf.services.CacheName;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.as.server.deployment.module.ResourceRoot;
-import org.jboss.capedwarf.shared.compatibility.Compatibility;
-import org.jboss.capedwarf.shared.components.ComponentRegistry;
-import org.jboss.capedwarf.shared.components.Key;
-import org.jboss.capedwarf.shared.components.SimpleKey;
-import org.jboss.vfs.VirtualFile;
 
 /**
- * Parse compatibility props.
+ * Define cache configs and its classes.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfCompatibilityParseProcessor extends CapedwarfTopDeploymentUnitProcessor {
+public class CapedwarfCacheEntriesTopProcessor extends CapedwarfTopDeploymentUnitProcessor {
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-        try {
-            DeploymentUnit unit = phaseContext.getDeploymentUnit();
-            ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
-            VirtualFile root = deploymentRoot.getRoot();
+        Map<CacheName, CacheConfig> configs = new ConcurrentHashMap<>();
 
-            VirtualFile cf = LibUtils.getCompatibilityFile(root);
-            Compatibility compatibility = Compatibility.readCompatibility(cf.exists() ? cf.openStream() : null);
-            Key<Compatibility> key = new SimpleKey<>(CapedwarfDeploymentMarker.getAppId(unit), Compatibility.class);
-            ComponentRegistry.getInstance().setComponent(key, compatibility);
-        } catch (IOException e) {
-            throw new DeploymentUnitProcessingException(e);
-        }
+        configs.put(CacheName.DEFAULT, CacheConfigs.createDefaultConfig());
+        configs.put(CacheName.SEARCH, CacheConfigs.createSearchConfig());
+        configs.put(CacheName.PROSPECTIVE_SEARCH, CacheConfigs.createProspectiveSearchConfig());
+        configs.put(CacheName.TASKS, CacheConfigs.createTasksConfig());
+        configs.put(CacheName.LOGS, CacheConfigs.createLogsConfig());
+
+        final DeploymentUnit unit = phaseContext.getDeploymentUnit();
+        unit.putAttachment(CapedwarfAttachments.CONFIGS, configs);
     }
 }

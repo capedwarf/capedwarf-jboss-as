@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2011, Red Hat, Inc., and individual contributors
+ * Copyright 2012, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -22,49 +22,32 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.io.IOException;
-import java.util.List;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
-import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.as.server.deployment.module.ResourceRoot;
+import org.jboss.vfs.VirtualFile;
 
 /**
- * Adjust some of the DataNucleus usage.
+ * Parse EAR app info - id, version.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public abstract class CapedwarfPersistenceProcessor extends CapedwarfWebDeploymentUnitProcessor {
-
-    static final String METADATA_SCANNER_KEY = "datanucleus.metadata.scanner";
-    static final String METADATA_SCANNER_CLASS = "org.jboss.capedwarf.datastore.datancleus.BaseMetaDataScanner";
-
-    static final String DIALECT_PROPERTY_KEY = "hibernate.dialect";
-    static final String DEFAULT_DIALECT = "org.hibernate.dialect.H2Dialect";
-
-    static enum ResourceType {
-        DEPLOYMENT_ROOT,
-        RESOURCE_ROOT
-    }
-
-    @Override
+public class CapedwarfEarAppInfoParseProcessor extends CapedwarfEarDeploymentUnitProcessor {
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final DeploymentUnit unit = phaseContext.getDeploymentUnit();
         try {
-            final ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
-            modifyPersistenceInfo(unit, deploymentRoot, ResourceType.DEPLOYMENT_ROOT);
-
-            final List<ResourceRoot> resourceRoots = unit.getAttachment(Attachments.RESOURCE_ROOTS);
-            for (ResourceRoot rr : resourceRoots) {
-                modifyPersistenceInfo(unit, rr, ResourceType.RESOURCE_ROOT);
-            }
-        } catch (IOException e) {
+            VirtualFile xml = ParseUtils.getFile(unit, ParseUtils.APPENGINE_APPLICATION_XML);
+            Map<String, String> info = ParseUtils.parseTokens(xml, new LinkedHashSet<>(Arrays.asList(ParseUtils.APPLICATION)));
+            String appId = info.get(ParseUtils.APPLICATION);
+            CapedwarfDeploymentMarker.setAppId(unit, appId);
+        } catch (Exception e) {
             throw new DeploymentUnitProcessingException(e);
         }
     }
-
-    protected abstract void modifyPersistenceInfo(DeploymentUnit unit, ResourceRoot resourceRoot, ResourceType type) throws IOException;
-
 }

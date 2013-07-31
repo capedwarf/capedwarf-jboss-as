@@ -45,6 +45,7 @@
 
         <module-def name="com.google.appengine">
             <maven-resource group="com.google.appengine" artifact="appengine-api-1.0-sdk" />
+            <maven-resource group="com.google.appengine" artifact="appengine-api-labs" />
         </module-def>
 
         <module-def name="javax.jdo.api">
@@ -138,6 +139,7 @@
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-log"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-mail"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-memcache"/>
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-modules"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-oauth"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-prospectivesearch"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-quota"/>

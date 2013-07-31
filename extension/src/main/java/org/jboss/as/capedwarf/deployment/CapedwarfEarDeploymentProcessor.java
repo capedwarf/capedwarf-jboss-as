@@ -22,49 +22,31 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.as.server.deployment.module.ResourceRoot;
+import org.jboss.as.server.deployment.module.ModuleSpecification;
+import org.jboss.modules.Module;
+import org.jboss.modules.ModuleIdentifier;
+import org.jboss.modules.ModuleLoader;
 
 /**
- * Adjust some of the DataNucleus usage.
+ * Add CapeDwarf modules to top EAR.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public abstract class CapedwarfPersistenceProcessor extends CapedwarfWebDeploymentUnitProcessor {
+public class CapedwarfEarDeploymentProcessor extends CapedwarfEarDeploymentUnitProcessor {
 
-    static final String METADATA_SCANNER_KEY = "datanucleus.metadata.scanner";
-    static final String METADATA_SCANNER_CLASS = "org.jboss.capedwarf.datastore.datancleus.BaseMetaDataScanner";
-
-    static final String DIALECT_PROPERTY_KEY = "hibernate.dialect";
-    static final String DEFAULT_DIALECT = "org.hibernate.dialect.H2Dialect";
-
-    static enum ResourceType {
-        DEPLOYMENT_ROOT,
-        RESOURCE_ROOT
-    }
+    private static final ModuleIdentifier CAPEDWARF_SHARED = ModuleIdentifier.create("org.jboss.capedwarf.shared");
 
     @Override
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-        final DeploymentUnit unit = phaseContext.getDeploymentUnit();
-        try {
-            final ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
-            modifyPersistenceInfo(unit, deploymentRoot, ResourceType.DEPLOYMENT_ROOT);
+        DeploymentUnit unit = phaseContext.getDeploymentUnit();
 
-            final List<ResourceRoot> resourceRoots = unit.getAttachment(Attachments.RESOURCE_ROOTS);
-            for (ResourceRoot rr : resourceRoots) {
-                modifyPersistenceInfo(unit, rr, ResourceType.RESOURCE_ROOT);
-            }
-        } catch (IOException e) {
-            throw new DeploymentUnitProcessingException(e);
-        }
+        final ModuleLoader loader = Module.getBootModuleLoader();
+        final ModuleSpecification moduleSpecification = unit.getAttachment(Attachments.MODULE_SPECIFICATION);
+        // CapeDwarf Shared module
+        moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, CAPEDWARF_SHARED));
     }
-
-    protected abstract void modifyPersistenceInfo(DeploymentUnit unit, ResourceRoot resourceRoot, ResourceType type) throws IOException;
-
 }
