@@ -25,18 +25,24 @@ package org.jboss.as.capedwarf.deployment;
 import org.jboss.as.server.deployment.DeploymentUnit;
 
 /**
- * Fix CapeDwarf Weld usage - use container's Weld.
+ * Remove GAE API jar if in modular deployment.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfWeldProcessor extends CapedwarfExcludeLibsProcessor {
-    private static final String WELD_SERVLET = "weld-servlet";
+public class CapedwarfExcludeGaeApiProcessor extends CapedwarfExcludeLibsProcessor {
+    private final String appengineAPI;
+
+    public CapedwarfExcludeGaeApiProcessor(String appengineAPI) {
+        if (appengineAPI == null)
+            appengineAPI = "appengine-api";
+        this.appengineAPI = appengineAPI;
+    }
 
     protected boolean exclude(DeploymentUnit unit) {
-        return true;
+        return CapedwarfDeploymentMarker.hasModules(unit);
     }
 
     protected String exclusion() {
-        return WELD_SERVLET;
+        return appengineAPI;
     }
 }

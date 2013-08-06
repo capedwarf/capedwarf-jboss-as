@@ -40,7 +40,6 @@ import org.jboss.as.capedwarf.services.DatastoreConfigurationCallback;
 import org.jboss.as.capedwarf.services.DatastoreVersionsConfigurationCallback;
 import org.jboss.as.capedwarf.services.IndexableConfigurationCallback;
 import org.jboss.as.capedwarf.services.MuxIdGenerator;
-import org.jboss.as.capedwarf.services.StoreAsBinaryConfigurationCallback;
 import org.jboss.as.clustering.infinispan.subsystem.CacheConfigurationService;
 import org.jboss.as.clustering.infinispan.subsystem.EmbeddedCacheManagerService;
 import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
@@ -85,8 +84,6 @@ public class CapedwarfCacheProcessor extends CapedwarfTopDeploymentUnitProcessor
         final ServiceTarget serviceTarget = context.getServiceTarget();
         // configs
         Map<CacheName, CacheConfig> configs = unit.getAttachment(CapedwarfAttachments.CONFIGS);
-        // is modular app
-        boolean modular = CapedwarfDeploymentMarker.hasModules(unit);
 
         // default
         List<IndexesXml> indexes = unit.getAttachmentList(CapedwarfAttachments.INDEXES_LIST);
@@ -99,13 +96,8 @@ public class CapedwarfCacheProcessor extends CapedwarfTopDeploymentUnitProcessor
         }
         // versions
         createBuilder(serviceTarget, CacheName.DATASTORE_VERSIONS, appId, new DatastoreVersionsConfigurationCallback());
-        // memcache, dist
-        for (CacheName cn : Arrays.asList(CacheName.MEMCACHE, CacheName.DIST)) {
-            ConfigurationCallback callback = (modular ? new StoreAsBinaryConfigurationCallback(false, true, true) : null);
-            createBuilder(serviceTarget, cn, appId, callback);
-        }
-        // data, metadata
-        for (CacheName cn : Arrays.asList(CacheName.DATA, CacheName.METADATA)) {
+        // data, metadata, memcache, dist
+        for (CacheName cn : Arrays.asList(CacheName.DATA, CacheName.METADATA, CacheName.MEMCACHE, CacheName.DIST)) {
             createBuilder(serviceTarget, cn, appId, null);
         }
     }

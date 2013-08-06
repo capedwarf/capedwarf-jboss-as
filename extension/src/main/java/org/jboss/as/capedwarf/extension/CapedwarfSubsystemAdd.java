@@ -55,6 +55,7 @@ import org.jboss.as.capedwarf.deployment.CapedwarfEarAppInfoParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfEarDeploymentProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfEntityProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfEnvironmentProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfExcludeGaeApiProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfInitializationProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfJPAProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfLoggingParseProcessor;
@@ -191,6 +192,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_WELD - 10, new CapedwarfWeldProcessor()); // before Weld
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 10, new CapedwarfJPAProcessor()); // before default JPA processor
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 6, new CapedwarfEarDeploymentProcessor()); // ear CL deps
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 10, new CapedwarfExcludeGaeApiProcessor(appengineAPI)); // before CapedwarfDeploymentProcessor
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 5, new CapedwarfDeploymentProcessor(appengineAPI)); // web CL deps
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 1, new CapedwarfCacheEntriesTopProcessor()); // gather cache configs
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_INJECTION_ANNOTATION - 1, new CapedwarfEnvironmentProcessor(properties)); // after module

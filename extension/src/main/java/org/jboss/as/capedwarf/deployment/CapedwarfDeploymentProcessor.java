@@ -54,7 +54,6 @@ import org.jboss.vfs.VirtualFile;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfDeploymentProcessor extends CapedwarfWebDeploymentUnitProcessor {
-
     private static final ModuleIdentifier CAPEDWARF_SHARED = ModuleIdentifier.create("org.jboss.capedwarf.shared");
 
     private static final ModuleIdentifier APPENGINE = ModuleIdentifier.create("com.google.appengine");
@@ -116,14 +115,14 @@ public class CapedwarfDeploymentProcessor extends CapedwarfWebDeploymentUnitProc
     private static final Version legacyVersion = new Version(1, 7, 4);
 
     private String defaultGaeVersion;
-    private Map<String, List<ResourceLoaderSpec>> capedwarfResources = new HashMap<String, List<ResourceLoaderSpec>>();
+    private Map<String, List<ResourceLoaderSpec>> capedwarfResources = new HashMap<>();
 
-    private String appengingAPI;
+    private String appengineAPI;
 
-    public CapedwarfDeploymentProcessor(String appengingAPI) {
-        if (appengingAPI == null)
-            appengingAPI = "appengine-api";
-        this.appengingAPI = appengingAPI;
+    public CapedwarfDeploymentProcessor(String appengineAPI) {
+        if (appengineAPI == null)
+            appengineAPI = "appengine-api";
+        this.appengineAPI = appengineAPI;
     }
 
     @Override
@@ -136,12 +135,14 @@ public class CapedwarfDeploymentProcessor extends CapedwarfWebDeploymentUnitProc
         moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, CAPEDWARF_SHARED));
         // always add Infinispan
         moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, INFINISPAN));
+        // Always add External transformer
+        moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.ExternalTransformer");
         // Always add BlackList transformer
         moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.blacklist.BlackListTransformer");
         // GAE version
         final String version;
         // check if we bundle gae api jar
-        final VirtualFile gae = LibUtils.findLibrary(unit, appengingAPI);
+        final VirtualFile gae = (CapedwarfDeploymentMarker.hasModules(unit)) ? null : LibUtils.findLibrary(unit, appengineAPI);
         if (gae != null && gae.exists()) {
             version = getVersion(gae);
             // set it in marker
@@ -212,7 +213,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfWebDeploymentUnitProc
         if (modulePaths == null) {
             mps = Collections.singletonList(new File(System.getProperty("jboss.home.dir"), "modules"));
         } else {
-            mps = new ArrayList<File>();
+            mps = new ArrayList<>();
             for (String s : modulePaths.split(":"))
                 mps.add(new File(s));
         }
@@ -228,7 +229,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfWebDeploymentUnitProc
                 if (capedwarfJars.isEmpty())
                     throw new DeploymentUnitProcessingException("No CapeDwarf jars found!");
 
-                resources = new ArrayList<ResourceLoaderSpec>();
+                resources = new ArrayList<>();
                 for (File jar : capedwarfJars) {
                     final JarFile jarFile = new JarFile(jar);
                     final ResourceLoader rl = ResourceLoaders.createJarResourceLoader(jar.getName(), jarFile);
@@ -245,8 +246,8 @@ public class CapedwarfDeploymentProcessor extends CapedwarfWebDeploymentUnitProc
     }
 
     protected List<File> findCapedwarfJars(String version, List<File> mps) {
-        final List<File> results = new ArrayList<File>();
-        final Set<String> existing = new HashSet<String>();
+        final List<File> results = new ArrayList<>();
+        final Set<String> existing = new HashSet<>();
         for (File mp : mps) {
             findCapedwarfJars(version, mp, results, existing);
         }
