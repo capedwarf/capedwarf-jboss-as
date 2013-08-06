@@ -72,6 +72,9 @@ public class CapedwarfEnvironmentProcessor extends CapedwarfWebDeploymentUnitPro
                     setValue(versionField, key, "JBoss CapeDwarf/" + version);
                     setValue(appIdField, key, appId);
                     setValue(appVersionField, key, appVersion + getDeploymentVersion(phaseContext, environment));
+
+                    // is it a modular app?
+                    System.setProperty("capedwarf.modules", String.valueOf(CapedwarfDeploymentMarker.hasModules(unit)));
                 } finally {
                     SecurityActions.setTCCL(previous);
                 }
