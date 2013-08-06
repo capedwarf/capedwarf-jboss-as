@@ -555,7 +555,9 @@
             <virtual-server name="default-host" enable-welcome-root="false">
                 <alias name="localhost"/>
             </virtual-server>
-            <virtual-server name="vs1"/>
+            <virtual-server name="vs1">
+                <alias name="my.app"/>
+            </virtual-server>
             <virtual-server name="vs2"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>

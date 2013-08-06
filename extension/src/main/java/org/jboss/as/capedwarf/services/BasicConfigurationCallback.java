@@ -22,7 +22,6 @@
 
 package org.jboss.as.capedwarf.services;
 
-import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 
 /**
@@ -35,10 +34,7 @@ public class BasicConfigurationCallback extends IndexableConfigurationCallback {
         super(config, appId, classLoader);
     }
 
-    public ConfigurationBuilder configure(Configuration configuration) {
-        ConfigurationBuilder builder = new ConfigurationBuilder();
-        builder.read(configuration);
+    protected void applyBuilder(ConfigurationBuilder builder) {
         applyIndexing(builder);
-        return builder;
     }
 }

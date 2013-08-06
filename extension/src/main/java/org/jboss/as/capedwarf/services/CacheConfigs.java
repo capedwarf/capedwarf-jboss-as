@@ -32,6 +32,7 @@ public class CacheConfigs {
         private CacheName cacheName;
         private CacheIndexing indexing;
         private boolean storeAsBinary;
+        private boolean defensive;
 
         private CacheConfigImpl(CacheName cacheName, int prefix) {
             this.cacheName = cacheName;
@@ -49,11 +50,21 @@ public class CacheConfigs {
         public boolean storeAsBinary() {
             return storeAsBinary;
         }
+
+        public boolean defensive() {
+            return defensive;
+        }
     }
 
     public static void storeAsBinary(CacheConfig config) {
         if (config instanceof CacheConfigImpl) {
             CacheConfigImpl.class.cast(config).storeAsBinary = true;
+        }
+    }
+
+    public static void defensive(CacheConfig config) {
+        if (config instanceof CacheConfigImpl) {
+            CacheConfigImpl.class.cast(config).defensive = true;
         }
     }
 

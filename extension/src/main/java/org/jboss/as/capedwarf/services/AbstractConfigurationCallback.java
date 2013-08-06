@@ -25,6 +25,8 @@ package org.jboss.as.capedwarf.services;
 import java.util.logging.Logger;
 
 import org.infinispan.Cache;
+import org.infinispan.configuration.cache.Configuration;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
 
 /**
@@ -34,6 +36,15 @@ import org.infinispan.manager.EmbeddedCacheManager;
  */
 public abstract class AbstractConfigurationCallback implements ConfigurationCallback {
     protected final Logger log = Logger.getLogger(getClass().getName());
+
+    public ConfigurationBuilder configure(Configuration configuration) {
+        ConfigurationBuilder builder = new ConfigurationBuilder();
+        builder.read(configuration);
+        applyBuilder(builder);
+        return builder;
+    }
+
+    protected abstract void applyBuilder(ConfigurationBuilder builder);
 
     public void start(EmbeddedCacheManager manager) {
     }

@@ -28,6 +28,7 @@ import org.hibernate.search.cfg.EntityMapping;
 import org.hibernate.search.cfg.SearchMapping;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.IndexingConfigurationBuilder;
+import org.infinispan.configuration.cache.StoreAsBinaryConfigurationBuilder;
 import org.jboss.msc.value.InjectedValue;
 import org.jgroups.JChannel;
 
@@ -74,7 +75,9 @@ public abstract class IndexableConfigurationCallback extends AbstractConfigurati
         indexing.setProperty(JGroupsChannelProvider.MUX_ID, muxId);
 
         // do we store as binary - e.g. Modules
-        builder.storeAsBinary().enabled(config.storeAsBinary());
+        final StoreAsBinaryConfigurationBuilder storeAsBinaryConfigurationBuilder = builder.storeAsBinary();
+        storeAsBinaryConfigurationBuilder.enabled(config.storeAsBinary());
+        storeAsBinaryConfigurationBuilder.defensive(config.defensive());
 
         return mapping;
     }

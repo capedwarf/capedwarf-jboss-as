@@ -44,23 +44,24 @@ public class CapedwarfCacheEntriesWebProcessor extends CapedwarfWebDeploymentUni
         final ClassLoader cl = unit.getAttachment(Attachments.MODULE).getClassLoader();
 
         final Map<CacheName, CacheConfig> configs = getTopDeploymentUnit(unit).getAttachment(CapedwarfAttachments.CONFIGS);
-        final boolean storeAsBinary = CapedwarfDeploymentMarker.hasModules(unit);
+        final boolean modular = CapedwarfDeploymentMarker.hasModules(unit);
         try {
-            addExactClass(cl, configs, CacheName.DEFAULT, storeAsBinary, "com.google.appengine.api.datastore.Entity");
-            addExactClass(cl, configs, CacheName.SEARCH, storeAsBinary, "org.jboss.capedwarf.search.CacheValue");
-            addExactClass(cl, configs, CacheName.PROSPECTIVE_SEARCH, storeAsBinary, "org.jboss.capedwarf.prospectivesearch.SubscriptionHolder");
-            addExactClass(cl, configs, CacheName.TASKS, storeAsBinary, "org.jboss.capedwarf.tasks.Task");
-            addExactClass(cl, configs, CacheName.LOGS, storeAsBinary, "org.jboss.capedwarf.log.CapedwarfAppLogLine", "org.jboss.capedwarf.log.CapedwarfRequestLogs");
+            addExactClass(cl, configs, CacheName.DEFAULT, modular, "com.google.appengine.api.datastore.Entity");
+            addExactClass(cl, configs, CacheName.SEARCH, modular, "org.jboss.capedwarf.search.CacheValue");
+            addExactClass(cl, configs, CacheName.PROSPECTIVE_SEARCH, modular, "org.jboss.capedwarf.prospectivesearch.SubscriptionHolder");
+            addExactClass(cl, configs, CacheName.TASKS, modular, "org.jboss.capedwarf.tasks.Task");
+            addExactClass(cl, configs, CacheName.LOGS, modular, "org.jboss.capedwarf.log.CapedwarfAppLogLine", "org.jboss.capedwarf.log.CapedwarfRequestLogs");
         } catch (Exception e) {
             throw new DeploymentUnitProcessingException(e);
         }
     }
 
-    private static void addExactClass(ClassLoader cl, Map<CacheName, CacheConfig> configs, CacheName cn, boolean storeAsBinary,String... classes) throws Exception {
+    private static void addExactClass(ClassLoader cl, Map<CacheName, CacheConfig> configs, CacheName cn, boolean modular, String... classes) throws Exception {
         CacheConfig config = configs.get(cn);
 
-        if (storeAsBinary) {
+        if (modular) {
             CacheConfigs.storeAsBinary(config);
+            CacheConfigs.defensive(config);
         }
 
         CacheIndexing indexing = config.getIndexing();

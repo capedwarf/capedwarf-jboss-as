@@ -107,10 +107,7 @@ public class CacheLifecycleService extends AbstractConfigurationCallback impleme
         return cache;
     }
 
-    public ConfigurationBuilder configure(Configuration configuration) {
-        final ConfigurationBuilder builder = new ConfigurationBuilder();
-        builder.read(configuration);
-        return builder;
+    protected void applyBuilder(ConfigurationBuilder builder) {
     }
 
     public InjectedValue<EmbeddedCacheManager> getEcmiv() {

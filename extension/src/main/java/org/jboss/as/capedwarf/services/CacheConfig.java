@@ -31,4 +31,5 @@ public interface CacheConfig {
     String getName();
     CacheIndexing getIndexing();
     boolean storeAsBinary();
+    boolean defensive();
 }
