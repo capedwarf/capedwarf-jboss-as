@@ -125,6 +125,15 @@ public class CapedwarfDeploymentProcessor extends CapedwarfWebDeploymentUnitProc
         this.appengineAPI = appengineAPI;
     }
 
+    // TODO -- check if domain app
+    protected VirtualFile lookupGAE(DeploymentUnit unit) {
+        if (CapedwarfDeploymentMarker.hasModules(unit) == false) {
+            return LibUtils.findLibrary(unit, appengineAPI);
+        } else {
+            return null; // do not lookup for modular apps
+        }
+    }
+
     @Override
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         DeploymentUnit unit = phaseContext.getDeploymentUnit();
@@ -142,7 +151,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfWebDeploymentUnitProc
         // GAE version
         final String version;
         // check if we bundle gae api jar
-        final VirtualFile gae = (CapedwarfDeploymentMarker.hasModules(unit)) ? null : LibUtils.findLibrary(unit, appengineAPI);
+        final VirtualFile gae = lookupGAE(unit);
         if (gae != null && gae.exists()) {
             version = getVersion(gae);
             // set it in marker
