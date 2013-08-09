@@ -24,14 +24,14 @@
 
 <module xmlns="urn:jboss:module:1.0" name="com.google.appengine">
     <resources>
-        <resource-root path="appengine-api-1.0-sdk-1.8.2.jar">
+        <resource-root path="appengine-api-1.0-sdk-1.8.3.jar">
            <filter>
                <include path="com/google/**"/>
                <include path="META-INF/**"/>
                <exclude path="**"/>
            </filter>
         </resource-root>
-        <resource-root path="appengine-api-labs-1.8.2.jar" />
+        <resource-root path="appengine-api-labs-1.8.3.jar" />
     </resources>
 
     <dependencies>
