@@ -70,7 +70,7 @@
         <version.org.infinispan>5.3.0.Final</version.org.infinispan>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
         <version.org.codehaus.exec>1.2.1</version.org.codehaus.exec>
-        <version.org.jboss.maven.transformer>1.0.0.Beta4</version.org.jboss.maven.transformer>
+        <version.org.jboss.maven.transformer>1.0.0.Beta5</version.org.jboss.maven.transformer>
         <version.javax.jai>1.1.1</version.javax.jai>
         <version.org.geotoolkit>3.21</version.org.geotoolkit>
 
