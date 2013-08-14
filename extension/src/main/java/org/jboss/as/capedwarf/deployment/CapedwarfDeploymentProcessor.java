@@ -148,6 +148,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.ExternalTransformer");
         // Always add BlackList transformer
         moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.blacklist.BlackListTransformer");
+        moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.endpoints.EndpointsTransformer");
         // GAE version
         final String version;
         // check if we bundle gae api jar

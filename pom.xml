@@ -451,6 +451,12 @@
 
             <dependency>
                 <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-jaxrs</artifactId>
+                <version>${version.jboss.as}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.as</groupId>
                 <artifactId>jboss-as-jpa</artifactId>
                 <version>${version.jboss.as}</version>
             </dependency>
@@ -689,6 +695,12 @@
             <dependency>
                 <groupId>com.google.appengine</groupId>
                 <artifactId>appengine-api-labs</artifactId>
+                <version>${version.com.google.appengine}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-endpoints</artifactId>
                 <version>${version.com.google.appengine}</version>
             </dependency>
 
