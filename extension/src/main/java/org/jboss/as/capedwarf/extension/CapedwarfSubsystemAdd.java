@@ -53,6 +53,7 @@ import org.jboss.as.capedwarf.deployment.CapedwarfDependenciesProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfDeploymentProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfEarAppInfoParseProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfEarDeploymentProcessor;
+import org.jboss.as.capedwarf.deployment.CapedwarfEndpointsProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfEntityProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfEnvironmentProcessor;
 import org.jboss.as.capedwarf.deployment.CapedwarfExcludeGaeApiProcessor;
@@ -201,6 +202,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 20, new CapedwarfEntityProcessor()); // adjust as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 30, new CapedwarfPostModuleJPAProcessor()); // after entity processor
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 40, new CapedwarfSynchHackProcessor()); // after module, adjust as needed
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_JAXRS_COMPONENT - 1, new CapedwarfEndpointsProcessor());
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 2, new CapedwarfCacheEntriesWebProcessor()); // gather cache configs
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 4, new CapedwarfCleanupProcessor()); // we still need module/CL
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 6, new CapedwarfWebContextProcessor()); // before web context lifecycle

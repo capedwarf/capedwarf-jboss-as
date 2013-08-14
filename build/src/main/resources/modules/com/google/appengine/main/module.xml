@@ -32,6 +32,7 @@
            </filter>
         </resource-root>
         <resource-root path="appengine-api-labs-1.8.3.jar" />
+        <resource-root path="appengine-endpoints-1.8.3.jar"/>
     </resources>
 
     <dependencies>
