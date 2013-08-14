@@ -22,10 +22,10 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import org.jboss.as.ee.weld.WeldDeploymentMarker;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.as.weld.WeldDeploymentMarker;
 
 /**
  * Make every Capedwarf app a CDI app -- due to admin console.
