@@ -36,10 +36,21 @@ import org.jboss.as.server.deployment.module.ResourceRoot;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public abstract class CapedwarfExcludeLibsProcessor extends CapedwarfWebDeploymentUnitProcessor {
+public abstract class CapedwarfExcludeLibsProcessor extends CapedwarfDeploymentUnitProcessor {
 
+    /**
+     * Shopuld we exclude exclusion.
+     *
+     * @param unit the current deployment unit
+     * @return true if exclude, false otherwise
+     */
     protected abstract boolean exclude(DeploymentUnit unit);
 
+    /**
+     * Exclusion string to match.
+     *
+     * @return the exclusion string to match
+     */
     protected abstract String exclusion();
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {

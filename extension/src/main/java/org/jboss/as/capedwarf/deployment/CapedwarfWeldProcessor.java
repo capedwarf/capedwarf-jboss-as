@@ -22,6 +22,7 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.server.deployment.DeploymentUnit;
 
 /**
@@ -31,6 +32,10 @@ import org.jboss.as.server.deployment.DeploymentUnit;
  */
 public class CapedwarfWeldProcessor extends CapedwarfExcludeLibsProcessor {
     private static final String WELD_SERVLET = "weld-servlet";
+
+    protected boolean proceed(DeploymentUnit unit) {
+        return (CapedwarfDeploymentMarker.getDeploymentType(unit) == DeploymentType.WAR);
+    }
 
     protected boolean exclude(DeploymentUnit unit) {
         return true;
