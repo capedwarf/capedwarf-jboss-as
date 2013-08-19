@@ -22,20 +22,19 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import org.jboss.as.capedwarf.subsystems.CompatibilitySubsystemHook;
+import org.jboss.as.capedwarf.subsystems.EndpointsSubsystemHook;
+import org.jboss.as.capedwarf.subsystems.SubsystemHook;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.as.server.deployment.module.ResourceRoot;
-import org.jboss.capedwarf.shared.compatibility.Compatibility;
-import org.jboss.vfs.VirtualFile;
 
 /**
  * Handle subsystems per deployment.
@@ -44,10 +43,15 @@ import org.jboss.vfs.VirtualFile;
  */
 public class CapedwarfSubsystemProcessor extends CapedwarfDeploymentUnitProcessor {
     private static final Set<String> EXCLUDED_SUBSYSTEMS;
+    private static final List<SubsystemHook> SUBSYSTEM_HOOKS;
 
     static {
         EXCLUDED_SUBSYSTEMS = new HashSet<>();
-//        EXCLUDED_SUBSYSTEMS.add("jaxrs"); // exclude REST for now
+        EXCLUDED_SUBSYSTEMS.add(SubsystemHook.JAXRS); // exclude REST for now
+
+        SUBSYSTEM_HOOKS = new ArrayList<>();
+        SUBSYSTEM_HOOKS.add(new CompatibilitySubsystemHook());
+        SUBSYSTEM_HOOKS.add(new EndpointsSubsystemHook());
     }
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
@@ -68,18 +72,12 @@ public class CapedwarfSubsystemProcessor extends CapedwarfDeploymentUnitProcesso
 
     protected Set<String> getEnabledSubsystems(DeploymentUnit unit) throws DeploymentUnitProcessingException {
         try {
-            ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
-            VirtualFile root = deploymentRoot.getRoot();
-            Compatibility compatibility = LibUtils.getCompatibility(root);
-            if (compatibility != null) {
-                String value = compatibility.getValue(Compatibility.Feature.ENABLED_SUBSYSTEMS);
-                if (value != null) {
-                    String[] split = value.split(",");
-                    return new HashSet<>(Arrays.asList(split));
-                }
+            final Set<String> set = new HashSet<>();
+            for (SubsystemHook hook : SUBSYSTEM_HOOKS) {
+                hook.apply(unit, set);
             }
-            return Collections.emptySet();
-        } catch (IOException e) {
+            return set;
+        } catch (Exception e) {
             throw new DeploymentUnitProcessingException(e);
         }
     }

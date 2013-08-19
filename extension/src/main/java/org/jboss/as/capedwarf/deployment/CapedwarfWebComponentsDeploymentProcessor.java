@@ -167,7 +167,10 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
             addServletAndMapping(webMetaData, UPLOAD_SERVLET, UPLOAD_SERVLET_MAPPING);
             addServletAndMapping(webMetaData, IMAGE_SERVLET, IMAGE_SERVLET_MAPPING);
             addServletAndMapping(webMetaData, DEFERRED_TASK_SERVLET, DEFERRED_TASK_SERVLET_MAPPING);
-            getServletMappings(webMetaData).add(ENDPOINT_SERVLET_MAPPING);
+
+            if (CapedwarfEndpointsProcessor.hasApis(unit)) {
+                getServletMappings(webMetaData).add(ENDPOINT_SERVLET_MAPPING);
+            }
 
             replaceRemoteApiServlet(webMetaData);
 

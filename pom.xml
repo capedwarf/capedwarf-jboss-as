@@ -698,12 +698,6 @@
                 <version>${version.com.google.appengine}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.google.appengine</groupId>
-                <artifactId>appengine-endpoints</artifactId>
-                <version>${version.com.google.appengine}</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 

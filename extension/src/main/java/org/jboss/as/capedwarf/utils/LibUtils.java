@@ -1,4 +1,4 @@
-package org.jboss.as.capedwarf.deployment;
+package org.jboss.as.capedwarf.utils;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -18,7 +18,7 @@ import org.jboss.vfs.VirtualFileFilter;
 /**
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-final class LibUtils {
+public final class LibUtils {
     private static final AttachmentKey<List<VirtualFile>> LIBS_KEY = AttachmentKey.create(List.class);
 
     private LibUtils() {
@@ -66,11 +66,11 @@ final class LibUtils {
         return new ModuleDependency(loader, moduleIdentifier, false, false, true, false);
     }
 
-    static VirtualFile getCompatibilityFile(VirtualFile root) {
+    public static VirtualFile getCompatibilityFile(VirtualFile root) {
         return root.getChild("WEB-INF/classes/" + Compatibility.FILENAME);
     }
 
-    static Compatibility getCompatibility(VirtualFile root) throws IOException {
+    public static Compatibility getCompatibility(VirtualFile root) throws IOException {
         VirtualFile cf = getCompatibilityFile(root);
         return (cf.exists()) ? Compatibility.readCompatibility(cf.openStream()) : null;
     }

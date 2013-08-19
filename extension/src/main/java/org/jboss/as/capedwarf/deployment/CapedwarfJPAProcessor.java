@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import org.jboss.as.capedwarf.utils.LibUtils;
 import org.jboss.as.jpa.config.Configuration;
 import org.jboss.as.jpa.config.PersistenceUnitMetadataHolder;
 import org.jboss.as.jpa.persistenceprovider.PersistenceProviderLoader;

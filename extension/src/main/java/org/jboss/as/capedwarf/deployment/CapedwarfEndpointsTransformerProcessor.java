@@ -22,32 +22,22 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import org.jboss.as.capedwarf.utils.LibUtils;
+import java.util.List;
+
 import org.jboss.as.server.deployment.Attachments;
-import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
-import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.module.ModuleSpecification;
-import org.jboss.modules.Module;
-import org.jboss.modules.ModuleIdentifier;
-import org.jboss.modules.ModuleLoader;
+import org.jboss.jandex.AnnotationInstance;
 
 /**
- * Add CapeDwarf modules to top EAR.
+ * Add Endpoints transformer.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfEarDeploymentProcessor extends CapedwarfEarDeploymentUnitProcessor {
-
-    private static final ModuleIdentifier CAPEDWARF_SHARED = ModuleIdentifier.create("org.jboss.capedwarf.shared");
-
-    @Override
-    protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-        DeploymentUnit unit = phaseContext.getDeploymentUnit();
-
-        final ModuleLoader loader = Module.getBootModuleLoader();
+public class CapedwarfEndpointsTransformerProcessor extends CapedwarfEndpointsProcessor {
+    protected void doDeploy(DeploymentUnit unit, List<AnnotationInstance> apis) {
         final ModuleSpecification moduleSpecification = unit.getAttachment(Attachments.MODULE_SPECIFICATION);
-        // CapeDwarf Shared module
-        moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, CAPEDWARF_SHARED));
+        // endpoints transformer
+        moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.endpoints.EndpointsTransformer");
     }
 }

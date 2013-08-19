@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarFile;
 
+import org.jboss.as.capedwarf.utils.LibUtils;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -148,7 +149,6 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.ExternalTransformer");
         // Always add BlackList transformer
         moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.blacklist.BlackListTransformer");
-        moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.endpoints.EndpointsTransformer");
         // GAE version
         final String version;
         // check if we bundle gae api jar

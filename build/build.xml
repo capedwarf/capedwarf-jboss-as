@@ -46,7 +46,6 @@
         <module-def name="com.google.appengine">
             <maven-resource group="com.google.appengine" artifact="appengine-api-1.0-sdk" />
             <maven-resource group="com.google.appengine" artifact="appengine-api-labs" />
-            <maven-resource group="com.google.appengine" artifact="appengine-endpoints" />
         </module-def>
 
         <module-def name="javax.jdo.api">
