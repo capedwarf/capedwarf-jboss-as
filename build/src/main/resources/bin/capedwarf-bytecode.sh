@@ -69,4 +69,5 @@ eval \"$JAVA\" $JAVA_OPTS \
          -mp \"${JBOSS_MODULEPATH}\" \
          org.jboss.capedwarf \
          \"${JBOSS_MODULEPATH}/com/google/appengine/main/appengine-api-1.0-sdk-1.8.3.jar\" \
+         \"${JBOSS_MODULEPATH}/com/google/appengine/main/appengine-api-labs-1.8.3.jar\" \
          "$@"

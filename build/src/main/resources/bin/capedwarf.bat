@@ -9,7 +9,7 @@ if "%OS%" == "Windows_NT" (
 )
 
 rem check if we need to run bytecode transformation
-if not exist %DIRNAME%..\modules\com\google\appengine\main\old-appengine-api-1.0-sdk* (
+if not exist %DIRNAME%..\modules\com\google\appengine\main\appengine-api-1.0-sdk*-capedwarf* (
 	%DIRNAME%capedwarf-bytecode.bat
 )
 
