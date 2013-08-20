@@ -47,7 +47,7 @@ public class CapedwarfSubsystemProcessor extends CapedwarfDeploymentUnitProcesso
 
     static {
         EXCLUDED_SUBSYSTEMS = new HashSet<>();
-        EXCLUDED_SUBSYSTEMS.add("jaxrs"); // exclude REST for now
+//        EXCLUDED_SUBSYSTEMS.add("jaxrs"); // exclude REST for now
     }
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
