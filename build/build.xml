@@ -48,6 +48,10 @@
             <maven-resource group="com.google.appengine" artifact="appengine-api-labs" />
         </module-def>
 
+        <module-def name="com.google.appengine.endpoints">
+            <maven-resource group="com.google.appengine" artifact="appengine-endpoints" />
+        </module-def>
+
         <module-def name="javax.jdo.api">
             <maven-resource group="javax.jdo" artifact="jdo-api"/>
         </module-def>
