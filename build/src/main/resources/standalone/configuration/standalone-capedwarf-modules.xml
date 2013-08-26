@@ -23,6 +23,9 @@
         <extension module="org.jboss.as.web"/>
         <extension module="org.jboss.as.weld"/>
     </extensions>
+    <system-properties>
+        <property name="org.apache.catalina.connector.USE_IP_PORT_FOR_ALIAS" value="true"/>
+    </system-properties>
     <management>
         <security-realms>
             <security-realm name="ManagementRealm">
@@ -556,9 +559,11 @@
                 <alias name="localhost"/>
             </virtual-server>
             <virtual-server name="vs1">
-                <alias name="my.app"/>
+                <alias name="localhost:8180"/>
             </virtual-server>
-            <virtual-server name="vs2"/>
+            <virtual-server name="vs2">
+                <alias name="localhost:8280"/>
+            </virtual-server>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
     </profile>

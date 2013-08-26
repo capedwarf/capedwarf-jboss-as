@@ -74,6 +74,9 @@
         <version.javax.jai>1.1.1</version.javax.jai>
         <version.org.geotoolkit>3.21</version.org.geotoolkit>
 
+        <version.org.jboss.web>7.2.3.Final</version.org.jboss.web>
+        <version.org.eclipse.jdt.core.compiler>3.7.2</version.org.eclipse.jdt.core.compiler>
+
         <version.org.datanucleus>3.1.2</version.org.datanucleus>
         <version.org.datanucleus.appengine>2.1.1</version.org.datanucleus.appengine>
         <version.org.datanucleus.cache>3.1.1</version.org.datanucleus.cache>
@@ -519,6 +522,18 @@
                 <groupId>org.picketlink</groupId>
                 <artifactId>picketlink-consolidated-social</artifactId>
                 <version>${version.org.picketlink.consolidated.social}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.web</groupId>
+                <artifactId>jbossweb</artifactId>
+                <version>${version.org.jboss.web}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jdt.core.compiler</groupId>
+                <artifactId>ecj</artifactId>
+                <version>${version.org.eclipse.jdt.core.compiler}</version>
             </dependency>
 
             <!-- CapeDwarf & GAE -->

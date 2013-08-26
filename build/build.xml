@@ -190,8 +190,14 @@
             <maven-resource group="org.picketlink" artifact="picketlink-consolidated-social"/>
         </module-def>
 
-    </target>
+        <!-- Override Web -->
+        <module-def name="org.jboss.as.web">
+            <maven-resource group="org.jboss.as" artifact="jboss-as-web"/>
+            <maven-resource group="org.eclipse.jdt.core.compiler" artifact="ecj"/>
+            <maven-resource group="org.jboss.web" artifact="jbossweb"/>
+        </module-def>
 
+    </target>
 
     <target name="clean-target">
         <delete dir="${output.dir}"/>
