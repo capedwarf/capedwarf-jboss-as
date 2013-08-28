@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Socket;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -50,6 +51,7 @@ import org.jboss.as.capedwarf.services.OptionalThreadFactoryService;
 import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
 import org.jboss.as.capedwarf.services.SimpleThreadsHandler;
 import org.jboss.as.capedwarf.services.ThreadsHandler;
+import org.jboss.as.capedwarf.socket.CapedwarfSocketFactory;
 import org.jboss.as.capedwarf.utils.CapedwarfProperties;
 import org.jboss.as.capedwarf.utils.Constants;
 import org.jboss.as.clustering.infinispan.subsystem.EmbeddedCacheManagerService;
@@ -129,6 +131,11 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         // register custom URLStreamHandlerFactory
         registerURLStreamHandlerFactory();
 
+        // register custom Socket Factory
+        registerSocketFactory();
+
+        addTiffSupport();
+
         readCapedwarfConf();
 
         context.addStep(new AbstractDeploymentChainStep() {
@@ -141,8 +148,6 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 putExecutorServiceToRegistry(serviceTarget, newControllers, handler);
                 putThreadFactoryToRegistry(serviceTarget, newControllers, handler);
                 addHttpClient(serviceTarget, newControllers);
-
-                addTiffSupport();
 
                 addServicesToRegistry(serviceTarget, newControllers);
 
@@ -168,6 +173,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 5, new CapedwarfDeploymentProcessor(appengineAPI)); // web CL deps
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 3, new CapedwarfEndpointsTransformerProcessor()); // after CL deps
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.DEPENDENCIES, Phase.DEPENDENCIES_JPA - 1, new CapedwarfCacheEntriesTopProcessor()); // gather cache configs
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_INJECTION_ANNOTATION - 2, new CapedwarfSocketFactoryProcessor()); // after module
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_INJECTION_ANNOTATION - 1, new CapedwarfEnvironmentProcessor(properties)); // after module
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_LOGGING_CONFIG - 1, new CapedwarfLoggingParseProcessor()); // just before AS logging configuration
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_WELD_PORTABLE_EXTENSIONS + 10, new CapedwarfCDIExtensionProcessor()); // after Weld portable extensions lookup
@@ -201,7 +207,15 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 }
             });
         } catch (Exception e) {
-            throw new OperationFailedException(e.getMessage());
+            throw new OperationFailedException(e.getMessage(), e);
+        }
+    }
+
+    protected static void registerSocketFactory() throws OperationFailedException {
+        try {
+            Socket.setSocketImplFactory(CapedwarfSocketFactory.INSTANCE);
+        } catch (IOException e) {
+            throw new OperationFailedException(e.getMessage(), e);
         }
     }
 
