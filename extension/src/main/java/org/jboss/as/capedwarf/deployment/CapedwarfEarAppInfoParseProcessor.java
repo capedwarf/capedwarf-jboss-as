@@ -22,11 +22,7 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -43,7 +39,7 @@ public class CapedwarfEarAppInfoParseProcessor extends CapedwarfEarDeploymentUni
         final DeploymentUnit unit = phaseContext.getDeploymentUnit();
         try {
             VirtualFile xml = ParseUtils.getFile(unit, ParseUtils.APPENGINE_APPLICATION_XML);
-            Map<String, String> info = ParseUtils.parseTokens(xml, new LinkedHashSet<>(Arrays.asList(ParseUtils.APPLICATION)));
+            Map<String, String> info = ParseUtils.parseTokens(xml, ParseUtils.APPLICATION);
             String appId = info.get(ParseUtils.APPLICATION);
             CapedwarfDeploymentMarker.setAppId(unit, appId);
         } catch (Exception e) {

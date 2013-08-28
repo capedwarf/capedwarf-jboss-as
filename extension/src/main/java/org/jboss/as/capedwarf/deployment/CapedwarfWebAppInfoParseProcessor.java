@@ -22,8 +22,6 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -37,7 +35,7 @@ import org.jboss.vfs.VirtualFile;
  */
 public class CapedwarfWebAppInfoParseProcessor extends CapedwarfAppEngineWebXmlParseProcessor {
     protected void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
-        final Map<String, String> results = ParseUtils.parseTokens(xml, new LinkedHashSet<>(Arrays.asList(ParseUtils.APPLICATION, ParseUtils.VERSION, ParseUtils.THREADSAFE, ParseUtils.MODULE)));
+        final Map<String, String> results = ParseUtils.parseTokens(xml, ParseUtils.APPLICATION, ParseUtils.VERSION, ParseUtils.THREADSAFE, ParseUtils.MODULE);
 
         final String appId;
         if (CapedwarfDeploymentMarker.hasModules(unit)) {

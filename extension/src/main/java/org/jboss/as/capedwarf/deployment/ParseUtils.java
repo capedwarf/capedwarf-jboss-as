@@ -24,7 +24,9 @@ package org.jboss.as.capedwarf.deployment;
 
 import java.io.Closeable;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,7 +61,12 @@ final class ParseUtils {
         return root.getChild(path);
     }
 
-    static Map<String, String> parseTokens(VirtualFile xml, final Set<String> tokens) throws Exception {
+    static Map<String, String> parseTokens(VirtualFile xml, final String... tokens) throws Exception {
+        final Set<String> set = new LinkedHashSet<>(Arrays.asList(tokens));
+        return parseTokens(xml, set);
+    }
+
+    private static Map<String, String> parseTokens(VirtualFile xml, final Set<String> tokens) throws Exception {
         final Map<String, String> results = new HashMap<>();
         InputStream is = xml.openStream();
         try {
