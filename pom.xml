@@ -430,14 +430,12 @@
                 <groupId>org.jgroups</groupId>
                 <artifactId>jgroups</artifactId>
                 <version>${version.org.jgroups}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.infinispan</groupId>
                 <artifactId>infinispan-core</artifactId>
                 <version>${version.org.infinispan}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>

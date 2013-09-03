@@ -39,7 +39,8 @@
         <module name="javax.activation.api"/>
         <module name="javax.mail.api"/>
         <module name="org.jboss.capedwarf" services="import"/>
-        <!-- needed for annotations to work (@Transformable, @Indexed, ...) -->
+        <!-- needed for annotations to work (@SerializeWith, @Transformable, @Indexed, ...) -->
+        <module name="org.infinispan"/>
         <module name="org.infinispan.query"/>
         <module name="org.hibernate.search"/>
         <!-- used when creating proxies -->
