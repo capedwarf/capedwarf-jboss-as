@@ -328,6 +328,11 @@
 
         <dependency>
             <groupId>org.jboss.capedwarf.blue</groupId>
+            <artifactId>capedwarf-endpoints</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.capedwarf.blue</groupId>
             <artifactId>capedwarf-environment</artifactId>
         </dependency>
 
@@ -491,6 +496,11 @@
         <dependency>
             <groupId>org.jboss.web</groupId>
             <artifactId>jbossweb</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
         </dependency>
 
     </dependencies>

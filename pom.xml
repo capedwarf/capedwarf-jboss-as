@@ -73,6 +73,7 @@
         <version.org.jboss.maven.transformer>1.0.0.Beta5</version.org.jboss.maven.transformer>
         <version.javax.jai>1.1.1</version.javax.jai>
         <version.org.geotoolkit>3.21</version.org.geotoolkit>
+        <version.javassist>3.18.1-GA</version.javassist>
 
         <version.org.jboss.web>7.2.3.Final</version.org.jboss.web>
         <version.org.eclipse.jdt.core.compiler>3.7.2</version.org.eclipse.jdt.core.compiler>
@@ -534,6 +535,12 @@
                 <version>${version.org.eclipse.jdt.core.compiler}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${version.javassist}</version>
+            </dependency>
+
             <!-- CapeDwarf & GAE -->
 
             <dependency>
@@ -599,6 +606,12 @@
             <dependency>
                 <groupId>org.jboss.capedwarf.blue</groupId>
                 <artifactId>capedwarf-datastore</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-endpoints</artifactId>
                 <version>${version.org.jboss.capedwarf}</version>
             </dependency>
 
@@ -679,7 +692,6 @@
                 <artifactId>capedwarf-urlfetch</artifactId>
                 <version>${version.org.jboss.capedwarf}</version>
             </dependency>
-
 
             <dependency>
                 <groupId>org.jboss.capedwarf.blue</groupId>

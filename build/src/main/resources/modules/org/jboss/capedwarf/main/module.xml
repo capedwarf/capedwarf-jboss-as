@@ -66,5 +66,6 @@
         <module name="org.jboss.as.web"/>
         <module name="org.jboss.marshalling"/>
         <module name="org.jboss.marshalling.river" services="import"/>
+        <module name="org.codehaus.jackson.jackson-core-asl"/>
     </dependencies>
 </module>

@@ -16,6 +16,7 @@ import org.jboss.jandex.DotName;
  */
 public abstract class CapedwarfEndpointsProcessor extends CapedwarfWebDeploymentUnitProcessor {
     private static final DotName ENDPOINT_API = DotName.createSimple("com.google.api.server.spi.config.Api");
+    private static final DotName ENDPOINT_API_SERIALIZER = DotName.createSimple("com.google.api.server.spi.config.ApiSerializer");
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         DeploymentUnit unit = phaseContext.getDeploymentUnit();
@@ -28,6 +29,11 @@ public abstract class CapedwarfEndpointsProcessor extends CapedwarfWebDeployment
     static List<AnnotationInstance> getApis(DeploymentUnit unit) {
         CompositeIndex index = unit.getAttachment(Attachments.COMPOSITE_ANNOTATION_INDEX);
         return index.getAnnotations(ENDPOINT_API);
+    }
+
+    static List<AnnotationInstance> getApiSerializers(DeploymentUnit unit) {
+        CompositeIndex index = unit.getAttachment(Attachments.COMPOSITE_ANNOTATION_INDEX);
+        return index.getAnnotations(ENDPOINT_API_SERIALIZER);
     }
 
     static boolean hasApis(DeploymentUnit unit) {

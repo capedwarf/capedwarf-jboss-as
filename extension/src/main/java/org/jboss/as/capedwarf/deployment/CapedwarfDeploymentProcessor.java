@@ -82,6 +82,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier WEB = ModuleIdentifier.create("org.jboss.as.web");
     private static final ModuleIdentifier MARSHALLING = ModuleIdentifier.create("org.jboss.marshalling");
     private static final ModuleIdentifier MARSHALLING_RIVER = ModuleIdentifier.create("org.jboss.marshalling.river");
+    private static final ModuleIdentifier JACKSON_CORE_ASL = ModuleIdentifier.create("org.codehaus.jackson.jackson-core-asl");
     // inline this module deps, if running with bundled
     private static final ModuleIdentifier[] INLINE = {
             MODULES,
@@ -104,7 +105,8 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
             COMMON_CORE,
             WEB,
             MARSHALLING,
-            MARSHALLING_RIVER
+            MARSHALLING_RIVER,
+            JACKSON_CORE_ASL
     };
 
     private static final FilenameFilter JARS_SDK = new FilenameFilter() {

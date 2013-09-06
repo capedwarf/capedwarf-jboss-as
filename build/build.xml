@@ -146,6 +146,7 @@
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-cluster"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-common"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-datastore"/>
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-endpoints"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-environment"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-files"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-images"/>
@@ -195,6 +196,12 @@
             <maven-resource group="org.jboss.as" artifact="jboss-as-web"/>
             <maven-resource group="org.eclipse.jdt.core.compiler" artifact="ecj"/>
             <maven-resource group="org.jboss.web" artifact="jbossweb"/>
+        </module-def>
+
+        <!-- Override Javassist -->
+
+        <module-def name="org.javassist">
+            <maven-resource group="org.javassist" artifact="javassist"/>
         </module-def>
 
     </target>
