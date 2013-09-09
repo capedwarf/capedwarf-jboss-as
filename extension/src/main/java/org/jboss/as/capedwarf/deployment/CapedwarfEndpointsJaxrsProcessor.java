@@ -1,6 +1,10 @@
 package org.jboss.as.capedwarf.deployment;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -18,8 +22,10 @@ import org.jboss.as.jaxrs.deployment.ResteasyDeploymentData;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.jandex.AnnotationInstance;
+import org.jboss.jandex.AnnotationValue;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
+import org.jboss.jandex.Type;
 
 /**
  * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
@@ -32,29 +38,76 @@ public class CapedwarfEndpointsJaxrsProcessor extends CapedwarfEndpointsProcesso
 
     protected void doDeploy(DeploymentUnit unit, List<AnnotationInstance> apis) {
         final ResteasyDeploymentData resteasyDeploymentData = unit.getAttachment(JaxrsAttachments.RESTEASY_DEPLOYMENT_DATA);
+        final ClassLoader cl = unit.getAttachment(Attachments.MODULE).getClassLoader();
+        final Map<String, Callback> targets = new LinkedHashMap<>();
 
         final Set<String> classes = resteasyDeploymentData.getScannedResourceClasses();
         for (AnnotationInstance api : apis) {
             ClassInfo ci = (ClassInfo) api.target();
             DotName className = ci.name();
             classes.add(className.toString());
+
+            AnnotationValue serializers = api.value("serializers");
+            if (serializers != null) {
+                readSerializers(cl, targets, serializers.asClassArray());
+            }
         }
 
-        final List<AnnotationInstance> serializers = getApiSerializers(unit);
-        if (serializers != null && serializers.size() > 0) {
-            final ClassLoader cl = unit.getAttachment(Attachments.MODULE).getClassLoader();
+        // handle custom serializers last, as they override @Api::serializers
+        final List<AnnotationInstance> customSerializers = getApiSerializers(unit);
+        if (customSerializers != null && customSerializers.size() > 0) {
+            for (AnnotationInstance ai : customSerializers) {
+                ClassInfo ci = (ClassInfo) ai.target();
+                final DotName className = ci.name();
+                targets.put(className.toString(), new Callback() {
+                    public void applyCtor(CtConstructor ctor) throws Exception {
+                        ctor.setBody(String.format("{super(%s.class);}", className.toString()));
+                    }
+                });
+            }
+        }
+
+        if (targets.size() > 0) {
             final Set<String> providers = resteasyDeploymentData.getScannedProviderClasses();
-            for (AnnotationInstance ai : serializers) {
-                providers.add(generateProvider(cl, ai));
+
+            for (Map.Entry<String, Callback> entry : targets.entrySet()) {
+                providers.add(generateProvider(cl, entry.getKey(), entry.getValue()));
             }
         }
     }
 
-    protected String generateProvider(ClassLoader cl, AnnotationInstance ai) {
+    protected void readSerializers(ClassLoader cl, Map<String, Callback> targets, Type[] types) {
         try {
-            ClassInfo ci = (ClassInfo) ai.target();
-            DotName className = ci.name();
-            return generateSimpleSub(cl, className.toString(), PROVIDER, DEPENDENT);
+            for (Type type : types) {
+                final Class<?> clazz = cl.loadClass(type.name().toString());
+                Method dm = findDeserialize(clazz.getName(), clazz);
+                final String className = dm.getReturnType().getName();
+                targets.put(className, new Callback() {
+                    public void applyCtor(CtConstructor ctor) throws Exception {
+                        ctor.setBody(String.format("{super(%s.class, %s.class);}", className, clazz.getName()));
+                    }
+                });
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    protected Method findDeserialize(String info, Class<?> clazz) {
+        if (clazz == null) {
+            throw new IllegalArgumentException("Cannot find deserialize method: " + info);
+        }
+        for (Method m : clazz.getMethods()) {
+            if ("deserialize".equals(m.getName()) && m.getParameterTypes().length == 1 && Modifier.isPublic(m.getModifiers()) && m.isBridge() == false) {
+                return m;
+            }
+        }
+        return findDeserialize(info, clazz.getSuperclass());
+    }
+
+    protected String generateProvider(ClassLoader cl, String className, Callback callback) {
+        try {
+            return generateSimpleSub(cl, className, PROVIDER, callback, DEPENDENT);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -69,7 +122,7 @@ public class CapedwarfEndpointsJaxrsProcessor extends CapedwarfEndpointsProcesso
         return "L" + className.replace('.', '/');
     }
 
-    protected static String generateSimpleSub(final ClassLoader cl, String ctorParamClass, String superClass, String... classAnnotations) throws Exception {
+    protected static String generateSimpleSub(final ClassLoader cl, String ctorParamClass, String superClass, Callback callback, String... classAnnotations) throws Exception {
         final ClassPool pool = new ClassPool() {
             @Override
             public ClassLoader getClassLoader() {
@@ -96,11 +149,15 @@ public class CapedwarfEndpointsJaxrsProcessor extends CapedwarfEndpointsProcesso
         }
 
         CtConstructor ctor = new CtConstructor(new CtClass[0], newClass);
-        ctor.setBody(String.format("{super(%s.class);}", ctorParamClass));
+        callback.applyCtor(ctor);
         newClass.addConstructor(ctor);
 
         newClass.toClass();
 
         return classname;
+    }
+
+    private static interface Callback {
+        void applyCtor(CtConstructor ctor) throws Exception;
     }
 }
