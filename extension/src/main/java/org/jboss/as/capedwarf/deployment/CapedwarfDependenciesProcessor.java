@@ -48,14 +48,15 @@ public class CapedwarfDependenciesProcessor extends CapedwarfTopDeploymentUnitPr
 
     @SuppressWarnings("unchecked")
     private static final List<Key<?>> KEYS = Arrays.asList(
-            Keys.TM,
-            Keys.USER_TX,
-            Keys.CHANNEL,
-            Keys.EXECUTOR_SERVICE,
-            Keys.THREAD_FACTORY,
-            Keys.CACHE_MANAGER,
-            Keys.MAIL_SESSION,
-            Keys.HTTP_CLIENT
+        Keys.TM,
+        Keys.USER_TX,
+        Keys.CHANNEL,
+        Keys.EXECUTOR_SERVICE,
+        Keys.THREAD_FACTORY,
+        Keys.CACHE_MANAGER,
+        Keys.MAIL_SESSION,
+        Keys.HTTP_CLIENT,
+        Keys.MODULE_LOADER
     );
 
     private static final List<ServiceName> keys = Lists.transform(KEYS, new Function<Key<?>, ServiceName>() {

@@ -292,6 +292,9 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
     }
 
     protected static void addServicesToRegistry(ServiceTarget serviceTarget, List<ServiceController<?>> newControllers) {
+        ServiceName mlServiceName = Services.JBOSS_SERVICE_MODULE_LOADER;
+        addComponentRegistryService(serviceTarget, newControllers, Keys.MODULE_LOADER, mlServiceName);
+
         ServiceName chServiceName = ChannelService.getServiceName(Constants.CAPEDWARF);
         addComponentRegistryService(serviceTarget, newControllers, Keys.CHANNEL, chServiceName);
 
