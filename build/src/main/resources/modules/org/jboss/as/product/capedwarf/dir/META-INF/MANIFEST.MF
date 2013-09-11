@@ -1,3 +1,3 @@
 JBoss-Product-Release-Name: Capedwarf
-JBoss-Product-Release-Version: 1.0.0.Beta6
+JBoss-Product-Release-Version: 1.0.0.CR1
 JBoss-Product-Console-Slot: main
