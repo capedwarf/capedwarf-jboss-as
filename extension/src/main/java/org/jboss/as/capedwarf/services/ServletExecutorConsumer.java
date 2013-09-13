@@ -76,9 +76,9 @@ class ServletExecutorConsumer implements MessageListener {
     private ServletRequestCreator getServletRequestCreator(final String appId, ClassLoader cl, Message message) throws Exception {
         final String factoryClass = getValue(message, MessageConstants.FACTORY);
         ServletRequestCreator factory;
-        final Key<Map<String, ServletRequestCreator>> key = new MapKey<String, ServletRequestCreator>(appId, Slot.SERVLET_REQUEST_CREATOR);
+        final Key<Map<String, ServletRequestCreator>> key = new MapKey<>(appId, Slot.SERVLET_REQUEST_CREATOR);
         ComponentRegistry registry = ComponentRegistry.getInstance();
-        Map<String, ServletRequestCreator> map = new HashMap<String, ServletRequestCreator>();
+        Map<String, ServletRequestCreator> map = new HashMap<>();
         Map<String, ServletRequestCreator> factories = registry.putIfAbsent(key, map);
         if (factories == null) {
             factories = map;
@@ -108,7 +108,7 @@ class ServletExecutorConsumer implements MessageListener {
             }
 
             final String appId = getValue(message, MessageConstants.APP_ID);
-            final SimpleKey<ServletContext> key = new SimpleKey<ServletContext>(appId, ServletContext.class);
+            final SimpleKey<ServletContext> key = new SimpleKey<>(appId, ServletContext.class);
             final ServletContext context = ComponentRegistry.getInstance().getComponent(key);
             if (context == null) {
                 log.warn("No matching ServletContext, app (" + appId + ") already undeployed?");
@@ -122,9 +122,9 @@ class ServletExecutorConsumer implements MessageListener {
 
             creator.prepare(request, appId);
             try {
-                HttpServletResponse response = ServletExecutor.dispatch(appId, path, context, request);
-                if (!isStatus2xx(response)) {
-                    throw new RuntimeException("Status was " + response.getStatus());
+                final HttpServletResponse response = ServletExecutor.dispatch(appId, path, context, request);
+                if (creator.isValid(request, response) == false) {
+                    throw new RuntimeException(String.format("Invalid response for path %s, status was %s", path, response.getStatus()));
                 }
             } finally {
                 creator.finish();
@@ -136,10 +136,6 @@ class ServletExecutorConsumer implements MessageListener {
             log.error("Error handling servlet execution.", e);
             throw new RuntimeException(e);
         }
-    }
-
-    private boolean isStatus2xx(HttpServletResponse response) {
-        return 200 <= response.getStatus() && response.getStatus() <= 299;
     }
 
     protected Module loadModule(ModuleIdentifier identifier) {
