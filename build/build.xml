@@ -188,7 +188,7 @@
         </module-def>
 
         <module-def name="org.picketlink.social">
-            <maven-resource group="org.picketlink" artifact="picketlink-consolidated-social"/>
+            <maven-resource group="org.picketlink" artifact="picketlink-social"/>
         </module-def>
 
         <!-- Override Web -->
