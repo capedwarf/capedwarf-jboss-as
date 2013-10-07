@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -66,12 +67,13 @@ public final class LibUtils {
         return new ModuleDependency(loader, moduleIdentifier, false, false, true, false);
     }
 
-    public static VirtualFile getCompatibilityFile(VirtualFile root) {
-        return root.getChild("WEB-INF/classes/" + Compatibility.FILENAME);
+    public static VirtualFile getCompatibilityFile(DeploymentType type, VirtualFile root) {
+        String path = ((type == DeploymentType.EAR) ? "META-INF/" : "WEB-INF/classes/") + Compatibility.FILENAME;
+        return root.getChild(path);
     }
 
-    public static Compatibility getCompatibility(VirtualFile root) throws IOException {
-        VirtualFile cf = getCompatibilityFile(root);
+    public static Compatibility getCompatibility(DeploymentType type, VirtualFile root) throws IOException {
+        VirtualFile cf = getCompatibilityFile(type, root);
         return (cf.exists()) ? Compatibility.readCompatibility(cf.openStream()) : null;
     }
 }

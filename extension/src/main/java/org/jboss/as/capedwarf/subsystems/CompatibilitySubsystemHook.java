@@ -25,6 +25,7 @@ package org.jboss.as.capedwarf.subsystems;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.jboss.as.capedwarf.deployment.CapedwarfDeploymentMarker;
 import org.jboss.as.capedwarf.utils.LibUtils;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -39,7 +40,7 @@ public class CompatibilitySubsystemHook implements SubsystemHook {
     public void apply(DeploymentUnit unit, Set<String> enabledSubsystems) throws Exception {
         ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
         VirtualFile root = deploymentRoot.getRoot();
-        Compatibility compatibility = LibUtils.getCompatibility(root);
+        Compatibility compatibility = LibUtils.getCompatibility(CapedwarfDeploymentMarker.getDeploymentType(unit), root);
         if (compatibility != null) {
             String value = compatibility.getValue(Compatibility.Feature.ENABLED_SUBSYSTEMS);
             if (value != null) {

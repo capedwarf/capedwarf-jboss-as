@@ -25,6 +25,7 @@ package org.jboss.as.capedwarf.deployment;
 import java.io.IOException;
 
 import org.jboss.as.capedwarf.utils.LibUtils;
+import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -48,7 +49,8 @@ public class CapedwarfCompatibilityParseProcessor extends CapedwarfTopDeployment
             ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
             VirtualFile root = deploymentRoot.getRoot();
 
-            VirtualFile cf = LibUtils.getCompatibilityFile(root);
+            DeploymentType type = CapedwarfDeploymentMarker.getDeploymentType(unit);
+            VirtualFile cf = LibUtils.getCompatibilityFile(type, root);
             Compatibility compatibility = Compatibility.readCompatibility(cf.exists() ? cf.openStream() : null);
             Key<Compatibility> key = new SimpleKey<>(CapedwarfDeploymentMarker.getAppId(unit), Compatibility.class);
             ComponentRegistry.getInstance().setComponent(key, compatibility);

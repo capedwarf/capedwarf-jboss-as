@@ -22,8 +22,6 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.io.Closeable;
-
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
