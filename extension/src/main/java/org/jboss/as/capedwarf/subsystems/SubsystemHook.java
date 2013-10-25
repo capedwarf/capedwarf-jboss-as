@@ -30,14 +30,13 @@ import org.jboss.as.server.deployment.DeploymentUnit;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public interface SubsystemHook {
-    public static final String JAXRS = "jaxrs";
-
     /**
      * Apply hook.
      *
      * @param unit the current deployment unit
      * @param enabledSubsystems enabled subsystems set
+     * @param disabledSubsystems disabled subsystems set
      * @throws Exception for any error
      */
-    void apply(DeploymentUnit unit, Set<String> enabledSubsystems) throws Exception;
+    void apply(DeploymentUnit unit, Set<String> enabledSubsystems, Set<String> disabledSubsystems) throws Exception;
 }

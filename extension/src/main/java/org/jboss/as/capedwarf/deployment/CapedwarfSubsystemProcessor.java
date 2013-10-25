@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.jboss.as.capedwarf.subsystems.CompatibilitySubsystemHook;
-import org.jboss.as.capedwarf.subsystems.EndpointsSubsystemHook;
 import org.jboss.as.capedwarf.subsystems.SubsystemHook;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -46,19 +45,22 @@ public class CapedwarfSubsystemProcessor extends CapedwarfDeploymentUnitProcesso
     private static final List<SubsystemHook> SUBSYSTEM_HOOKS;
 
     static {
-        EXCLUDED_SUBSYSTEMS = new HashSet<>();
-        EXCLUDED_SUBSYSTEMS.add(SubsystemHook.JAXRS); // exclude REST for now
+        EXCLUDED_SUBSYSTEMS = new HashSet<>(); // atm we don't exclude anything by default
 
         SUBSYSTEM_HOOKS = new ArrayList<>();
         SUBSYSTEM_HOOKS.add(new CompatibilitySubsystemHook());
-        SUBSYSTEM_HOOKS.add(new EndpointsSubsystemHook());
     }
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         DeploymentUnit unit = phaseContext.getDeploymentUnit();
 
+        Set<String> enabledSubsystems = new HashSet<>();
+        Set<String> disabledSubsystems = new HashSet<>();
+        applySubsystemHooks(unit, enabledSubsystems, disabledSubsystems);
+
         Set<String> excludedSubsystems = new HashSet<>(EXCLUDED_SUBSYSTEMS);
-        excludedSubsystems.removeAll(getEnabledSubsystems(unit));
+        excludedSubsystems.addAll(disabledSubsystems);
+        excludedSubsystems.removeAll(enabledSubsystems);
 
         if (excludedSubsystems.size() > 0) {
             Set<String> subsystems = unit.getAttachment(Attachments.EXCLUDED_SUBSYSTEMS);
@@ -70,13 +72,11 @@ public class CapedwarfSubsystemProcessor extends CapedwarfDeploymentUnitProcesso
         }
     }
 
-    protected Set<String> getEnabledSubsystems(DeploymentUnit unit) throws DeploymentUnitProcessingException {
+    protected void applySubsystemHooks(DeploymentUnit unit, Set<String> enabled, Set<String> disabled) throws DeploymentUnitProcessingException {
         try {
-            final Set<String> set = new HashSet<>();
             for (SubsystemHook hook : SUBSYSTEM_HOOKS) {
-                hook.apply(unit, set);
+                hook.apply(unit, enabled, disabled);
             }
-            return set;
         } catch (Exception e) {
             throw new DeploymentUnitProcessingException(e);
         }

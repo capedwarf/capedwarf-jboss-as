@@ -37,15 +37,20 @@ import org.jboss.vfs.VirtualFile;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CompatibilitySubsystemHook implements SubsystemHook {
-    public void apply(DeploymentUnit unit, Set<String> enabledSubsystems) throws Exception {
+    public void apply(DeploymentUnit unit, Set<String> enabledSubsystems, Set<String> disabledSubsystems) throws Exception {
         ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
         VirtualFile root = deploymentRoot.getRoot();
         Compatibility compatibility = LibUtils.getCompatibility(CapedwarfDeploymentMarker.getDeploymentType(unit), root);
+        addSystems(compatibility, Compatibility.Feature.ENABLED_SUBSYSTEMS, enabledSubsystems);
+        addSystems(compatibility, Compatibility.Feature.DISABLED_SUBSYSTEMS, disabledSubsystems);
+    }
+
+    private static void addSystems(Compatibility compatibility, Compatibility.Feature feature, Set<String> subsystems) {
         if (compatibility != null) {
-            String value = compatibility.getValue(Compatibility.Feature.ENABLED_SUBSYSTEMS);
+            String value = compatibility.getValue(feature);
             if (value != null) {
                 String[] split = value.split(",");
-                enabledSubsystems.addAll(Arrays.asList(split));
+                subsystems.addAll(Arrays.asList(split));
             }
         }
     }

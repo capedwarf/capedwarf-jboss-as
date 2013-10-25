@@ -16,7 +16,8 @@ import org.jboss.jandex.DotName;
  */
 public abstract class CapedwarfEndpointsProcessor extends CapedwarfWebDeploymentUnitProcessor {
     private static final DotName ENDPOINT_API = DotName.createSimple("com.google.api.server.spi.config.Api");
-    private static final DotName ENDPOINT_API_SERIALIZER = DotName.createSimple("com.google.api.server.spi.config.ApiSerializer");
+    private static final DotName ENDPOINT_API_METHOD = DotName.createSimple("com.google.api.server.spi.config.ApiMethod");
+    private static final DotName ENDPOINT_API_TRANSFORMER = DotName.createSimple("com.google.api.server.spi.config.ApiTransformer");
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         DeploymentUnit unit = phaseContext.getDeploymentUnit();
@@ -31,9 +32,14 @@ public abstract class CapedwarfEndpointsProcessor extends CapedwarfWebDeployment
         return index.getAnnotations(ENDPOINT_API);
     }
 
-    static List<AnnotationInstance> getApiSerializers(DeploymentUnit unit) {
+    static List<AnnotationInstance> getApiMethods(DeploymentUnit unit) {
         CompositeIndex index = unit.getAttachment(Attachments.COMPOSITE_ANNOTATION_INDEX);
-        return index.getAnnotations(ENDPOINT_API_SERIALIZER);
+        return index.getAnnotations(ENDPOINT_API_METHOD);
+    }
+
+    static List<AnnotationInstance> getApiTransformers(DeploymentUnit unit) {
+        CompositeIndex index = unit.getAttachment(Attachments.COMPOSITE_ANNOTATION_INDEX);
+        return index.getAnnotations(ENDPOINT_API_TRANSFORMER);
     }
 
     static boolean hasApis(DeploymentUnit unit) {
