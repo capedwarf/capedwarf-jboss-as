@@ -19,7 +19,6 @@ import org.jboss.metadata.web.jboss.ContainerListenerMetaData;
 import org.jboss.metadata.web.jboss.ContainerListenerType;
 import org.jboss.metadata.web.jboss.JBoss70WebMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
-import org.jboss.metadata.web.jboss.ValveMetaData;
 import org.jboss.metadata.web.spec.AuthConstraintMetaData;
 import org.jboss.metadata.web.spec.DispatcherType;
 import org.jboss.metadata.web.spec.FilterMappingMetaData;
@@ -97,8 +96,6 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final LoginConfigMetaData ADMIN_SERVLET_CONFIG;
     private final SecurityRoleMetaData ADMIN_SERVLET_ROLE;
 
-    private final ValveMetaData AUTH_VALVE;
-
     private final String adminTGT;
 
     public CapedwarfWebComponentsDeploymentProcessor(String tgt) {
@@ -134,8 +131,6 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         ADMIN_SERVLET_CONSTRAINT = createAdminServletSecurityConstraint();
         ADMIN_SERVLET_CONFIG = createAdminServletLogin();
         ADMIN_SERVLET_ROLE = createAdminServletSecurityRole();
-
-        AUTH_VALVE = createValve(isCapedwarfAuth() ? "org.jboss.capedwarf.users.CapedwarfUsersAuthenticator" : "org.jboss.capedwarf.users.CapedwarfBasicAuthenticator");
     }
 
     protected boolean isCapedwarfAuth() {
@@ -145,6 +140,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     @Override
     protected void doDeploy(DeploymentUnit unit, WebMetaData webMetaData, Type type) {
         if (type == Type.SPEC) {
+            addContextParamsTo(webMetaData, create("__TGT__", adminTGT));
+
             getListeners(webMetaData).add(0, GAE_LISTENER);
             getListeners(webMetaData).add(CDI_LISTENER);
             getListeners(webMetaData).add(CDAS_LISTENER);
@@ -188,9 +185,6 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     @Override
     protected void doDeploy(DeploymentUnit unit, JBossWebMetaData webMetaData, Type type) {
         if (type == Type.JBOSS) {
-            List<ValveMetaData> valves = getValves(webMetaData);
-            valves.add(0, AUTH_VALVE);
-
             // are we running in Modules env
             if (CapedwarfDeploymentMarker.hasModules(unit)) {
                 webMetaData.setContextRoot(""); // everything is a root
@@ -436,21 +430,6 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         configMetaData.setAuthMethod(isCapedwarfAuth() ? "OAUTH" : "BASIC");
         configMetaData.setRealmName("ApplicationRealm");
         return configMetaData;
-    }
-
-    private List<ValveMetaData> getValves(JBossWebMetaData webMetaData) {
-        List<ValveMetaData> valves = webMetaData.getValves();
-        if (valves == null) {
-            valves = new ArrayList<>();
-            webMetaData.setValves(valves);
-        }
-        return valves;
-    }
-
-    private ValveMetaData createValve(String valveClass) {
-        ValveMetaData vmd = new ValveMetaData();
-        vmd.setValveClass(valveClass);
-        return vmd;
     }
 
     protected List<ContainerListenerMetaData> getContainerListeners(JBossWebMetaData webMetaData) {

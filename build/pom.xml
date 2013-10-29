@@ -481,28 +481,6 @@
             <artifactId>geotk-coverageio</artifactId>
         </dependency>
 
-        <!-- Web -->
-
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.jdt.core.compiler</groupId>
-            <artifactId>ecj</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jboss.web</groupId>
-            <artifactId>jbossweb</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>

@@ -186,19 +186,6 @@
             <maven-resource group="org.picketlink" artifact="picketlink-social"/>
         </module-def>
 
-        <!-- Override Web -->
-        <module-def name="org.jboss.as.web">
-            <maven-resource group="org.jboss.as" artifact="jboss-as-web"/>
-            <maven-resource group="org.eclipse.jdt.core.compiler" artifact="ecj"/>
-            <maven-resource group="org.jboss.web" artifact="jbossweb"/>
-        </module-def>
-
-        <!-- Override Javassist -->
-
-        <module-def name="org.javassist">
-            <maven-resource group="org.javassist" artifact="javassist"/>
-        </module-def>
-
     </target>
 
     <target name="clean-target">
