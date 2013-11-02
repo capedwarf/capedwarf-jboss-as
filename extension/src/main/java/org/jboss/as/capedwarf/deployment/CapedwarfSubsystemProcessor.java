@@ -45,7 +45,8 @@ public class CapedwarfSubsystemProcessor extends CapedwarfDeploymentUnitProcesso
     private static final List<SubsystemHook> SUBSYSTEM_HOOKS;
 
     static {
-        EXCLUDED_SUBSYSTEMS = new HashSet<>(); // atm we don't exclude anything by default
+        EXCLUDED_SUBSYSTEMS = new HashSet<>();
+        EXCLUDED_SUBSYSTEMS.add(SubsystemHook.JAXRS);
 
         SUBSYSTEM_HOOKS = new ArrayList<>();
         SUBSYSTEM_HOOKS.add(new CompatibilitySubsystemHook());

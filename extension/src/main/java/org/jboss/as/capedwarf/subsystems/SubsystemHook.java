@@ -30,6 +30,8 @@ import org.jboss.as.server.deployment.DeploymentUnit;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public interface SubsystemHook {
+    public static final String JAXRS = "jaxrs";
+
     /**
      * Apply hook.
      *

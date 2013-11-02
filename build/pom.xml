@@ -185,6 +185,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-local-endpoints</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>javax.jdo</groupId>
             <artifactId>jdo-api</artifactId>
         </dependency>

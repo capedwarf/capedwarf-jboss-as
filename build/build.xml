@@ -49,7 +49,7 @@
         </module-def>
 
         <module-def name="com.google.appengine.endpoints">
-            <maven-resource group="com.google.appengine" artifact="appengine-endpoints" />
+            <maven-resource group="com.google.appengine" artifact="appengine-local-endpoints" />
         </module-def>
 
         <module-def name="javax.jdo.api">

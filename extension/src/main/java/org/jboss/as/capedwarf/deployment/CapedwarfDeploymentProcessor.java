@@ -121,6 +121,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
 
     private String defaultGaeVersion;
     private Map<String, List<ResourceLoaderSpec>> capedwarfResources = new HashMap<>();
+    private Map<String, List<ResourceLoaderSpec>> endpointsResources = new HashMap<>();
 
     private String appengineAPI;
 
@@ -204,6 +205,17 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
                 version = gaeDependency.getIdentifier().getSlot();
             }
         }
+
+        // check Endpoints
+        if (CapedwarfEndpointsProcessor.hasApis(unit)) {
+            moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.endpoints.EndpointsTransformer");
+            // add resources
+            List<ResourceLoaderSpec> resources = getEndpointsResources(version);
+            for (ResourceLoaderSpec rls : resources) {
+                moduleSpecification.addResourceLoader(rls);
+            }
+        }
+
         // set best guess version
         CapedwarfDeploymentMarker.setVersion(unit, version);
     }
@@ -234,22 +246,31 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         return mps;
     }
 
-    protected synchronized List<ResourceLoaderSpec> getCapedwarfResources(final String version) throws DeploymentUnitProcessingException {
-        List<ResourceLoaderSpec> resources = capedwarfResources.get(version);
+    protected List<ResourceLoaderSpec> getCapedwarfResources(String version) throws DeploymentUnitProcessingException {
+        return getResources(capedwarfResources, version, "org/jboss/capedwarf/");
+    }
+
+    protected List<ResourceLoaderSpec> getEndpointsResources(String version) throws DeploymentUnitProcessingException {
+        return getResources(endpointsResources, version, "com/google/appengine/endpoints/");
+    }
+
+    protected synchronized List<ResourceLoaderSpec> getResources(Map<String, List<ResourceLoaderSpec>> map, String version, String path) throws DeploymentUnitProcessingException {
+        List<ResourceLoaderSpec> resources = map.get(version);
         if (resources == null) {
             try {
                 final List<File> mps = getModulePaths();
-                final List<File> capedwarfJars = findCapedwarfJars(version, mps);
-                if (capedwarfJars.isEmpty())
-                    throw new DeploymentUnitProcessingException("No CapeDwarf jars found!");
+                final List<File> jars = findJars(path, version, mps);
+                if (jars.isEmpty()) {
+                    throw new DeploymentUnitProcessingException(String.format("No jars found under %s", path));
+                }
 
                 resources = new ArrayList<>();
-                for (File jar : capedwarfJars) {
+                for (File jar : jars) {
                     final JarFile jarFile = new JarFile(jar);
                     final ResourceLoader rl = ResourceLoaders.createJarResourceLoader(jar.getName(), jarFile);
                     resources.add(ResourceLoaderSpec.createResourceLoaderSpec(rl));
                 }
-                capedwarfResources.put(version, resources);
+                map.put(version, resources);
             } catch (DeploymentUnitProcessingException e) {
                 throw e;
             } catch (Exception e) {
@@ -259,17 +280,17 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         return resources;
     }
 
-    protected List<File> findCapedwarfJars(String version, List<File> mps) {
+    protected List<File> findJars(String path, String version, List<File> mps) {
         final List<File> results = new ArrayList<>();
         final Set<String> existing = new HashSet<>();
         for (File mp : mps) {
-            findCapedwarfJars(version, mp, results, existing);
+            findJars(path, version, mp, results, existing);
         }
         return results;
     }
 
-    protected void findCapedwarfJars(String version, File mp, List<File> results, Set<String> existing) {
-        final File cdModules = bestVersionMatch(version, mp);
+    protected void findJars(String path, String version, File mp, List<File> results, Set<String> existing) {
+        final File cdModules = bestVersionMatch(path, version, mp);
         if (cdModules != null) {
             for (File jar : cdModules.listFiles(JARS_SDK)) {
                 if (existing.add(jar.getName())) {
@@ -279,9 +300,9 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         }
     }
 
-    protected File bestVersionMatch(String version, File mp) {
+    protected File bestVersionMatch(String path, String version, File mp) {
         while (true) {
-            final File cdModules = new File(mp, "org/jboss/capedwarf/" + version);
+            final File cdModules = new File(mp, path + version);
             if (cdModules.exists()) {
                 return cdModules;
             }
