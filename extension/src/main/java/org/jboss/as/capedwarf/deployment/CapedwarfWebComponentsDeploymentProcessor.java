@@ -51,6 +51,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String GAE_REMOTE_API_SERVLET_NAME = "com.google.apphosting.utils.remoteapi.RemoteApiServlet";
     private static final String CAPEDWARF_REMOTE_API_SERVLET_NAME = "org.jboss.capedwarf.admin.remote.RemoteApiServlet";
 
+    private static final String ENDPOINTS_SYSTEM_SERVICE_SERVLET = "com.google.api.server.spi.SystemServiceServlet";
+
     private static final String SINGLE_THREAD_FILTER_NAME = "SingleThreadFilter";
     private static final String GAE_FILTER_NAME = "GAEFilter";
     private static final String LOGIN_SERVLET_NAME = "LoginServlet";
@@ -171,8 +173,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
             addServletAndMapping(webMetaData, DEFERRED_TASK_SERVLET, DEFERRED_TASK_SERVLET_MAPPING);
 
             if (CapedwarfEndpointsProcessor.hasApis(unit)) {
-                getServlets(webMetaData).add(ENDPOINT_REST_SERVLET);
-                getServletMappings(webMetaData).add(ENDPOINT_REST_SERVLET_MAPPING);
+                handleEndpoints(webMetaData);
             }
 
             replaceRemoteApiServlet(webMetaData);
@@ -209,6 +210,13 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         }
     }
 
+    private static ParamValueMetaData create(String name, String value) {
+        ParamValueMetaData pvmd = new ParamValueMetaData();
+        pvmd.setParamName(name);
+        pvmd.setParamValue(value);
+        return pvmd;
+    }
+
     private int getVirtualServerNumber(DeploymentUnit unit) {
         DeploymentUnit top = getTopDeploymentUnit(unit);
         EarMetaData emd = top.getAttachment(Attachments.EAR_METADATA);
@@ -227,12 +235,35 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         getServletMappings(webMetaData).add(servletMappingMetaData);
     }
 
+    private void handleEndpoints(WebMetaData webMetaData) {
+        getServlets(webMetaData).add(ENDPOINT_REST_SERVLET);
+        getServletMappings(webMetaData).add(ENDPOINT_REST_SERVLET_MAPPING);
+        // make SystemServiceServlet non-restricted
+        ServletMetaData sss = findSystemServiceServlet(webMetaData);
+        List<ParamValueMetaData> initParams = sss.getInitParam();
+        if (initParams == null) {
+            initParams = new ArrayList<>();
+            sss.setInitParam(initParams);
+        }
+        ParamValueMetaData pvmd = create("restricted", "false");
+        initParams.add(pvmd);
+    }
+
     private void replaceRemoteApiServlet(WebMetaData webMetaData) {
         for (ServletMetaData servletMetaData : getServlets(webMetaData)) {
             if (GAE_REMOTE_API_SERVLET_NAME.equals(servletMetaData.getServletClass())) {
                 servletMetaData.setServletClass(CAPEDWARF_REMOTE_API_SERVLET_NAME);
             }
         }
+    }
+
+    private ServletMetaData findSystemServiceServlet(WebMetaData webMetaData) {
+        for (ServletMetaData servletMetaData : getServlets(webMetaData)) {
+            if (ENDPOINTS_SYSTEM_SERVICE_SERVLET.equals(servletMetaData.getServletClass())) {
+                return servletMetaData;
+            }
+        }
+        throw new IllegalArgumentException(String.format("Missing %s in web.xml -- required for Endpoints support.", ENDPOINTS_SYSTEM_SERVICE_SERVLET));
     }
 
     protected void addContextParamsTo(WebMetaData webMetaData, ParamValueMetaData param) {
@@ -268,9 +299,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
     private FilterMetaData createSingleThreadFilter(int maxConcurrentRequests) {
         FilterMetaData filter = createFilter(SINGLE_THREAD_FILTER_NAME, "org.jboss.capedwarf.common.singlethread.SingleThreadFilter");
-        ParamValueMetaData initParam = new ParamValueMetaData();
-        initParam.setParamName("max-concurrent-requests");
-        initParam.setParamValue(String.valueOf(maxConcurrentRequests));
+        ParamValueMetaData initParam = create("max-concurrent-requests", String.valueOf(maxConcurrentRequests));
         List<ParamValueMetaData> initParams = Collections.singletonList(initParam);
         filter.setInitParam(initParams);
         return filter;

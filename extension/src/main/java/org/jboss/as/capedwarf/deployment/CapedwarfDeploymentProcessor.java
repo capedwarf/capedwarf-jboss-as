@@ -172,11 +172,13 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
                 moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.LegacyFactoriesTransformer");
             }
             // add CapeDwarf resources directly as libs
-            for (ResourceLoaderSpec rls : getCapedwarfResources(version))
+            for (ResourceLoaderSpec rls : getCapedwarfResources(version)) {
                 moduleSpecification.addResourceLoader(rls);
+            }
             // add other needed dependencies
-            for (ModuleIdentifier mi : INLINE)
+            for (ModuleIdentifier mi : INLINE) {
                 moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, mi));
+            }
         } else {
             // check if CD and GAE deps already exist
             final List<ModuleDependency> systemDependencies = moduleSpecification.getSystemDependencies();
@@ -208,7 +210,6 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
 
         // check Endpoints
         if (CapedwarfEndpointsProcessor.hasApis(unit)) {
-            moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.endpoints.EndpointsTransformer");
             // add resources
             List<ResourceLoaderSpec> resources = getEndpointsResources(version);
             for (ResourceLoaderSpec rls : resources) {
