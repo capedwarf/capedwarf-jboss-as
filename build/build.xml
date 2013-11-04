@@ -112,9 +112,13 @@
             <maven-resource group="org.geotoolkit" artifact="geotk-coverageio"/>
         </module-def>
 
-        <!-- module-def name="org.infinispan">
+        <module-def name="org.infinispan">
             <maven-resource group="org.infinispan" artifact="infinispan-core"/>
-        </module-def -->
+        </module-def>
+
+        <module-def name="org.infinispan.commons">
+            <maven-resource group="org.infinispan" artifact="infinispan-commons"/>
+        </module-def>
 
         <module-def name="org.infinispan.query">
             <maven-resource group="org.infinispan" artifact="infinispan-query"/>

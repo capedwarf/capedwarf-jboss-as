@@ -262,6 +262,11 @@
 
         <dependency>
             <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-commons</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.infinispan</groupId>
             <artifactId>infinispan-lucene-directory</artifactId>
         </dependency>
 
