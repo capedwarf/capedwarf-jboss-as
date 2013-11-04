@@ -427,7 +427,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
     private LoginConfigMetaData createAdminServletLogin() {
         LoginConfigMetaData configMetaData = new LoginConfigMetaData();
-        configMetaData.setAuthMethod(isCapedwarfAuth() ? "OAUTH" : "BASIC");
+        configMetaData.setAuthMethod(isCapedwarfAuth() ? "FORM" : "BASIC");
         configMetaData.setRealmName("ApplicationRealm");
         return configMetaData;
     }
