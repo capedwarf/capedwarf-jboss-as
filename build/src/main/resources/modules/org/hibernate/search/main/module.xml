@@ -36,6 +36,7 @@
         <module name="org.slf4j"/>
         <module name="org.hibernate"/>
         <module name="org.hibernate.commons-annotations"/>
+        <module name="org.hibernate.hql"/>
         <module name="org.apache.avro"/>
         <module name="org.apache.lucene"/>
         <module name="org.jgroups"/>
