@@ -95,6 +95,10 @@
             <maven-resource group="org.infinispan" artifact="infinispan-lucene-directory"/>
         </module-def>
 
+       <module-def name="org.hibernate.hql">
+            <maven-resource group="org.hibernate.hql" artifact="hibernate-hql-parser"/>
+        </module-def>
+
         <module-def name="org.jgroups">
             <maven-resource group="org.jgroups" artifact="jgroups"/>
         </module-def>
@@ -108,9 +112,9 @@
             <maven-resource group="org.geotoolkit" artifact="geotk-coverageio"/>
         </module-def>
 
-        <module-def name="org.infinispan">
+        <!-- module-def name="org.infinispan">
             <maven-resource group="org.infinispan" artifact="infinispan-core"/>
-        </module-def>
+        </module-def -->
 
         <module-def name="org.infinispan.query">
             <maven-resource group="org.infinispan" artifact="infinispan-query"/>

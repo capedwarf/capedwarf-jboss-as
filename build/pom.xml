@@ -246,6 +246,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.hibernate.hql</groupId>
+            <artifactId>hibernate-hql-parser</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.jgroups</groupId>
             <artifactId>jgroups</artifactId>
         </dependency>

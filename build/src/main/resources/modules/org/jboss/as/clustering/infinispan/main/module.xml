@@ -37,12 +37,12 @@
         <module name="net.jcip"/>
         <module name="org.infinispan" services="import"/>
         <module name="org.infinispan.cachestore.jdbc"/>
-        <module name="org.infinispan.cachestore.remote" />
-        <module name="org.infinispan.query" services="import" optional="true"/>
-        <module name="org.wildfly.clustering.api"/>
-        <module name="org.wildfly.clustering.server"/>
+        <module name="org.infinispan.cachestore.remote"/>
+        <module name="org.infinispan.client.hotrod" optional="true"/>
+        <module name="org.infinispan.commons"/>
+        <module name="org.infinispan.query" services="import"/>
         <module name="org.jboss.as.clustering.common"/>
-        <module name="org.jboss.as.clustering.jgroups" optional="true"/>
+        <module name="org.jboss.as.clustering.jgroups"/>
         <module name="org.jboss.as.controller"/>
         <module name="org.jboss.as.ee"/>
         <module name="org.jboss.as.jmx"/>
@@ -59,5 +59,8 @@
         <module name="org.jboss.staxmapper"/>
         <module name="org.jboss.threads"/>
         <module name="org.jgroups"/>
+        <module name="org.wildfly.clustering.api" optional="true"/>
+        <module name="org.wildfly.clustering.server" services="import" optional="true"/>
+        <module name="org.wildfly.security.manager"/>
     </dependencies>
 </module>
