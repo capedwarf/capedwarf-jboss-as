@@ -191,7 +191,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
                 // map against virtual host
                 int vs = getVirtualServerNumber(unit);
                 if (vs > 0) {
-                    webMetaData.setVirtualHosts(Collections.singletonList("vs" + vs));
+                    webMetaData.setServerInstanceName("server" + vs);
                 }
             }
         }
