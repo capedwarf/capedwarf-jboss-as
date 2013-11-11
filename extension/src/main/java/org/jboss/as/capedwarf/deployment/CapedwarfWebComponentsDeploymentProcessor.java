@@ -55,8 +55,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
     private static final String SINGLE_THREAD_FILTER_NAME = "SingleThreadFilter";
     private static final String GAE_FILTER_NAME = "GAEFilter";
-    private static final String LOGIN_SERVLET_NAME = "LoginServlet";
-    private static final String LOGOUT_SERVLET_NAME = "LogoutServlet";
+    private static final String AUTH_SERVLET_NAME = "AuthServlet";
     private static final String ADMIN_SERVLET_NAME = "CapedwarfAdminServlet";
     private static final String CHANNEL_SERVLET_NAME = "ChannelServlet";
     private static final String UPLOAD_SERVLET_NAME = "UploadServlet";
@@ -64,8 +63,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String DEFERRED_TASK_SERVLET_NAME = "DeferredTaskServlet";
     private static final String ENDPOINT_REST_SERVLET_NAME = "EndpointsRestServlet";
     private static final String[] ADMIN_SERVLET_URL_MAPPING = {"/_ah/admin/*", "/_ah/admin/"};
-    private static final String[] LOGIN_SERVLET_URL_MAPPING = {"/_ah/login/*", "/_ah/login/"};
-    private static final String[] LOGOUT_SERVLET_URL_MAPPING = {"/_ah/logout/*", "/_ah/logout/"};
+    private static final String[] AUTH_SERVLET_URL_MAPPING = {"/_ah/login/*", "/_ah/login/", "/_ah/logout/*", "/_ah/logout/", "/_ah/openIDCallBack"};
     private static final String[] CHANNEL_SERVLET_URL_MAPPING = {"/_ah/channel/*", "/_ah/channel/"};
     private static final String[] UPLOAD_SERVLET_URL_MAPPING = {"/_ah/blobstore/upload"};
     private static final String[] IMAGE_SERVLET_URL_MAPPING = {"/_ah/image/*"};
@@ -80,16 +78,14 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final FilterMetaData GAE_FILTER;
     private final FilterMappingMetaData SINGLE_THREAD_FILTER_MAPPING;
     private final FilterMappingMetaData GAE_FILTER_MAPPING;
-    private final ServletMetaData LOGIN_SERVLET;
-    private final ServletMetaData LOGOUT_SERVLET;
+    private final ServletMetaData AUTH_SERVLET;
     private final ServletMetaData ADMIN_SERVLET;
     private final ServletMetaData CHANNEL_SERVLET;
     private final ServletMetaData UPLOAD_SERVLET;
     private final ServletMetaData IMAGE_SERVLET;
     private final ServletMetaData DEFERRED_TASK_SERVLET;
     private final ServletMetaData ENDPOINT_REST_SERVLET;
-    private final ServletMappingMetaData LOGIN_SERVLET_MAPPING;
-    private final ServletMappingMetaData LOGOUT_SERVLET_MAPPING;
+    private final ServletMappingMetaData AUTH_SERVLET_MAPPING;
     private final ServletMappingMetaData ADMIN_SERVLET_MAPPING;
     private final ServletMappingMetaData CHANNEL_SERVLET_MAPPING;
     private final ServletMappingMetaData UPLOAD_SERVLET_MAPPING;
@@ -117,8 +113,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         GAE_FILTER_MAPPING = createFilterMapping(GAE_FILTER_NAME, "/*");
         SINGLE_THREAD_FILTER_MAPPING = createFilterMapping(SINGLE_THREAD_FILTER_NAME, "/*");
 
-        LOGIN_SERVLET = createServlet(LOGIN_SERVLET_NAME, "org.jboss.capedwarf.users.LoginServlet");
-        LOGOUT_SERVLET = createServlet(LOGOUT_SERVLET_NAME, "org.jboss.capedwarf.users.LogoutServlet");
+        AUTH_SERVLET = createServlet(AUTH_SERVLET_NAME, "org.jboss.capedwarf.users.AuthServlet");
         ADMIN_SERVLET = createServlet(ADMIN_SERVLET_NAME, "org.jboss.capedwarf.admin.AdminServlet");
         CHANNEL_SERVLET = createServlet(CHANNEL_SERVLET_NAME, "org.jboss.capedwarf.channel.servlet.ChannelServlet");
         UPLOAD_SERVLET = createUploadServlet();
@@ -126,8 +121,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         DEFERRED_TASK_SERVLET = createServlet(DEFERRED_TASK_SERVLET_NAME, "com.google.apphosting.utils.servlet.DeferredTaskServlet");
         ENDPOINT_REST_SERVLET = createServlet(ENDPOINT_REST_SERVLET_NAME, "com.google.api.server.spi.tools.devserver.RestApiServlet");
 
-        LOGIN_SERVLET_MAPPING = createServletMapping(LOGIN_SERVLET_NAME, LOGIN_SERVLET_URL_MAPPING);
-        LOGOUT_SERVLET_MAPPING = createServletMapping(LOGOUT_SERVLET_NAME, LOGOUT_SERVLET_URL_MAPPING);
+        AUTH_SERVLET_MAPPING = createServletMapping(AUTH_SERVLET_NAME, AUTH_SERVLET_URL_MAPPING);
         ADMIN_SERVLET_MAPPING = createServletMapping(ADMIN_SERVLET_NAME, ADMIN_SERVLET_URL_MAPPING);
         CHANNEL_SERVLET_MAPPING = createServletMapping(CHANNEL_SERVLET_NAME, CHANNEL_SERVLET_URL_MAPPING);
         UPLOAD_SERVLET_MAPPING = createServletMapping(UPLOAD_SERVLET_NAME, UPLOAD_SERVLET_URL_MAPPING);
@@ -164,8 +158,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
             getFilters(webMetaData).add(GAE_FILTER);
 
-            addServletAndMapping(webMetaData, LOGIN_SERVLET, LOGIN_SERVLET_MAPPING);
-            addServletAndMapping(webMetaData, LOGOUT_SERVLET, LOGOUT_SERVLET_MAPPING);
+            addServletAndMapping(webMetaData, AUTH_SERVLET, AUTH_SERVLET_MAPPING);
             addServletAndMapping(webMetaData, ADMIN_SERVLET, ADMIN_SERVLET_MAPPING);
             addServletAndMapping(webMetaData, CHANNEL_SERVLET, CHANNEL_SERVLET_MAPPING);
             addServletAndMapping(webMetaData, UPLOAD_SERVLET, UPLOAD_SERVLET_MAPPING);
