@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.List;
 import java.util.Properties;
@@ -212,6 +213,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
     protected static void registerSocketFactory() throws OperationFailedException {
         try {
             Socket.setSocketImplFactory(CapedwarfSocketFactory.INSTANCE);
+            DatagramSocket.setDatagramSocketImplFactory(CapedwarfSocketFactory.INSTANCE);
         } catch (IOException e) {
             throw new OperationFailedException(e.getMessage(), e);
         }
