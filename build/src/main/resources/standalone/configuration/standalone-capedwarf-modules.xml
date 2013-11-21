@@ -144,13 +144,11 @@
                 </bean-instance-pools>
             </pools>
             <caches>
-                <cache name="simple" aliases="NoPassivationCache"/>
-                <cache name="passivating" passivation-store-ref="file" aliases="SimpleStatefulCache"/>
-                <cache name="clustered" passivation-store-ref="infinispan" aliases="StatefulTreeCache"/>
+                <cache name="simple"/>
+                <cache name="distributable" aliases="passivating clustered" passivation-store-ref="infinispan"/>
             </caches>
             <passivation-stores>
-                <file-passivation-store name="file"/>
-                <cluster-passivation-store name="infinispan" cache-container="ejb"/>
+                <passivation-store name="infinispan" cache-container="ejb" max-size="10000"/>
             </passivation-stores>
             <async thread-pool-name="default"/>
             <timer-service thread-pool-name="default" default-data-store="default-file-store">
@@ -180,29 +178,15 @@
                     <locking isolation="REPEATABLE_READ"/>
                 </replicated-cache>
             </cache-container>
-            <cache-container name="web" aliases="standard-session-cache" default-cache="repl" module="org.wildfly.clustering.web.infinispan">
+            <cache-container name="web" default-cache="dist" module="org.wildfly.clustering.web.infinispan">
                 <transport lock-timeout="60000"/>
-                <replicated-cache name="repl" mode="ASYNC" batching="true">
-                    <file-store/>
-                </replicated-cache>
-                <replicated-cache name="sso" mode="SYNC" batching="true"/>
-                <distributed-cache name="dist" mode="ASYNC" batching="true" l1-lifespan="0">
+                <distributed-cache name="dist" mode="ASYNC" batching="true" l1-lifespan="0" owners="4">
                     <file-store/>
                 </distributed-cache>
             </cache-container>
-            <cache-container name="ejb" aliases="sfsb sfsb-cache" default-cache="repl" module="org.jboss.as.clustering.ejb3.infinispan">
+            <cache-container name="ejb" aliases="sfsb" default-cache="dist" module="org.wildfly.clustering.ejb.infinispan">
                 <transport lock-timeout="60000"/>
-                <replicated-cache name="repl" mode="ASYNC" batching="true">
-                    <eviction strategy="LRU" max-entries="10000"/>
-                    <file-store/>
-                </replicated-cache>
-                <!--
-                  ~  Clustered cache used internally by EJB subsytem for managing the client-mapping(s) of
-                  ~                 the socketbinding referenced by the EJB remoting connector
-                  -->
-                <replicated-cache name="remote-connector-client-mappings" mode="SYNC" batching="true"/>
-                <distributed-cache name="dist" mode="ASYNC" batching="true" l1-lifespan="0">
-                    <eviction strategy="LRU" max-entries="10000"/>
+                <distributed-cache name="dist" mode="ASYNC" batching="true" l1-lifespan="0" owners="4">
                     <file-store/>
                 </distributed-cache>
             </cache-container>
