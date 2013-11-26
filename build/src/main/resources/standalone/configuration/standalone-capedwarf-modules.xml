@@ -307,6 +307,20 @@
                         <property name="hibernate.search.default.worker.backend">jgroups</property>
                     </indexing>
                 </distributed-cache>
+                <distributed-cache name="channel" mode="ASYNC">
+                    <transaction mode="NON_XA"/>
+                    <eviction strategy="LIRS" max-entries="10000"/>
+                    <file-store preload="false" purge="false"/>
+                    <indexing index="LOCAL">
+                        <property name="hibernate.search.default.block_waiting_ack">false</property>
+                        <property name="hibernate.search.default.exclusive_index_use">false</property>
+                        <property name="hibernate.search.default.directory_provider">infinispan</property>
+                        <property name="hibernate.search.infinispan.cachemanager_jndiname">
+                            java:jboss/infinispan/container/capedwarf
+                        </property>
+                        <property name="hibernate.search.default.worker.backend">jgroups</property>
+                    </indexing>
+                </distributed-cache>
                 <replicated-cache name="LuceneIndexesMetadata" mode="SYNC">
                     <transaction mode="NONE"/>
                     <eviction strategy="NONE"/>

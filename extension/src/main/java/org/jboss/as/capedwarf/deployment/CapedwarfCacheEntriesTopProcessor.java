@@ -46,6 +46,7 @@ public class CapedwarfCacheEntriesTopProcessor extends CapedwarfTopDeploymentUni
         configs.put(CacheName.PROSPECTIVE_SEARCH, CacheConfigs.createProspectiveSearchConfig());
         configs.put(CacheName.TASKS, CacheConfigs.createTasksConfig());
         configs.put(CacheName.LOGS, CacheConfigs.createLogsConfig());
+        configs.put(CacheName.CHANNEL, CacheConfigs.createChannelConfig());
 
         final DeploymentUnit unit = phaseContext.getDeploymentUnit();
         unit.putAttachment(CapedwarfAttachments.CONFIGS, configs);

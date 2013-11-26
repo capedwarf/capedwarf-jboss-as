@@ -73,6 +73,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ListenerMetaData GAE_LISTENER;
     private final ListenerMetaData CDI_LISTENER;
     private final ListenerMetaData CDAS_LISTENER;
+    private final ListenerMetaData WEB_SOCKET_LISTENER;
     private final FilterMetaData SINGLE_THREAD_FILTER;
     private final FilterMetaData GAE_FILTER;
     private final FilterMappingMetaData SINGLE_THREAD_FILTER_MAPPING;
@@ -104,6 +105,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         GAE_LISTENER = createListener("org.jboss.capedwarf.appidentity.GAEListener");
         CDI_LISTENER = createListener("org.jboss.capedwarf.appidentity.CDIListener");
         CDAS_LISTENER = createListener("org.jboss.capedwarf.shared.servlet.CapedwarfListener");
+        WEB_SOCKET_LISTENER = createListener("org.jboss.capedwarf.channel.transport.WebSocketsEndpointListener");
 
         GAE_FILTER = createFilter(GAE_FILTER_NAME, "org.jboss.capedwarf.appidentity.GAEFilter");
         SINGLE_THREAD_FILTER = createSingleThreadFilter(1); // TODO - per deployment #
@@ -145,6 +147,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
             getListeners(webMetaData).add(0, GAE_LISTENER);
             getListeners(webMetaData).add(CDI_LISTENER);
             getListeners(webMetaData).add(CDAS_LISTENER);
+            getListeners(webMetaData).add(WEB_SOCKET_LISTENER);
 
             getFilterMappings(webMetaData).add(0, GAE_FILTER_MAPPING);
 

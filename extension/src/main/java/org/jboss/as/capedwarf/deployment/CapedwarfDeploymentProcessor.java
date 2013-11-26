@@ -85,32 +85,34 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier MARSHALLING_RIVER = ModuleIdentifier.create("org.jboss.marshalling.river");
     private static final ModuleIdentifier JACKSON_CORE_ASL = ModuleIdentifier.create("org.codehaus.jackson.jackson-core-asl");
     private static final ModuleIdentifier JACKSON_MAPPER_ASL = ModuleIdentifier.create("org.codehaus.jackson.jackson-mapper-asl");
+    private static final ModuleIdentifier WEB_SOCKET = ModuleIdentifier.create("javax.websocket.api");
     // inline this module deps, if running with bundled
     private static final ModuleIdentifier[] INLINE = {
-            MODULES,
-            TX,
-            ACTIVATION,
-            MAIL,
-            JAVASSIST,
-            JGROUPS,
-            INFINISPAN_QUERY,
-            HIBERNATE_SEARCH,
-            LUCENE,
-            HTTP_COMPONENTS,
-            PICKETLINK,
-            PICKETLINK_SOCIAL,
-            GUAVA,
-            SMACK,
-            BOUNCY_CASTLE_MAIL,
-            BOUNCY_CASTLE_PKIX,
-            BOUNCY_CASTLE_PROV,
-            COMMON_CORE,
-            UNDERTOW_CORE,
-            UNDERTOW_SERVLET,
-            MARSHALLING,
-            MARSHALLING_RIVER,
-            JACKSON_CORE_ASL,
-            JACKSON_MAPPER_ASL
+        MODULES,
+        TX,
+        ACTIVATION,
+        MAIL,
+        JAVASSIST,
+        JGROUPS,
+        INFINISPAN_QUERY,
+        HIBERNATE_SEARCH,
+        LUCENE,
+        HTTP_COMPONENTS,
+        PICKETLINK,
+        PICKETLINK_SOCIAL,
+        GUAVA,
+        SMACK,
+        BOUNCY_CASTLE_MAIL,
+        BOUNCY_CASTLE_PKIX,
+        BOUNCY_CASTLE_PROV,
+        COMMON_CORE,
+        UNDERTOW_CORE,
+        UNDERTOW_SERVLET,
+        MARSHALLING,
+        MARSHALLING_RIVER,
+        JACKSON_CORE_ASL,
+        JACKSON_MAPPER_ASL,
+        WEB_SOCKET
     };
 
     private static final FilenameFilter JARS_SDK = new FilenameFilter() {
