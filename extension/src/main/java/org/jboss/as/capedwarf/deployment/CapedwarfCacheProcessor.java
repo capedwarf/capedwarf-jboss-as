@@ -89,8 +89,8 @@ public class CapedwarfCacheProcessor extends CapedwarfTopDeploymentUnitProcessor
         List<IndexesXml> indexes = unit.getAttachmentList(CapedwarfAttachments.INDEXES_LIST);
         createBuilder(serviceTarget, CacheName.DEFAULT, appId, new DatastoreConfigurationCallback(configs.get(CacheName.DEFAULT), appId, classLoader, indexes));
 
-        // search, ps, tasks, log cache
-        for (CacheName cn : Arrays.asList(CacheName.SEARCH, CacheName.PROSPECTIVE_SEARCH, CacheName.TASKS, CacheName.LOGS)) {
+        // search, ps, tasks, log, channel cache
+        for (CacheName cn : Arrays.asList(CacheName.SEARCH, CacheName.PROSPECTIVE_SEARCH, CacheName.TASKS, CacheName.LOGS, CacheName.CHANNEL)) {
             final ConfigurationCallback callback = new BasicConfigurationCallback(configs.get(cn), appId, classLoader);
             createBuilder(serviceTarget, cn, appId, callback);
         }

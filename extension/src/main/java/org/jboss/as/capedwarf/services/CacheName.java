@@ -38,7 +38,8 @@ public enum CacheName {
     METADATA,
     MEMCACHE,
     DIST,
-    DATASTORE_VERSIONS;
+    DATASTORE_VERSIONS,
+    CHANNEL;
 
     public String getName() {
         return name().toLowerCase();

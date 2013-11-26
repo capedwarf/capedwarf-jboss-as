@@ -69,5 +69,6 @@
         <module name="org.codehaus.jackson.jackson-mapper-asl"/>
         <module name="io.undertow.core"/>
         <module name="io.undertow.servlet"/>
+        <module name="javax.websocket.api"/>
     </dependencies>
 </module>

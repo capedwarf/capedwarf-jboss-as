@@ -77,7 +77,6 @@ public abstract class IndexableConfigurationCallback extends AbstractConfigurati
         // do we store as binary - e.g. Modules
         final StoreAsBinaryConfigurationBuilder storeAsBinaryConfigurationBuilder = builder.storeAsBinary();
         storeAsBinaryConfigurationBuilder.enabled(config.storeAsBinary());
-        storeAsBinaryConfigurationBuilder.defensive(config.defensive());
 
         return mapping;
     }

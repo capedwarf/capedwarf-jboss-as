@@ -68,6 +68,15 @@ public class CacheConfigs {
         }
     }
 
+    /**
+     * DEFAULT = 3 * 1 - 1 = 2
+     * SEARCH = 3 * (-1) + 1 = -2
+     * PS = 3 * (-1) - 0 = -3
+     * TASKS = 3 * 1 - 0 = 3
+     * LOGS = 3 * 1 - 2 = 1
+     * CHANNEL = 3 * (-1) + 2 = -1
+     */
+
     public static CacheConfig createDefaultConfig() {
         CacheConfigImpl config = new CacheConfigImpl(CacheName.DEFAULT, 1);
         config.getIndexing().setOffset(-1);
@@ -90,6 +99,12 @@ public class CacheConfigs {
 
     public static CacheConfig createLogsConfig() {
         CacheConfigImpl config = new CacheConfigImpl(CacheName.LOGS, 1);
+        config.getIndexing().setOffset(-2);
+        return config;
+    }
+
+    public static CacheConfig createChannelConfig() {
+        CacheConfigImpl config = new CacheConfigImpl(CacheName.CHANNEL, -1);
         config.getIndexing().setOffset(2);
         return config;
     }
