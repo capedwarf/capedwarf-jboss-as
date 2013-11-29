@@ -57,6 +57,8 @@
         <module name="org.apache.httpcomponents"/>
         <module name="org.picketlink"/>
         <module name="org.picketlink.social"/>
+        <module name="org.jboss.resteasy.resteasy-client"/>
+        <module name="org.jboss.resteasy.resteasy-jackson-provider"/>
         <module name="com.google.appengine"/>
         <module name="com.google.appengine.endpoints"/>
         <module name="com.google.guava"/>
