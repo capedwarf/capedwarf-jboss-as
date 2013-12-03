@@ -176,7 +176,10 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
             if (adminTGT != null) {
                 getSecurityConstraints(webMetaData).add(ADMIN_SERVLET_CONSTRAINT);
                 getSecurityRoles(webMetaData).add(ADMIN_SERVLET_ROLE);
-                webMetaData.setLoginConfig(ADMIN_SERVLET_CONFIG);
+                LoginConfigMetaData lcmd = webMetaData.getLoginConfig();
+                if (lcmd == null) {
+                    webMetaData.setLoginConfig(ADMIN_SERVLET_CONFIG);
+                }
             }
         }
     }
