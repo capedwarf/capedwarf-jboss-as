@@ -130,7 +130,7 @@
                 <stateless>
                     <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
                 </stateless>
-                <stateful default-access-timeout="5000" cache-ref="simple" clustered-cache-ref="clustered" passivation-disabled-cache-ref="simple"/>
+                <stateful default-access-timeout="5000" cache-ref="simple" passivation-disabled-cache-ref="simple"/>
                 <singleton default-access-timeout="5000"/>
             </session-bean>
             <mdb>
@@ -207,7 +207,7 @@
                     <eviction strategy="NONE"/>
                 </replicated-cache>
             </cache-container>
-            <cache-container name="capedwarf" default-cache="default">
+            <cache-container name="capedwarf" default-cache="default" module="org.infinispan.query">
                 <transport lock-timeout="60000"/>
                 <distributed-cache name="default" mode="SYNC">
                     <transaction mode="NON_XA"/>
@@ -404,7 +404,7 @@
                 <smtp-server outbound-socket-binding-ref="mail-smtp"/>
             </mail-session>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:messaging:1.4">
+        <subsystem xmlns="urn:jboss:domain:messaging:2.0">
             <hornetq-server>
                 <jmx-management-enabled>true</jmx-management-enabled>
                 <cluster-password>${jboss.messaging.cluster.password:CHANGE ME!!}</cluster-password>
@@ -416,7 +416,6 @@
                     <netty-connector name="netty-throughput" socket-binding="messaging-throughput">
                         <param key="batch-delay" value="50"/>
                     </netty-connector>
-                    <servlet-connector name="servlet" socket-binding="http" host="default-host"/>
                     <in-vm-connector name="in-vm" server-id="0"/>
                 </connectors>
                 <acceptors>
@@ -463,7 +462,7 @@
                         <redelivery-delay>0</redelivery-delay>
                         <redistribution-delay>1000</redistribution-delay>
                         <max-size-bytes>10485760</max-size-bytes>
-                        <address-full-policy>BLOCK</address-full-policy>
+                        <address-full-policy>PAGE</address-full-policy>
                         <page-size-bytes>2097152</page-size-bytes>
                         <message-counter-history-day-limit>10</message-counter-history-day-limit>
                     </address-setting>
@@ -474,17 +473,7 @@
                             <connector-ref connector-name="in-vm"/>
                         </connectors>
                         <entries>
-                            <!-- Global JNDI entry used to provide a default JMS Connection factory to EE application -->
-                            <entry name="java:jboss/DefaultJMSConnectionFactory"/>
                             <entry name="java:/ConnectionFactory"/>
-                        </entries>
-                    </connection-factory>
-                    <connection-factory name="ServletConnectionFactory">
-                        <connectors>
-                            <connector-ref connector-name="servlet"/>
-                        </connectors>
-                        <entries>
-                            <entry name="java:jboss/exported/jms/ServletConnectionFactory"/>
                         </entries>
                     </connection-factory>
                     <connection-factory name="RemoteConnectionFactory">
@@ -507,6 +496,8 @@
                         </connectors>
                         <entries>
                             <entry name="java:/JmsXA"/>
+                            <!-- Global JNDI entry used to provide a default JMS Connection factory to EE application -->
+                            <entry name="java:jboss/DefaultJMSConnectionFactory"/>
                         </entries>
                     </pooled-connection-factory>
                 </jms-connection-factories>

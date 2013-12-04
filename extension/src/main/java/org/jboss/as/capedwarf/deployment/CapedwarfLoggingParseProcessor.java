@@ -34,14 +34,14 @@ import java.util.logging.Handler;
 
 import org.jboss.as.capedwarf.utils.Constants;
 import org.jboss.as.logging.CommonAttributes;
-import org.jboss.as.logging.LoggingDeploymentUnitProcessor;
 import org.jboss.as.logging.LoggingExtension;
+import org.jboss.as.logging.deployments.LoggingConfigDeploymentProcessor;
+import org.jboss.as.logging.logmanager.WildFlyLogContextSelector;
 import org.jboss.as.logging.stdio.LogContextStdioContextSelector;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
-import org.jboss.logmanager.ClassLoaderLogContextSelector;
 import org.jboss.logmanager.Level;
 import org.jboss.logmanager.LogContext;
 import org.jboss.logmanager.Logger;
@@ -88,15 +88,15 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         excludedLoggers.add("org.picketlink");
     }
 
-    private ClassLoaderLogContextSelector contextSelector;
+    private WildFlyLogContextSelector contextSelector;
 
-    protected synchronized ClassLoaderLogContextSelector getContextSelector() {
+    protected synchronized WildFlyLogContextSelector getContextSelector() {
         if (contextSelector == null) {
             try {
                 Class<LoggingExtension> cle = LoggingExtension.class;
                 Field cs = cle.getDeclaredField("CONTEXT_SELECTOR");
                 cs.setAccessible(true);
-                contextSelector = (ClassLoaderLogContextSelector) cs.get(null);
+                contextSelector = (WildFlyLogContextSelector) cs.get(null);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -169,7 +169,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
             // register log context
             getContextSelector().registerLogContext(module.getClassLoader(), logContext);
             // Add as attachment / marker
-            unit.putAttachment(LoggingDeploymentUnitProcessor.LOG_CONTEXT_KEY, logContext);
+            unit.putAttachment(LoggingConfigDeploymentProcessor.LOG_CONTEXT_KEY, logContext);
         }
     }
 
