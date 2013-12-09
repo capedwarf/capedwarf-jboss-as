@@ -156,7 +156,7 @@
                     <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                 </data-stores>
             </timer-service>
-            <remote connector-ref="remoting-connector" thread-pool-name="default"/>
+            <remote connector-ref="http-remoting-connector" thread-pool-name="default"/>
             <thread-pools>
                 <thread-pool name="default">
                     <max-threads count="10"/>
@@ -207,7 +207,7 @@
                     <eviction strategy="NONE"/>
                 </replicated-cache>
             </cache-container>
-            <cache-container name="capedwarf" default-cache="default">
+            <cache-container name="capedwarf" default-cache="default" module="org.infinispan.query">
                 <transport lock-timeout="60000"/>
                 <distributed-cache name="default" mode="SYNC">
                     <transaction mode="NON_XA"/>
@@ -512,8 +512,8 @@
         <subsystem xmlns="urn:jboss:domain:naming:2.0">
             <remote-naming/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:remoting:1.1">
-            <connector name="remoting-connector" socket-binding="remoting" security-realm="ApplicationRealm"/>
+        <subsystem xmlns="urn:jboss:domain:remoting:2.0">
+            <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:security:1.2">
             <security-domains>
