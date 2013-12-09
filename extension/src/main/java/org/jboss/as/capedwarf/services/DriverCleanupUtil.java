@@ -22,41 +22,23 @@
 
 package org.jboss.as.capedwarf.services;
 
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.jboss.capedwarf.shared.reflection.ReflectionUtils;
 
 /**
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class DriverCleanupHelper {
-    private static final Logger log = Logger.getLogger(DriverCleanupHelper.class.getName());
+public class DriverCleanupUtil {
+    private static final Logger log = Logger.getLogger(DriverCleanupUtil.class.getName());
 
     public static void cleanup(ClassLoader deploymentClassLoader) {
-        final List<Driver> toUnregister = new ArrayList<>();
-        Enumeration<Driver> drivers = DriverManager.getDrivers();
-        while (drivers.hasMoreElements()) {
-            Driver driver = drivers.nextElement();
-            Class<? extends Driver> clazz = driver.getClass();
-            // make sure it's from our deployment
-            if (deploymentClassLoader == clazz.getClassLoader()) {
-                String className = clazz.getName();
-                if ("com.google.appengine.api.rdbms.AppEngineDriver".equals(className) || "com.mysql.jdbc.GoogleDriver".equals(className)) {
-                    toUnregister.add(driver);
-                }
-            }
-        }
-        for (Driver driver : toUnregister) {
-            try {
-                DriverManager.deregisterDriver(driver);
-            } catch (SQLException e) {
-                log.log(Level.WARNING, "Unable to deregister Driver automatically.", e);
-            }
+        try {
+            Class<?> clazz = deploymentClassLoader.loadClass("org.jboss.capedwarf.sql.DriverCleanupHelper");
+            ReflectionUtils.invokeStaticMethod(clazz, "cleanup", ClassLoader.class, deploymentClassLoader);
+        } catch (Exception e) {
+            log.log(Level.WARNING, String.format("Error invoking Driver cleanup: %s", e));
         }
     }
 }

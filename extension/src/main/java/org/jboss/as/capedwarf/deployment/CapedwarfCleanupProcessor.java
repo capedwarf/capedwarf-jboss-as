@@ -22,7 +22,7 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import org.jboss.as.capedwarf.services.DriverCleanupHelper;
+import org.jboss.as.capedwarf.services.DriverCleanupUtil;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -42,7 +42,7 @@ public class CapedwarfCleanupProcessor extends CapedwarfTopDeploymentUnitProcess
     protected void doUndeploy(DeploymentUnit unit) {
         final ClassLoader cl = unit.getAttachment(Attachments.MODULE).getClassLoader();
 
-        DriverCleanupHelper.cleanup(cl);
+        DriverCleanupUtil.cleanup(cl);
 
         final String appId = CapedwarfDeploymentMarker.getAppId(unit);
         if (appId != null) {
