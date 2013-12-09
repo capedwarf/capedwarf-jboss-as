@@ -22,6 +22,8 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import org.jboss.as.capedwarf.services.DriverCleanupHelper;
+import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -33,15 +35,15 @@ import org.jboss.capedwarf.shared.components.ComponentRegistry;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfCleanupProcessor extends CapedwarfTopDeploymentUnitProcessor {
-    @Override
-    public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-    }
-
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
     }
 
     @Override
     protected void doUndeploy(DeploymentUnit unit) {
+        final ClassLoader cl = unit.getAttachment(Attachments.MODULE).getClassLoader();
+
+        DriverCleanupHelper.cleanup(cl);
+
         final String appId = CapedwarfDeploymentMarker.getAppId(unit);
         if (appId != null) {
             ComponentRegistry.getInstance().clearComponents(appId);
