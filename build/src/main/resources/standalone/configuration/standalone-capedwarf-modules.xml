@@ -207,7 +207,7 @@
                     <eviction strategy="NONE"/>
                 </replicated-cache>
             </cache-container>
-            <cache-container name="capedwarf" default-cache="default" module="org.infinispan.query">
+            <cache-container name="capedwarf" default-cache="default" module="org.infinispan.query" statistics="true">
                 <transport lock-timeout="60000"/>
                 <distributed-cache name="default" mode="SYNC">
                     <transaction mode="NON_XA"/>
@@ -241,8 +241,8 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                 </replicated-cache>
-                <replicated-cache name="memcache" mode="SYNC">
-                    <transaction mode="NON_XA" locking="PESSIMISTIC"/>
+                <replicated-cache name="memcache" mode="SYNC" statistics="true">
+                <transaction mode="NON_XA" locking="PESSIMISTIC"/>
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <!-- no file-store as explicitly no persistence -->
                 </replicated-cache>
