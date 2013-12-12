@@ -86,6 +86,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         excludedLoggers.add("org.jgroups");
         excludedLoggers.add("org.picketbox");
         excludedLoggers.add("org.picketlink");
+        excludedLoggers.add("io.undertow");
     }
 
     private WildFlyLogContextSelector contextSelector;
