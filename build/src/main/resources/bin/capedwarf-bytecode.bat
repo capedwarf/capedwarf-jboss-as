@@ -81,4 +81,3 @@ rem set "JAVA_OPTS=%JAVA_OPTS% -Djboss.server.config.user.dir=..\standalone\conf
      %*
 
 :END
-if "x%NOPAUSE%" == "x" pause
