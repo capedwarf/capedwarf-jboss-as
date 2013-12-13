@@ -353,6 +353,11 @@
 
         <dependency>
             <groupId>org.jboss.capedwarf.blue</groupId>
+            <artifactId>capedwarf-gql4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.capedwarf.blue</groupId>
             <artifactId>capedwarf-images</artifactId>
         </dependency>
 
@@ -489,6 +494,11 @@
         <dependency>
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-coverageio</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr-runtime</artifactId>
         </dependency>
 
     </dependencies>

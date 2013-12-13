@@ -96,6 +96,7 @@
         <version.net.sourceforge.nekohtml>1.9.10</version.net.sourceforge.nekohtml>
         <version.com.google.code.guice>2.0</version.com.google.code.guice>
         <version.rhino.js>1.7R2</version.rhino.js>
+        <version.antlr>3.1</version.antlr>
 
         <!-- Compiler configuration -->
         <maven.compiler.source>1.7</maven.compiler.source>
@@ -523,6 +524,12 @@
                 <version>${version.javassist}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr-runtime</artifactId>
+                <version>${version.antlr}</version>
+            </dependency>
+
             <!-- CapeDwarf & GAE -->
 
             <dependency>
@@ -606,6 +613,12 @@
             <dependency>
                 <groupId>org.jboss.capedwarf.blue</groupId>
                 <artifactId>capedwarf-files</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-gql4j</artifactId>
                 <version>${version.org.jboss.capedwarf}</version>
             </dependency>
 

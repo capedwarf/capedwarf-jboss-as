@@ -63,6 +63,7 @@
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-endpoints"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-environment"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-files"/>
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-gql4j"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-images"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-log"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-mail"/>
@@ -152,6 +153,10 @@
 
         <module-def name="org.picketlink.social">
             <maven-resource group="org.picketlink" artifact="picketlink-social"/>
+        </module-def>
+
+        <module-def name="org.antlr" slot="3">
+            <maven-resource group="org.antlr" artifact="antlr-runtime"/>
         </module-def>
 
         <!-- module-def name="org.apache.avro">
