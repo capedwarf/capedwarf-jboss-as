@@ -13,4 +13,8 @@ if not exist %DIRNAME%..\modules\com\google\appengine\main\appengine-api-1.0-sdk
 	%DIRNAME%capedwarf-bytecode.bat
 )
 
-%DIRNAME%standalone.bat -c standalone-capedwarf.xml
+if "%1" == "" (
+  %DIRNAME%standalone.bat -c standalone-capedwarf.xml
+) else (
+  %DIRNAME%standalone.bat -c standalone-capedwarf.xml -DrootDeployment=%1
+)
