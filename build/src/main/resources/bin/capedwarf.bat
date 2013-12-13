@@ -10,7 +10,11 @@ if "%OS%" == "Windows_NT" (
 
 rem check if we need to run bytecode transformation
 if not exist %DIRNAME%..\modules\com\google\appengine\main\appengine-api-1.0-sdk*-capedwarf* (
-	%DIRNAME%capedwarf-bytecode.bat
+  call %DIRNAME%capedwarf-bytecode.bat
 )
 
-%DIRNAME%standalone.bat -c standalone-capedwarf.xml
+if "%1" == "" (
+  %DIRNAME%standalone.bat -c standalone-capedwarf.xml
+) else (
+  cmd /c "cd %1 && %DIRNAME%standalone.bat -c standalone-capedwarf.xml -DrootDeployment=%1"
+)

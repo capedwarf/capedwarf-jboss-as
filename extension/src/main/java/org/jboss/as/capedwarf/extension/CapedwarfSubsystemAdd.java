@@ -58,7 +58,14 @@ import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.OperationStepHandler;
+import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.ProcessType;
 import org.jboss.as.controller.ServiceVerificationHandler;
+import org.jboss.as.controller.operations.common.Util;
+import org.jboss.as.controller.registry.ImmutableManagementResourceRegistration;
+import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.naming.ManagedReferenceFactory;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.server.AbstractDeploymentChainStep;
@@ -86,6 +93,15 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.vfs.TempDir;
 import org.jboss.vfs.VFSUtils;
 
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ARCHIVE;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CONTENT;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DEPLOYMENT;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ENABLED;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PATH;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PERSISTENT;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RUNTIME_NAME;
+
 /**
  * Handler responsible for adding the subsystem resource to the model
  *
@@ -98,6 +114,38 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
     static final CapedwarfSubsystemAdd INSTANCE = new CapedwarfSubsystemAdd();
 
     private CapedwarfSubsystemAdd() {
+    }
+
+    @Override
+    protected void populateModel(OperationContext context, ModelNode operation, Resource resource) throws OperationFailedException {
+        super.populateModel(context, operation, resource);
+
+        if (context.getProcessType() == ProcessType.STANDALONE_SERVER) {
+            String rootDeployment = System.getProperty("rootDeployment");
+            if (rootDeployment != null) {
+                if (requiresRuntime(context)) {  // only add the step if we are going to actually deploy the war
+                    PathAddress deploymentAddress = PathAddress.pathAddress(PathElement.pathElement(DEPLOYMENT, rootDeployment));
+                    ModelNode op = Util.createOperation(ADD, deploymentAddress);
+                    op.get(ENABLED).set(true);
+                    op.get(PERSISTENT).set(false);
+                    op.get(RUNTIME_NAME).set("ROOT.war");
+                    op.get(CONTENT).add(getContentItem(rootDeployment));
+
+                    ImmutableManagementResourceRegistration rootResourceRegistration = context.getRootResourceRegistration();
+                    OperationStepHandler handler = rootResourceRegistration.getOperationHandler(deploymentAddress, ADD);
+
+                    context.addStep(op, handler, OperationContext.Stage.MODEL);
+                }
+            }
+        }
+    }
+
+    private ModelNode getContentItem(String explodedWar)  {
+        ModelNode contentItem = new ModelNode();
+        File war = new File(explodedWar);
+        contentItem.get(PATH).set(war.getAbsolutePath());
+        contentItem.get(ARCHIVE).set(war.isFile());
+        return contentItem;
     }
 
     /**
