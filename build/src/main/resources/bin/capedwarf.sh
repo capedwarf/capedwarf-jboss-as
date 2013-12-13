@@ -8,4 +8,8 @@ if ! ls ${DIRNAME}/../modules/com/google/appengine/main/appengine-api-1.0-sdk-*-
     ${DIRNAME}/capedwarf-bytecode.sh
 fi
 
-${DIRNAME}/standalone.sh -c standalone-capedwarf.xml
+if [ -z "$1" ] then
+    ${DIRNAME}/standalone.sh -c standalone-capedwarf.xml
+else
+    ${DIRNAME}/standalone.sh -c standalone-capedwarf.xml -DrootDeployment=$1
+fi
