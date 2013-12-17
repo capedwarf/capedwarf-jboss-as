@@ -49,7 +49,6 @@
         <module name="org.jgroups"/>
         <module name="org.jboss.common-core"/>
         <module name="org.jboss.logmanager"/>
-        <module name="org.jboss.resteasy.resteasy-jaxrs"/>
         <module name="org.infinispan"/>
         <module name="org.infinispan.query"/>
         <module name="org.hibernate.search"/>
@@ -57,7 +56,7 @@
         <module name="org.apache.httpcomponents"/>
         <module name="org.picketlink"/>
         <module name="org.picketlink.social"/>
-        <module name="org.jboss.resteasy.resteasy-client"/>
+        <module name="org.jboss.resteasy.resteasy-jaxrs"/>
         <module name="org.jboss.resteasy.resteasy-jackson-provider"/>
         <module name="com.google.appengine"/>
         <module name="com.google.appengine.endpoints"/>
