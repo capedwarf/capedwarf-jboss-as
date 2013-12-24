@@ -1,4 +1,4 @@
 capedwarf-jboss-as
 ==================
 
-JBossAS integration with CapeDwarf Blue
+WildFly integration with [CapeDwarf Blue](https://github.com/capedwarf/capedwarf-blue)
