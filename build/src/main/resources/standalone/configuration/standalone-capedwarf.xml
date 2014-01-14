@@ -135,6 +135,7 @@
             </session-bean>
             <mdb>
                 <resource-adapter-ref resource-adapter-name="hornetq-ra"/>
+                <resource-adapter-ref resource-adapter-name="org.wildfly.mail.ra:main"/>
                 <bean-instance-pool-ref pool-name="mdb-strict-max-pool"/>
             </mdb>
             <pools>
@@ -514,6 +515,13 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:remoting:2.0">
             <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:resource-adapters:2.0">
+            <resource-adapters>
+                <resource-adapter id="org.wildfly.mail.ra:main">
+                    <module slot="main" id="org.wildfly.mail.ra"/>
+                </resource-adapter>
+            </resource-adapters>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:security:1.2">
             <security-domains>

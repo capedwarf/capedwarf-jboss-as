@@ -501,6 +501,16 @@
             <artifactId>antlr-runtime</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>mail-ra-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>mail-ra-impl</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

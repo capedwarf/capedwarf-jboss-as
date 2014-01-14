@@ -1,0 +1,103 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2013, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.jboss.as.capedwarf.deployment;
+
+import org.jboss.as.ejb3.deployment.EjbDeploymentAttachmentKeys;
+import org.jboss.as.server.deployment.DeploymentPhaseContext;
+import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.as.server.deployment.DeploymentUnitProcessor;
+import org.jboss.capedwarf.shared.config.AppEngineWebXml;
+import org.jboss.capedwarf.shared.config.CapedwarfConfiguration;
+import org.jboss.capedwarf.shared.config.InboundMailAccount;
+import org.jboss.capedwarf.shared.config.InboundServices;
+import org.jboss.metadata.ejb.jboss.ejb3.JBossGenericBeanMetaData;
+import org.jboss.metadata.ejb.spec.ActivationConfigMetaData;
+import org.jboss.metadata.ejb.spec.ActivationConfigPropertiesMetaData;
+import org.jboss.metadata.ejb.spec.ActivationConfigPropertyMetaData;
+import org.jboss.metadata.ejb.spec.EjbJarMetaData;
+import org.jboss.metadata.ejb.spec.EjbJarVersion;
+import org.jboss.metadata.ejb.spec.EjbType;
+import org.jboss.metadata.ejb.spec.EnterpriseBeansMetaData;
+
+/**
+ * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
+ */
+public class CapedwarfInboundMailProcessor implements DeploymentUnitProcessor {
+
+    @Override
+    public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
+        DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
+
+        AppEngineWebXml appEngineWebXml = deploymentUnit.getAttachment(CapedwarfAttachments.APP_ENGINE_WEB_XML);
+        if (appEngineWebXml.isInboundServiceEnabled(InboundServices.Service.mail)) {
+            CapedwarfConfiguration config = deploymentUnit.getAttachment(CapedwarfAttachments.CAPEDWARF_WEB_XML);
+            for (InboundMailAccount account : config.getInboundMailAccounts()) {
+                configureAccount(deploymentUnit, account);
+            }
+        }
+    }
+
+    private void configureAccount(DeploymentUnit deploymentUnit, InboundMailAccount account) {
+        EjbJarMetaData ejbJarMetaData = deploymentUnit.getAttachment(EjbDeploymentAttachmentKeys.EJB_JAR_METADATA);
+        if (ejbJarMetaData == null) {
+            ejbJarMetaData = new EjbJarMetaData(EjbJarVersion.EJB_3_2);
+            deploymentUnit.putAttachment(EjbDeploymentAttachmentKeys.EJB_JAR_METADATA, ejbJarMetaData);
+        }
+        if (ejbJarMetaData.getEnterpriseBeans() == null) {
+            ejbJarMetaData.setEnterpriseBeans(new EnterpriseBeansMetaData());
+        }
+        ejbJarMetaData.getEnterpriseBeans().add(createMdbMetaData(account));
+    }
+
+    private JBossGenericBeanMetaData createMdbMetaData(InboundMailAccount account) {
+        JBossGenericBeanMetaData mdb = new JBossGenericBeanMetaData();
+        mdb.setName("InboundMailMDB_" + account.getHost() + "_" + account.getUser());
+        mdb.setEjbType(EjbType.MESSAGE_DRIVEN);
+        mdb.setEjbClass("org.jboss.capedwarf.mail.CapedwarfInboundMailMDB");
+        mdb.setMessagingType("org.wildfly.mail.ra.MailListener");
+
+        ActivationConfigPropertiesMetaData properties = new ActivationConfigPropertiesMetaData();
+        properties.add(createConfigProperty("mailServer", account.getHost()));
+        properties.add(createConfigProperty("userName", account.getUser()));
+        properties.add(createConfigProperty("password", account.getPassword()));
+        properties.add(createConfigProperty("storeProtocol", account.getProtocol()));
+        properties.add(createConfigProperty("mailFolder", account.getFolder()));
+        properties.add(createConfigProperty("pollingInterval", String.valueOf(account.getPollingInterval())));
+
+        ActivationConfigMetaData activationConfig = new ActivationConfigMetaData();
+        activationConfig.setActivationConfigProperties(properties);
+        mdb.setActivationConfig(activationConfig);
+        return mdb;
+    }
+
+    private ActivationConfigPropertyMetaData createConfigProperty(String name, String value) {
+        ActivationConfigPropertyMetaData configProperty = new ActivationConfigPropertyMetaData();
+        configProperty.setActivationConfigPropertyName(name);
+        configProperty.setValue(value);
+        return configProperty;
+    }
+
+    @Override
+    public void undeploy(DeploymentUnit context) {
+    }
+}
