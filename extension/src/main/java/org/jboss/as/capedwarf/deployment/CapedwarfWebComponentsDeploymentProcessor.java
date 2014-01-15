@@ -44,6 +44,7 @@ import org.jboss.metadata.web.spec.WebResourceCollectionsMetaData;
  * @author <a href="mailto:marko.luksa@gmail.com">Marko Luksa</a>
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  * @author <a href="mailto:mlazar@redhat.com">Matej Lazar</a>
+ * @author <a href="mailto:gregor.sfiligoj@gmail.com">Gregor Sfiligoj</a>
  */
 public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModificationDeploymentProcessor {
 
@@ -60,12 +61,16 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String UPLOAD_SERVLET_NAME = "UploadServlet";
     private static final String IMAGE_SERVLET_NAME = "ImageServlet";
     private static final String DEFERRED_TASK_SERVLET_NAME = "DeferredTaskServlet";
+    private static final String ENDPOINT_STATIC_SERVLET_NAME = "EndpointsStaticServlet";
+    private static final String ENDPOINT_RPC_SERVLET_NAME = "EndpointsRpcServlet";
     private static final String ENDPOINT_REST_SERVLET_NAME = "EndpointsRestServlet";
     private static final String[] ADMIN_SERVLET_URL_MAPPING = {"/_ah/admin/*", "/_ah/admin/"};
     private static final String[] AUTH_SERVLET_URL_MAPPING = {"/_ah/login/*", "/_ah/login/", "/_ah/logout/*", "/_ah/logout/", "/_ah/openIDCallBack"};
     private static final String[] CHANNEL_SERVLET_URL_MAPPING = {"/_ah/channel/*", "/_ah/channel/"};
     private static final String[] UPLOAD_SERVLET_URL_MAPPING = {"/_ah/blobstore/upload"};
     private static final String[] IMAGE_SERVLET_URL_MAPPING = {"/_ah/image/*"};
+    private static final String[] ENDPOINTS_STATIC_URL_MAPPING = {"/_ah/api/static/*"};
+    private static final String[] ENDPOINTS_RPC_URL_MAPPING = {"/_ah/api/rpc"};
     private static final String[] ENDPOINTS_REST_URL_MAPPING = {"/_ah/api/*"};
     private static final String[] DEFERRED_TASK_SERVLET_URL_MAPPING = {"/_ah/queue/__deferred__"};
     private static final String CAPEDWARF_TGT = "CAPEDWARF";
@@ -84,6 +89,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ServletMetaData UPLOAD_SERVLET;
     private final ServletMetaData IMAGE_SERVLET;
     private final ServletMetaData DEFERRED_TASK_SERVLET;
+    private final ServletMetaData ENDPOINT_STATIC_SERVLET;
+    private final ServletMetaData ENDPOINT_RPC_SERVLET;
     private final ServletMetaData ENDPOINT_REST_SERVLET;
     private final ServletMappingMetaData AUTH_SERVLET_MAPPING;
     private final ServletMappingMetaData ADMIN_SERVLET_MAPPING;
@@ -91,6 +98,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ServletMappingMetaData UPLOAD_SERVLET_MAPPING;
     private final ServletMappingMetaData IMAGE_SERVLET_MAPPING;
     private final ServletMappingMetaData DEFERRED_TASK_SERVLET_MAPPING;
+    private final ServletMappingMetaData ENDPOINT_STATIC_SERVLET_MAPPING;
+    private final ServletMappingMetaData ENDPOINT_RPC_SERVLET_MAPPING;
     private final ServletMappingMetaData ENDPOINT_REST_SERVLET_MAPPING;
     private final ResourceReferenceMetaData INFINISPAN_REF;
     private final SecurityConstraintMetaData ADMIN_SERVLET_CONSTRAINT;
@@ -118,6 +127,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         UPLOAD_SERVLET = createUploadServlet();
         IMAGE_SERVLET = createServlet(IMAGE_SERVLET_NAME, "org.jboss.capedwarf.images.ImageServlet");
         DEFERRED_TASK_SERVLET = createServlet(DEFERRED_TASK_SERVLET_NAME, "com.google.apphosting.utils.servlet.DeferredTaskServlet");
+        ENDPOINT_STATIC_SERVLET = createServlet(ENDPOINT_STATIC_SERVLET_NAME, "com.google.api.server.spi.tools.devserver.StaticServlet");
+        ENDPOINT_RPC_SERVLET = createServlet(ENDPOINT_RPC_SERVLET_NAME, "com.google.api.server.spi.tools.devserver.RpcApiServlet");
         ENDPOINT_REST_SERVLET = createServlet(ENDPOINT_REST_SERVLET_NAME, "com.google.api.server.spi.tools.devserver.RestApiServlet");
 
         AUTH_SERVLET_MAPPING = createServletMapping(AUTH_SERVLET_NAME, AUTH_SERVLET_URL_MAPPING);
@@ -126,6 +137,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         UPLOAD_SERVLET_MAPPING = createServletMapping(UPLOAD_SERVLET_NAME, UPLOAD_SERVLET_URL_MAPPING);
         IMAGE_SERVLET_MAPPING = createServletMapping(IMAGE_SERVLET_NAME, IMAGE_SERVLET_URL_MAPPING);
         DEFERRED_TASK_SERVLET_MAPPING = createServletMapping(DEFERRED_TASK_SERVLET_NAME, DEFERRED_TASK_SERVLET_URL_MAPPING);
+        ENDPOINT_STATIC_SERVLET_MAPPING = createServletMapping(ENDPOINT_STATIC_SERVLET_NAME, ENDPOINTS_STATIC_URL_MAPPING);
+        ENDPOINT_RPC_SERVLET_MAPPING = createServletMapping(ENDPOINT_RPC_SERVLET_NAME, ENDPOINTS_RPC_URL_MAPPING);
         ENDPOINT_REST_SERVLET_MAPPING = createServletMapping(ENDPOINT_REST_SERVLET_NAME, ENDPOINTS_REST_URL_MAPPING);
 
         INFINISPAN_REF = createInfinispanRef();
@@ -229,6 +242,10 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     }
 
     private void handleEndpoints(WebMetaData webMetaData) {
+        getServlets(webMetaData).add(ENDPOINT_STATIC_SERVLET);
+        getServletMappings(webMetaData).add(ENDPOINT_STATIC_SERVLET_MAPPING);
+        getServlets(webMetaData).add(ENDPOINT_RPC_SERVLET);
+        getServletMappings(webMetaData).add(ENDPOINT_RPC_SERVLET_MAPPING);
         getServlets(webMetaData).add(ENDPOINT_REST_SERVLET);
         getServletMappings(webMetaData).add(ENDPOINT_REST_SERVLET_MAPPING);
         // make SystemServiceServlet non-restricted
