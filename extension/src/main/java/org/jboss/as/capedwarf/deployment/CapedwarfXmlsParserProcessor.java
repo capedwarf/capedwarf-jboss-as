@@ -30,10 +30,12 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
+import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.capedwarf.shared.components.MapKey;
 import org.jboss.capedwarf.shared.components.Slot;
 import org.jboss.capedwarf.shared.config.AppEngineWebXml;
 import org.jboss.capedwarf.shared.config.AppEngineWebXmlParser;
+import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
 import org.jboss.capedwarf.shared.config.BackendsXml;
 import org.jboss.capedwarf.shared.config.BackendsXmlParser;
 import org.jboss.capedwarf.shared.config.CapedwarfConfiguration;
@@ -113,6 +115,17 @@ public class CapedwarfXmlsParserProcessor extends CapedwarfWebDeploymentUnitProc
             } finally {
                 safeClose(indexesIs);
             }
+
+            ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration(
+                unit.getAttachment(CapedwarfAttachments.APP_ENGINE_WEB_XML),
+                unit.getAttachment(CapedwarfAttachments.CAPEDWARF_WEB_XML),
+                unit.getAttachment(CapedwarfAttachments.QUEUE_XML),
+                unit.getAttachment(CapedwarfAttachments.BACKENDS_XML),
+                unit.getAttachment(CapedwarfAttachments.INDEXES_XML));
+            unit.putAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION, applicationConfiguration);
+
+            ComponentRegistry.getInstance().setComponent(Keys.APPLICATION_CONFIGURATION, applicationConfiguration);
+
         } catch (DeploymentUnitProcessingException e) {
             throw e;
         } catch (Exception e) {

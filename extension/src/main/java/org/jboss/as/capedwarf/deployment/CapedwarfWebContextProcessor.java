@@ -51,16 +51,9 @@ public class CapedwarfWebContextProcessor extends CapedwarfWebDeploymentUnitProc
         final ClassLoader classLoader = module.getClassLoader();
         final ClassLoader previous = SecurityActions.setTCCL(classLoader);
         try {
-            ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration(
-                unit.getAttachment(CapedwarfAttachments.APP_ENGINE_WEB_XML),
-                unit.getAttachment(CapedwarfAttachments.CAPEDWARF_WEB_XML),
-                unit.getAttachment(CapedwarfAttachments.QUEUE_XML),
-                unit.getAttachment(CapedwarfAttachments.BACKENDS_XML),
-                unit.getAttachment(CapedwarfAttachments.INDEXES_XML));
-
             final String appId = CapedwarfDeploymentMarker.getAppId(unit);
             final Set<ServiceName> dependencies = CapedwarfDependenciesProcessor.getDependecies(appId);
-            final CapedwarfSetupAction cas = new CapedwarfSetupAction(dependencies, classLoader, applicationConfiguration);
+            final CapedwarfSetupAction cas = new CapedwarfSetupAction(dependencies, classLoader, unit.getAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION));
             unit.addToAttachmentList(org.jboss.as.ee.component.Attachments.WEB_SETUP_ACTIONS, cas);
         } catch (Exception e) {
             throw new DeploymentUnitProcessingException(e);
