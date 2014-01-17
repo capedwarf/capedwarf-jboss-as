@@ -21,6 +21,9 @@
  */
 package org.jboss.as.capedwarf.deployment;
 
+import java.util.List;
+import java.util.logging.Logger;
+
 import org.jboss.as.ejb3.deployment.EjbDeploymentAttachmentKeys;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -44,15 +47,29 @@ import org.jboss.metadata.ejb.spec.EnterpriseBeansMetaData;
  */
 public class CapedwarfInboundMailProcessor implements DeploymentUnitProcessor {
 
+    private final Logger log = Logger.getLogger(getClass().getName());
+
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
 
         AppEngineWebXml appEngineWebXml = deploymentUnit.getAttachment(CapedwarfAttachments.APP_ENGINE_WEB_XML);
+        CapedwarfConfiguration config = deploymentUnit.getAttachment(CapedwarfAttachments.CAPEDWARF_WEB_XML);
+        List<InboundMailAccount> inboundMailAccounts = config.getInboundMailAccounts();
+
         if (appEngineWebXml.isInboundServiceEnabled(InboundServices.Service.mail)) {
-            CapedwarfConfiguration config = deploymentUnit.getAttachment(CapedwarfAttachments.CAPEDWARF_WEB_XML);
-            for (InboundMailAccount account : config.getInboundMailAccounts()) {
-                configureAccount(deploymentUnit, account);
+            if (inboundMailAccounts.isEmpty()) {
+                log.warning("The inbound mail service is enabled in appengine-web.xml, but there are no inbound mail " +
+                    "accounts defined in capedwarf-web.xml. Inbound mail service will not be activated.");
+            } else {
+                for (InboundMailAccount account : inboundMailAccounts) {
+                    configureAccount(deploymentUnit, account);
+                }
+            }
+        } else {
+            if (!inboundMailAccounts.isEmpty()) {
+                log.warning("There are inbound mail accounts defined in capedwarf-web.xml, but the inbound mail service " +
+                    "is not enabled in appengine-web.xml. Inbound mail service will not be activated.");
             }
         }
     }
