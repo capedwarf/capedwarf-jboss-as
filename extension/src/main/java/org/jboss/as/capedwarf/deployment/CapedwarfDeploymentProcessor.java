@@ -65,6 +65,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier TX = ModuleIdentifier.create("javax.transaction.api");
     private static final ModuleIdentifier ACTIVATION = ModuleIdentifier.create("javax.activation.api");
     private static final ModuleIdentifier MAIL = ModuleIdentifier.create("org.javassist");
+    private static final ModuleIdentifier MAIL_RA = ModuleIdentifier.create("org.wildfly.mail.ra");
     private static final ModuleIdentifier JAVASSIST = ModuleIdentifier.create("javax.mail.api");
     private static final ModuleIdentifier JGROUPS = ModuleIdentifier.create("org.jgroups");
     private static final ModuleIdentifier INFINISPAN_QUERY = ModuleIdentifier.create("org.infinispan.query");
@@ -95,6 +96,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         TX,
         ACTIVATION,
         MAIL,
+        MAIL_RA,
         JAVASSIST,
         JGROUPS,
         INFINISPAN_QUERY,

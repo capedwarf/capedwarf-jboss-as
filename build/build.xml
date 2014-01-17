@@ -159,6 +159,11 @@
             <maven-resource group="org.antlr" artifact="antlr-runtime"/>
         </module-def>
 
+        <module-def name="org.wildfly.mail.ra">
+            <maven-resource group="org.wildfly" artifact="mail-ra-api"/>
+            <maven-resource group="org.wildfly" artifact="mail-ra-impl"/>
+        </module-def>
+
         <!-- module-def name="org.apache.avro">
             <maven-resource group="org.apache.avro" artifact="avro"/>
         </module-def>

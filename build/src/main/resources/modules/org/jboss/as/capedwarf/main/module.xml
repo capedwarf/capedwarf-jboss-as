@@ -40,6 +40,7 @@
         <module name="org.jboss.as.clustering.jgroups"/>
         <module name="org.jboss.as.server"/>
         <module name="org.jboss.as.ee"/>
+        <module name="org.jboss.as.ejb3"/>
         <module name="org.jboss.as.jaxrs"/>
         <module name="org.jboss.as.jpa"/>
         <module name="org.jboss.as.jpa.spi"/>

@@ -31,12 +31,8 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.SetupAction;
-import org.jboss.capedwarf.shared.config.AppEngineWebXml;
-import org.jboss.capedwarf.shared.config.BackendsXml;
-import org.jboss.capedwarf.shared.config.CapedwarfConfiguration;
+import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
 import org.jboss.capedwarf.shared.config.ConfigurationAware;
-import org.jboss.capedwarf.shared.config.IndexesXml;
-import org.jboss.capedwarf.shared.config.QueueXml;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceName;
 
@@ -55,15 +51,9 @@ public class CapedwarfWebContextProcessor extends CapedwarfWebDeploymentUnitProc
         final ClassLoader classLoader = module.getClassLoader();
         final ClassLoader previous = SecurityActions.setTCCL(classLoader);
         try {
-            AppEngineWebXml appConfig = unit.getAttachment(CapedwarfAttachments.APP_ENGINE_WEB_XML);
-            CapedwarfConfiguration cdConfig = unit.getAttachment(CapedwarfAttachments.CAPEDWARF_WEB_XML);
-            QueueXml queueConfig = unit.getAttachment(CapedwarfAttachments.QUEUE_XML);
-            BackendsXml backendsConfig = unit.getAttachment(CapedwarfAttachments.BACKENDS_XML);
-            IndexesXml indexesConfig = unit.getAttachment(CapedwarfAttachments.INDEXES_XML);
-
             final String appId = CapedwarfDeploymentMarker.getAppId(unit);
             final Set<ServiceName> dependencies = CapedwarfDependenciesProcessor.getDependecies(appId);
-            final CapedwarfSetupAction cas = new CapedwarfSetupAction(dependencies, classLoader, appConfig, cdConfig, queueConfig, backendsConfig, indexesConfig);
+            final CapedwarfSetupAction cas = new CapedwarfSetupAction(dependencies, classLoader, unit.getAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION));
             unit.addToAttachmentList(org.jboss.as.ee.component.Attachments.WEB_SETUP_ACTIONS, cas);
         } catch (Exception e) {
             throw new DeploymentUnitProcessingException(e);
@@ -76,18 +66,14 @@ public class CapedwarfWebContextProcessor extends CapedwarfWebDeploymentUnitProc
         private final Set<ServiceName> dependencies;
         private final ClassLoader appCL;
 
-        private CapedwarfSetupAction(Set<ServiceName> dependencies, ClassLoader appCL, AppEngineWebXml appEngineWebXml, CapedwarfConfiguration capedwarfConfiguration, QueueXml queueXml, BackendsXml backendsXml, IndexesXml indexesXml) {
-            super(appEngineWebXml, capedwarfConfiguration, queueXml, backendsXml, indexesXml);
+        private CapedwarfSetupAction(Set<ServiceName> dependencies, ClassLoader appCL, ApplicationConfiguration applicationConfiguration) {
+            super(applicationConfiguration);
             this.dependencies = dependencies;
             this.appCL = appCL;
         }
 
         public void setup(Map<String, Object> properties) {
-            ConfigurationAware.setAppEngineWebXml(appEngineWebXml);
-            ConfigurationAware.setCapedwarfConfiguration(capedwarfConfiguration);
-            ConfigurationAware.setQueueXml(queueXml);
-            ConfigurationAware.setBackendsXml(backendsXml);
-            ConfigurationAware.setIndexesXml(indexesXml);
+            ConfigurationAware.setApplicationConfiguration(applicationConfiguration);
 
             try {
                 invokeListener(appCL, "setup");
@@ -108,11 +94,7 @@ public class CapedwarfWebContextProcessor extends CapedwarfWebDeploymentUnitProc
         }
 
         private void reset() {
-            ConfigurationAware.setAppEngineWebXml(null);
-            ConfigurationAware.setCapedwarfConfiguration(null);
-            ConfigurationAware.setQueueXml(null);
-            ConfigurationAware.setBackendsXml(null);
-            ConfigurationAware.setIndexesXml(null);
+            ConfigurationAware.setApplicationConfiguration(null);
         }
 
         public int priority() {

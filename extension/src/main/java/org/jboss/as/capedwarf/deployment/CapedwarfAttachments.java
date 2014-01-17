@@ -29,6 +29,7 @@ import org.jboss.as.capedwarf.services.CacheName;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.AttachmentList;
 import org.jboss.capedwarf.shared.config.AppEngineWebXml;
+import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
 import org.jboss.capedwarf.shared.config.BackendsXml;
 import org.jboss.capedwarf.shared.config.CapedwarfConfiguration;
 import org.jboss.capedwarf.shared.config.IndexesXml;
@@ -40,6 +41,8 @@ import org.jboss.capedwarf.shared.config.QueueXml;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 final class CapedwarfAttachments {
+    static final AttachmentKey<ApplicationConfiguration> APPLICATION_CONFIGURATION = AttachmentKey.create(ApplicationConfiguration.class);
+
     // xmls
     static final AttachmentKey<AppEngineWebXml> APP_ENGINE_WEB_XML = AttachmentKey.create(AppEngineWebXml.class);
     static final AttachmentKey<CapedwarfConfiguration> CAPEDWARF_WEB_XML = AttachmentKey.create(CapedwarfConfiguration.class);
