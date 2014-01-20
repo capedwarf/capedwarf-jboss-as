@@ -28,7 +28,6 @@ import org.jboss.as.ejb3.deployment.EjbDeploymentAttachmentKeys;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.capedwarf.shared.config.AppEngineWebXml;
 import org.jboss.capedwarf.shared.config.CapedwarfConfiguration;
 import org.jboss.capedwarf.shared.config.InboundMailAccount;
@@ -45,12 +44,10 @@ import org.jboss.metadata.ejb.spec.EnterpriseBeansMetaData;
 /**
  * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
-public class CapedwarfInboundMailProcessor implements DeploymentUnitProcessor {
-
+public class CapedwarfInboundMailProcessor extends CapedwarfDeploymentUnitProcessor {
     private final Logger log = Logger.getLogger(getClass().getName());
 
-    @Override
-    public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
+    protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
 
         AppEngineWebXml appEngineWebXml = deploymentUnit.getAttachment(CapedwarfAttachments.APP_ENGINE_WEB_XML);
@@ -80,10 +77,12 @@ public class CapedwarfInboundMailProcessor implements DeploymentUnitProcessor {
             ejbJarMetaData = new EjbJarMetaData(EjbJarVersion.EJB_3_2);
             deploymentUnit.putAttachment(EjbDeploymentAttachmentKeys.EJB_JAR_METADATA, ejbJarMetaData);
         }
-        if (ejbJarMetaData.getEnterpriseBeans() == null) {
-            ejbJarMetaData.setEnterpriseBeans(new EnterpriseBeansMetaData());
+        EnterpriseBeansMetaData enterpriseBeans = ejbJarMetaData.getEnterpriseBeans();
+        if (enterpriseBeans == null) {
+            enterpriseBeans = new EnterpriseBeansMetaData();
+            ejbJarMetaData.setEnterpriseBeans(enterpriseBeans);
         }
-        ejbJarMetaData.getEnterpriseBeans().add(createMdbMetaData(account));
+        enterpriseBeans.add(createMdbMetaData(account));
     }
 
     private JBossGenericBeanMetaData createMdbMetaData(InboundMailAccount account) {
@@ -112,9 +111,5 @@ public class CapedwarfInboundMailProcessor implements DeploymentUnitProcessor {
         configProperty.setActivationConfigPropertyName(name);
         configProperty.setValue(value);
         return configProperty;
-    }
-
-    @Override
-    public void undeploy(DeploymentUnit context) {
     }
 }

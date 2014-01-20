@@ -30,8 +30,8 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
-import org.jboss.capedwarf.shared.components.Keys;
 import org.jboss.capedwarf.shared.components.MapKey;
+import org.jboss.capedwarf.shared.components.SimpleKey;
 import org.jboss.capedwarf.shared.components.Slot;
 import org.jboss.capedwarf.shared.config.AppEngineWebXml;
 import org.jboss.capedwarf.shared.config.AppEngineWebXmlParser;
@@ -59,12 +59,12 @@ public class CapedwarfXmlsParserProcessor extends CapedwarfWebDeploymentUnitProc
         final DeploymentUnit unit = phaseContext.getDeploymentUnit();
         final VirtualFile deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT).getRoot();
         try {
+            final String appId = CapedwarfDeploymentMarker.getAppId(unit);
+
             // appengine-web.xml
             final InputStream appIs = getInputStream(deploymentRoot, "WEB-INF/appengine-web.xml", true);
             try {
                 AppEngineWebXml appConfig = AppEngineWebXmlParser.parse(appIs);
-
-                final String appId = CapedwarfDeploymentMarker.getAppId(unit);
 
                 if (CapedwarfDeploymentMarker.hasModules(unit)) {
                     AppEngineWebXml.override(appConfig, appId);
@@ -124,7 +124,7 @@ public class CapedwarfXmlsParserProcessor extends CapedwarfWebDeploymentUnitProc
                 unit.getAttachment(CapedwarfAttachments.INDEXES_XML));
             unit.putAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION, applicationConfiguration);
 
-            ComponentRegistry.getInstance().setComponent(Keys.APPLICATION_CONFIGURATION, applicationConfiguration);
+            ComponentRegistry.getInstance().setComponent(new SimpleKey<>(appId, ApplicationConfiguration.class), applicationConfiguration);
 
         } catch (DeploymentUnitProcessingException e) {
             throw e;
