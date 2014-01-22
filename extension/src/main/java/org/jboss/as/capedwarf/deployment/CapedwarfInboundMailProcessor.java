@@ -44,7 +44,7 @@ import org.jboss.metadata.ejb.spec.EnterpriseBeansMetaData;
 /**
  * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
-public class CapedwarfInboundMailProcessor extends CapedwarfDeploymentUnitProcessor {
+public class CapedwarfInboundMailProcessor extends CapedwarfWebDeploymentUnitProcessor {
     private final Logger log = Logger.getLogger(getClass().getName());
 
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
