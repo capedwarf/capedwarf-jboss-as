@@ -22,8 +22,8 @@
 
 package org.jboss.as.capedwarf.services;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -78,7 +78,7 @@ class ServletExecutorConsumer implements MessageListener {
         ServletRequestCreator factory;
         final Key<Map<String, ServletRequestCreator>> key = new MapKey<>(appId, module, Slot.SERVLET_REQUEST_CREATOR);
         ComponentRegistry registry = ComponentRegistry.getInstance();
-        Map<String, ServletRequestCreator> map = new HashMap<>();
+        Map<String, ServletRequestCreator> map = new ConcurrentHashMap<>();
         Map<String, ServletRequestCreator> factories = registry.putIfAbsent(key, map);
         if (factories == null) {
             factories = map;
