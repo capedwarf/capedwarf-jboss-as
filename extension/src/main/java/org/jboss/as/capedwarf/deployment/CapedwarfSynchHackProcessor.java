@@ -73,7 +73,7 @@ public class CapedwarfSynchHackProcessor extends CapedwarfWebDeploymentUnitProce
                 String appId = CapedwarfDeploymentMarker.getAppId(unit);
                 String moduleId = CapedwarfDeploymentMarker.getModule(unit);
                 Key<Set<String>> key = new SetKey<>(appId, moduleId, Slot.SYNC_HACK);
-                ComponentRegistry.getInstance().setComponent(key, callers);
+                ComponentRegistry.getInstance().setComponent(key, Collections.unmodifiableSet(callers));
             }
         }
     }

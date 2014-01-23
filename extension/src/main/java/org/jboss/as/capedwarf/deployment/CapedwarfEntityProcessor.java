@@ -22,6 +22,7 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -157,9 +158,9 @@ public class CapedwarfEntityProcessor extends CapedwarfWebDeploymentUnitProcesso
         String moduleId = CapedwarfDeploymentMarker.getModule(unit);
         ComponentRegistry registry = ComponentRegistry.getInstance();
         // push allocationsMap to registry
-        registry.setComponent(new MapKey<String, Integer>(appId, moduleId, Slot.ALLOCATIONS_MAP), allocationsMap);
+        registry.setComponent(new MapKey<String, Integer>(appId, moduleId, Slot.ALLOCATIONS_MAP), Collections.unmodifiableMap(allocationsMap));
         // push entities to registry
-        registry.setComponent(new SetKey<String>(appId, moduleId, Slot.METADATA_SCANNER), entityClasses);
+        registry.setComponent(new SetKey<String>(appId, moduleId, Slot.METADATA_SCANNER), Collections.unmodifiableSet(entityClasses));
 
         // attach to unit
         CapedwarfDeploymentMarker.setEntities(unit, entityClasses);
