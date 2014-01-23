@@ -39,14 +39,14 @@ import org.jboss.modules.Module;
 
 /**
  * Check for sync callers classes.
- *
+ * <p/>
  * TODO -- configure from config / management
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfSynchHackProcessor extends CapedwarfWebDeploymentUnitProcessor {
     private static final String FORCE_SYNC = "jboss.capedwarf.forceSync";
-    private static final Set<String> SYNC_CALLERS = new LinkedHashSet<String>();
+    private static final Set<String> SYNC_CALLERS = new LinkedHashSet<>();
 
     static {
         SYNC_CALLERS.add("com.google.appengine.tools.pipeline.impl.backend.AppEngineBackEnd");
@@ -61,7 +61,7 @@ public class CapedwarfSynchHackProcessor extends CapedwarfWebDeploymentUnitProce
         final Module module = unit.getAttachment(Attachments.MODULE);
         if (module != null) {
             final ClassLoader cl = module.getClassLoader();
-            final Set<String> callers = new HashSet<String>();
+            final Set<String> callers = new HashSet<>();
             for (String caller : SYNC_CALLERS) {
                 try {
                     cl.loadClass(caller);
@@ -71,7 +71,8 @@ public class CapedwarfSynchHackProcessor extends CapedwarfWebDeploymentUnitProce
             }
             if (callers.size() > 0) {
                 String appId = CapedwarfDeploymentMarker.getAppId(unit);
-                Key<Set<String>> key = new SetKey<String>(appId, Slot.SYNC_HACK);
+                String moduleId = CapedwarfDeploymentMarker.getModule(unit);
+                Key<Set<String>> key = new SetKey<>(appId, moduleId, Slot.SYNC_HACK);
                 ComponentRegistry.getInstance().setComponent(key, callers);
             }
         }

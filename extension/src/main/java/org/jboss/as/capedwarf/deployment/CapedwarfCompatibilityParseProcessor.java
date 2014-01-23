@@ -42,7 +42,7 @@ import org.jboss.vfs.VirtualFile;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfCompatibilityParseProcessor extends CapedwarfTopDeploymentUnitProcessor {
+public class CapedwarfCompatibilityParseProcessor extends CapedwarfWebDeploymentUnitProcessor {
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         try {
             DeploymentUnit unit = phaseContext.getDeploymentUnit();
@@ -52,7 +52,9 @@ public class CapedwarfCompatibilityParseProcessor extends CapedwarfTopDeployment
             DeploymentType type = CapedwarfDeploymentMarker.getDeploymentType(unit);
             VirtualFile cf = LibUtils.getCompatibilityFile(type, root);
             Compatibility compatibility = Compatibility.readCompatibility(cf.exists() ? cf.openStream() : null);
-            Key<Compatibility> key = new SimpleKey<>(CapedwarfDeploymentMarker.getAppId(unit), Compatibility.class);
+            String appId = CapedwarfDeploymentMarker.getAppId(unit);
+            String moduleId = CapedwarfDeploymentMarker.getModule(unit);
+            Key<Compatibility> key = new SimpleKey<>(appId, moduleId, Compatibility.class);
             ComponentRegistry.getInstance().setComponent(key, compatibility);
         } catch (IOException e) {
             throw new DeploymentUnitProcessingException(e);

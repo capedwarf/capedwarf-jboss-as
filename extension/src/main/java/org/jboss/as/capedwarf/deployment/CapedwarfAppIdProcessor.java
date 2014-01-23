@@ -23,15 +23,11 @@
 package org.jboss.as.capedwarf.deployment;
 
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.capedwarf.shared.components.ComponentRegistry;
-import org.jboss.capedwarf.shared.components.MapKey;
-import org.jboss.capedwarf.shared.components.Slot;
 import org.jboss.capedwarf.shared.modules.ModuleInfo;
 
 /**
@@ -52,8 +48,7 @@ public class CapedwarfAppIdProcessor extends CapedwarfTopDeploymentUnitProcessor
             throw new IllegalArgumentException("App id already exists: " + appId);
 
         // put any per-app prepared components
-        final ComponentRegistry registry = ComponentRegistry.getInstance();
-        registry.setComponent(new MapKey<String, ModuleInfo>(appId, Slot.MODULES), new ConcurrentHashMap<String, ModuleInfo>());
+        ModuleInfo.putModules(appId);
     }
 
     protected void doUndeploy(DeploymentUnit unit) {

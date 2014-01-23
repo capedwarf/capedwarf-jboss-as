@@ -43,6 +43,7 @@ import org.jboss.capedwarf.shared.components.SimpleKey;
 import org.jboss.capedwarf.shared.components.Slot;
 import org.jboss.capedwarf.shared.config.IndexesXml;
 import org.jboss.capedwarf.shared.datastore.CapedwarfMultiSearchWorkCreator;
+import org.jboss.capedwarf.shared.modules.ModuleInfo;
 
 /**
  * Datastore cache configuration callback.
@@ -62,15 +63,24 @@ public class DatastoreConfigurationCallback extends BasicConfigurationCallback {
         ConfigurationBuilder builder = super.configure(configuration);
 
         ComponentRegistry registry = ComponentRegistry.getInstance();
-        Compatibility compatibility = registry.getComponent(new SimpleKey<>(appId, Compatibility.class));
-        if (compatibility.isEnabled(Compatibility.Feature.FORCE_ASYNC_DATASTORE)) {
-            Set<String> callers = registry.getComponent(new SetKey<String>(appId, Slot.SYNC_HACK));
-            if (callers == null || callers.isEmpty()) {
-                log.info("Forcing async cache mode -- compatibility setting.");
-                builder.clustering().cacheMode(CacheMode.DIST_ASYNC);
+        boolean asycn = true;
+        for (String module : ModuleInfo.getModules(appId).keySet()) {
+            Compatibility compatibility = registry.getComponent(new SimpleKey<>(appId, module, Compatibility.class));
+            if (compatibility.isEnabled(Compatibility.Feature.FORCE_ASYNC_DATASTORE)) {
+                Set<String> callers = registry.getComponent(new SetKey<String>(appId, module, Slot.SYNC_HACK));
+                if (callers != null && callers.isEmpty() == false) {
+                    log.warning("Ignoring async force, found callers: " + callers);
+                    asycn = false;
+                    break;
+                }
             } else {
-                log.warning("Ignoring async force, found callers: " + callers);
+                asycn = false;
+                break;
             }
+        }
+        if (asycn) {
+            log.info("Forcing async cache mode -- compatibility setting.");
+            builder.clustering().cacheMode(CacheMode.DIST_ASYNC);
         }
 
         return builder;
@@ -87,7 +97,7 @@ public class DatastoreConfigurationCallback extends BasicConfigurationCallback {
 
         int i = 1;
         for (IndexesXml index : indexes) {
-            final ListMultimap<String,IndexesXml.Index> list = index.getIndexes();
+            final ListMultimap<String, IndexesXml.Index> list = index.getIndexes();
             final Collection<IndexesXml.Index> values = list.values();
             for (IndexesXml.Index ii : values) {
                 String name = ii.getName();

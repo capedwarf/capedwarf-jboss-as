@@ -73,10 +73,10 @@ class ServletExecutorConsumer implements MessageListener {
         return ModuleIdentifier.fromString(mi);
     }
 
-    private ServletRequestCreator getServletRequestCreator(final String appId, ClassLoader cl, Message message) throws Exception {
+    private ServletRequestCreator getServletRequestCreator(String appId, String module, ClassLoader cl, Message message) throws Exception {
         final String factoryClass = getValue(message, MessageConstants.FACTORY);
         ServletRequestCreator factory;
-        final Key<Map<String, ServletRequestCreator>> key = new MapKey<>(appId, Slot.SERVLET_REQUEST_CREATOR);
+        final Key<Map<String, ServletRequestCreator>> key = new MapKey<>(appId, module, Slot.SERVLET_REQUEST_CREATOR);
         ComponentRegistry registry = ComponentRegistry.getInstance();
         Map<String, ServletRequestCreator> map = new HashMap<>();
         Map<String, ServletRequestCreator> factories = registry.putIfAbsent(key, map);
@@ -108,7 +108,8 @@ class ServletExecutorConsumer implements MessageListener {
             }
 
             final String appId = getValue(message, MessageConstants.APP_ID);
-            final SimpleKey<ServletContext> key = new SimpleKey<>(appId, ServletContext.class);
+            final String moduleId = getValue(message, MessageConstants.MODULE_ID);
+            final SimpleKey<ServletContext> key = new SimpleKey<>(appId, moduleId, ServletContext.class);
             final ServletContext context = ComponentRegistry.getInstance().getComponent(key);
             if (context == null) {
                 log.warn("No matching ServletContext, app (" + appId + ") already undeployed?");
@@ -116,11 +117,11 @@ class ServletExecutorConsumer implements MessageListener {
             }
 
             final ClassLoader cl = module.getClassLoader();
-            final ServletRequestCreator creator = getServletRequestCreator(appId, cl, message);
+            final ServletRequestCreator creator = getServletRequestCreator(appId, moduleId, cl, message);
             final HttpServletRequest request = creator.createServletRequest(context, message);
             final String path = getValue(message, MessageConstants.PATH);
 
-            creator.prepare(request, appId);
+            creator.prepare(request, appId, moduleId);
             try {
                 final HttpServletResponse response = ServletExecutor.dispatch(appId, path, context, request);
                 if (creator.isValid(request, response) == false) {

@@ -30,9 +30,7 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
-import org.jboss.capedwarf.shared.components.MapKey;
 import org.jboss.capedwarf.shared.components.SimpleKey;
-import org.jboss.capedwarf.shared.components.Slot;
 import org.jboss.capedwarf.shared.config.AppEngineWebXml;
 import org.jboss.capedwarf.shared.config.AppEngineWebXmlParser;
 import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
@@ -60,6 +58,7 @@ public class CapedwarfXmlsParserProcessor extends CapedwarfWebDeploymentUnitProc
         final VirtualFile deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT).getRoot();
         try {
             final String appId = CapedwarfDeploymentMarker.getAppId(unit);
+            final String moduleId = CapedwarfDeploymentMarker.getModule(unit);
 
             // appengine-web.xml
             final InputStream appIs = getInputStream(deploymentRoot, "WEB-INF/appengine-web.xml", true);
@@ -70,8 +69,7 @@ public class CapedwarfXmlsParserProcessor extends CapedwarfWebDeploymentUnitProc
                     AppEngineWebXml.override(appConfig, appId);
                 }
 
-                final ComponentRegistry registry = ComponentRegistry.getInstance();
-                Map<String, ModuleInfo> map = registry.getComponent(new MapKey<String, ModuleInfo>(appId, Slot.MODULES));
+                Map<String, ModuleInfo> map = ModuleInfo.getModules(appId);
                 map.put(appConfig.getModule(), new ModuleInfo(appConfig));
 
                 unit.putAttachment(CapedwarfAttachments.APP_ENGINE_WEB_XML, appConfig);
@@ -124,7 +122,7 @@ public class CapedwarfXmlsParserProcessor extends CapedwarfWebDeploymentUnitProc
                 unit.getAttachment(CapedwarfAttachments.INDEXES_XML));
             unit.putAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION, applicationConfiguration);
 
-            ComponentRegistry.getInstance().setComponent(new SimpleKey<>(appId, ApplicationConfiguration.class), applicationConfiguration);
+            ComponentRegistry.getInstance().setComponent(new SimpleKey<>(appId, moduleId, ApplicationConfiguration.class), applicationConfiguration);
 
         } catch (DeploymentUnitProcessingException e) {
             throw e;

@@ -47,6 +47,7 @@ public class CapedwarfWebAppInfoParseProcessor extends CapedwarfAppEngineWebXmlP
         CapedwarfDeploymentMarker.setAppId(unit, appId);
         CapedwarfDeploymentMarker.setAppVersion(unit, results.get(ParseUtils.VERSION));
         CapedwarfDeploymentMarker.setThreadsafe(unit, Boolean.parseBoolean(results.get(ParseUtils.THREADSAFE)));
-        CapedwarfDeploymentMarker.setModule(unit, results.get(ParseUtils.MODULE));
+        String module = results.get(ParseUtils.MODULE);
+        CapedwarfDeploymentMarker.setModule(unit, module);
     }
 }

@@ -40,7 +40,7 @@ public class CapedwarfModuleProcessor extends CapedwarfWebDeploymentUnitProcesso
         final Module module = unit.getAttachment(Attachments.MODULE);
         if (module != null) {
             final ClassLoader classLoader = module.getClassLoader();
-            CapedwarfApiProxy.initialize(classLoader, CapedwarfDeploymentMarker.getAppId(unit));
+            CapedwarfApiProxy.initialize(classLoader, CapedwarfDeploymentMarker.getAppId(unit), CapedwarfDeploymentMarker.getModule(unit));
         }
     }
 

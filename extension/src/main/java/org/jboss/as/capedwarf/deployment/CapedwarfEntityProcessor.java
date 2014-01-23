@@ -61,13 +61,13 @@ public class CapedwarfEntityProcessor extends CapedwarfWebDeploymentUnitProcesso
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final DeploymentUnit unit = phaseContext.getDeploymentUnit();
         final CompositeIndex index = unit.getAttachment(Attachments.COMPOSITE_ANNOTATION_INDEX);
-        final Map<String, Integer> allocationsMap = new HashMap<String, Integer>();
-        final Set<String> entityClasses = new HashSet<String>();
+        final Map<String, Integer> allocationsMap = new HashMap<>();
+        final Set<String> entityClasses = new HashSet<>();
         // handle JPA
         final List<AnnotationInstance> entities = index.getAnnotations(JPA_ENTITY);
         if (entities.isEmpty() == false) {
             // fill-in entity classes
-            final Map<String, AnnotationInstance> entityMap = new HashMap<String, AnnotationInstance>();
+            final Map<String, AnnotationInstance> entityMap = new HashMap<>();
             for (AnnotationInstance ai : entities) {
                 final AnnotationTarget target = ai.target();
                 final ClassInfo ci = (ClassInfo) target;
@@ -154,11 +154,12 @@ public class CapedwarfEntityProcessor extends CapedwarfWebDeploymentUnitProcesso
         addTargetClasses(index, JDO_ENTITY, entityClasses);
 
         String appId = CapedwarfDeploymentMarker.getAppId(unit);
+        String moduleId = CapedwarfDeploymentMarker.getModule(unit);
         ComponentRegistry registry = ComponentRegistry.getInstance();
         // push allocationsMap to registry
-        registry.setComponent(new MapKey<String, Integer>(appId, Slot.ALLOCATIONS_MAP), allocationsMap);
+        registry.setComponent(new MapKey<String, Integer>(appId, moduleId, Slot.ALLOCATIONS_MAP), allocationsMap);
         // push entities to registry
-        registry.setComponent(new SetKey<String>(appId, Slot.METADATA_SCANNER), entityClasses);
+        registry.setComponent(new SetKey<String>(appId, moduleId, Slot.METADATA_SCANNER), entityClasses);
 
         // attach to unit
         CapedwarfDeploymentMarker.setEntities(unit, entityClasses);
