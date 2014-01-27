@@ -22,7 +22,6 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,6 +32,8 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.SetupAction;
 import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
 import org.jboss.capedwarf.shared.config.ConfigurationAware;
+import org.jboss.capedwarf.shared.reflection.MethodInvocation;
+import org.jboss.capedwarf.shared.reflection.ReflectionUtils;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceName;
 
@@ -64,19 +65,24 @@ public class CapedwarfWebContextProcessor extends CapedwarfWebDeploymentUnitProc
 
     private static class CapedwarfSetupAction extends ConfigurationAware implements SetupAction {
         private final Set<ServiceName> dependencies;
-        private final ClassLoader appCL;
+        private final MethodInvocation<Void> setup;
+        private final MethodInvocation<Boolean> isSetup;
+        private final MethodInvocation<Void> teardown;
 
-        private CapedwarfSetupAction(Set<ServiceName> dependencies, ClassLoader appCL, ApplicationConfiguration applicationConfiguration) {
+        private CapedwarfSetupAction(Set<ServiceName> dependencies, ClassLoader appCL, ApplicationConfiguration applicationConfiguration) throws Exception {
             super(applicationConfiguration);
             this.dependencies = dependencies;
-            this.appCL = appCL;
+            Class<?> clazz = appCL.loadClass("org.jboss.capedwarf.appidentity.GAEListener");
+            this.setup = ReflectionUtils.cacheMethod(clazz, "setup");
+            this.isSetup = ReflectionUtils.cacheMethod(clazz, "isSetup");
+            this.teardown = ReflectionUtils.cacheMethod(clazz, "teardown");
         }
 
         public void setup(Map<String, Object> properties) {
             ConfigurationAware.setApplicationConfiguration(applicationConfiguration);
 
             try {
-                invokeListener(appCL, "setup");
+                setup.invoke();
             } catch (RuntimeException e) {
                 reset();
                 throw e;
@@ -86,7 +92,7 @@ public class CapedwarfWebContextProcessor extends CapedwarfWebDeploymentUnitProc
         public void teardown(Map<String, Object> properties) {
             try {
                 if (isContextSetup()) {
-                    invokeListener(appCL, "teardown");
+                    teardown.invoke();
                 }
             } finally {
                 reset();
@@ -106,21 +112,7 @@ public class CapedwarfWebContextProcessor extends CapedwarfWebDeploymentUnitProc
         }
 
         protected boolean isContextSetup() {
-            return (Boolean) invokeListener(appCL, "isSetup");
-        }
-
-        protected static Object invokeListener(ClassLoader appCL, String method) {
-            return invokeListener(appCL, method, new Class[0], new Object[0]);
-        }
-
-        protected static Object invokeListener(ClassLoader appCL, String method, Class<?>[] types, Object[] args) {
-            try {
-                Class<?> gaeListenerClass = appCL.loadClass("org.jboss.capedwarf.appidentity.GAEListener");
-                Method m = gaeListenerClass.getDeclaredMethod(method, types);
-                return m.invoke(null, args);
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+            return isSetup.invoke();
         }
     }
 }
