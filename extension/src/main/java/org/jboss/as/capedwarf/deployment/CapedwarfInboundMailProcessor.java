@@ -54,7 +54,7 @@ public class CapedwarfInboundMailProcessor extends CapedwarfWebDeploymentUnitPro
         CapedwarfConfiguration config = deploymentUnit.getAttachment(CapedwarfAttachments.CAPEDWARF_WEB_XML);
         List<InboundMailAccount> inboundMailAccounts = config.getInboundMailAccounts();
 
-        if (appEngineWebXml.isInboundServiceEnabled(InboundServices.Service.mail)) {
+        if (appEngineWebXml.isInboundServiceEnabled(InboundServices.Service.mail) || appEngineWebXml.isInboundServiceEnabled(InboundServices.Service.mail_bounce)) {
             if (inboundMailAccounts.isEmpty()) {
                 log.warning("The inbound mail service is enabled in appengine-web.xml, but there are no inbound mail " +
                     "accounts defined in capedwarf-web.xml. Inbound mail service will not be activated.");
