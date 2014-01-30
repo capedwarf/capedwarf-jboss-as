@@ -22,6 +22,8 @@
 
 package org.jboss.as.capedwarf.services;
 
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
 import org.wildfly.extension.undertow.Server;
 import org.wildfly.extension.undertow.UndertowService;
 
@@ -31,16 +33,23 @@ import org.wildfly.extension.undertow.UndertowService;
 public class UTInstanceInfo extends ServerInstanceInfo {
     private Server server;
 
-    protected synchronized Server getServer() {
-        if (server == null) {
-            UndertowService ut = getUndertowServiceInjectedValue().getValue();
-            for (Server s : ut.getServers()) {
-                if (ut.getDefaultServer().equals(s.getName())) {
-                    server = s;
-                    return s;
-                }
+    @Override
+    protected Server getServer() {
+        return server;
+    }
+
+    protected Server findServer() {
+        UndertowService ut = getUndertowServiceInjectedValue().getValue();
+        for (Server s : ut.getServers()) {
+            if (ut.getDefaultServer().equals(s.getName())) {
+                return s;
             }
         }
-        return server;
+        throw new IllegalStateException(String.format("No default server found?! - [%s, %s]", ut.getDefaultServer(), ut.getServers()));
+    }
+
+    public void start(StartContext startContext) throws StartException {
+        server = findServer();
+        super.start(startContext);
     }
 }

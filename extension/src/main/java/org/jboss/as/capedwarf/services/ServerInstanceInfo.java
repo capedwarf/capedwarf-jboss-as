@@ -42,6 +42,7 @@ public class ServerInstanceInfo implements Service<InstanceInfo>, InstanceInfo {
     private InjectedValue<UndertowService> undertowServiceInjectedValue = new InjectedValue<>();
     private InjectedValue<Server> serverInjectedValue = new InjectedValue<>();
     private String serverName;
+    private int port;
 
     protected ServerInstanceInfo() {
     }
@@ -81,11 +82,12 @@ public class ServerInstanceInfo implements Service<InstanceInfo>, InstanceInfo {
     }
 
     public int getPort() {
-        InjectedValue<SocketBinding> binding = getListener(HttpListenerService.class).getBinding();
-        return binding.getValue().getPort();
+        return port;
     }
 
     public void start(StartContext startContext) throws StartException {
+        InjectedValue<SocketBinding> binding = getListener(HttpListenerService.class).getBinding();
+        port = binding.getValue().getPort();
     }
 
     public void stop(StopContext stopContext) {
