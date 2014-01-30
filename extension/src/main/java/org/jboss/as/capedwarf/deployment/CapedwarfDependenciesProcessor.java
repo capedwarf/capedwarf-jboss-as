@@ -66,7 +66,7 @@ public class CapedwarfDependenciesProcessor extends CapedwarfTopDeploymentUnitPr
     });
 
     static {
-        STATIC_DEPENDECIES = new HashSet<ServiceName>();
+        STATIC_DEPENDECIES = new HashSet<>();
         STATIC_DEPENDECIES.add(ServletExecutorConsumerService.NAME); // default queue
         STATIC_DEPENDECIES.add(Constants.JMSXA_BIND_INFO.getBinderServiceName()); // we need jms xa
         STATIC_DEPENDECIES.add(Constants.QUEUE_BIND_INFO.getBinderServiceName()); // we need queue
@@ -81,10 +81,11 @@ public class CapedwarfDependenciesProcessor extends CapedwarfTopDeploymentUnitPr
     }
 
     static Set<ServiceName> getDependecies(String appId) {
-        Set<ServiceName> set = new HashSet<ServiceName>();
+        Set<ServiceName> set = new HashSet<>();
         set.addAll(STATIC_DEPENDECIES);
         set.addAll(CapedwarfCacheProcessor.getDependencies(appId));
         set.add(CapedwarfMuxIdProcessor.getDependency(appId));
+        set.addAll(CapedwarfInstanceInfoProcessor.getDependencies(appId));
         return Collections.unmodifiableSet(set);
     }
 }

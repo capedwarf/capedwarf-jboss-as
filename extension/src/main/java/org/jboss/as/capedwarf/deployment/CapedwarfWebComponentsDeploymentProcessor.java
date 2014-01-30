@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.jboss.as.capedwarf.services.ServerInstanceInfo;
+import org.jboss.as.capedwarf.services.UTInstanceInfo;
 import org.jboss.as.ee.structure.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.metadata.ear.spec.EarMetaData;
@@ -210,9 +212,13 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
                 // map against virtual host
                 int vs = getVirtualServerNumber(unit);
                 if (vs > 0) {
-                    webMetaData.setServerInstanceName("server" + vs);
+                    String serverInstanceName = "server" + vs;
+                    webMetaData.setServerInstanceName(serverInstanceName);
+                    unit.putAttachment(CapedwarfAttachments.INSTANCE_INFO, new ServerInstanceInfo(serverInstanceName));
+                    return;
                 }
             }
+            unit.putAttachment(CapedwarfAttachments.INSTANCE_INFO, new UTInstanceInfo());
         }
     }
 

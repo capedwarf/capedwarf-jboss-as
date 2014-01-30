@@ -140,7 +140,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         }
     }
 
-    private ModelNode getContentItem(String explodedWar)  {
+    private ModelNode getContentItem(String explodedWar) {
         ModelNode contentItem = new ModelNode();
         File war = new File(explodedWar);
         contentItem.get(PATH).set(war.getAbsolutePath());
@@ -163,7 +163,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
     @Override
     public void performBoottime(final OperationContext context, ModelNode operation, ModelNode model,
                                 ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers)
-            throws OperationFailedException {
+        throws OperationFailedException {
 
         final ModelNode appEngineModel = CapedwarfDefinition.APPENGINE_API.resolveModelAttribute(context, model);
         final String appengineAPI = appEngineModel.isDefined() ? appEngineModel.asString() : null;
@@ -229,7 +229,8 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 2, new CapedwarfCacheEntriesWebProcessor()); // gather cache configs
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 4, new CapedwarfCleanupProcessor()); // we still need module/CL
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 5, new CapedwarfSubCleanupProcessor()); // we still need module/CL
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 6, new CapedwarfWebContextProcessor()); // before web context lifecycle
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 6, new CapedwarfInstanceInfoProcessor()); // web context processor
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 7, new CapedwarfWebContextProcessor()); // before web context lifecycle
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT - 3, new CapedwarfCacheProcessor()); // after module
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT - 1, new CapedwarfMuxIdProcessor()); // adjust order as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_MODULE_JNDI_BINDINGS - 2, new CapedwarfDependenciesProcessor()); // after logging

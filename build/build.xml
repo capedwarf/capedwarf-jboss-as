@@ -41,7 +41,7 @@
         <chmod file="${output.dir}/bin/capedwarf.sh" perm="755"/>
     </target>
 
-    <target name="modules" >
+    <target name="modules">
 
         <module-def name="org.jboss.as.product" slot="capedwarf"/>
 
@@ -89,23 +89,23 @@
         </module-def>
 
         <module-def name="com.google.appengine">
-            <maven-resource group="com.google.appengine" artifact="appengine-api-1.0-sdk" />
-            <maven-resource group="com.google.appengine" artifact="appengine-api-labs" />
+            <maven-resource group="com.google.appengine" artifact="appengine-api-1.0-sdk"/>
+            <maven-resource group="com.google.appengine" artifact="appengine-api-labs"/>
         </module-def>
 
         <module-def name="com.google.appengine.endpoints">
-            <maven-resource group="com.google.appengine" artifact="appengine-local-endpoints" />
+            <maven-resource group="com.google.appengine" artifact="appengine-local-endpoints"/>
         </module-def>
 
-    	<module-def name="org.bouncycastle.bcmail">
+        <module-def name="org.bouncycastle.bcmail">
             <maven-resource group="org.bouncycastle" artifact="bcmail-jdk15on"/>
         </module-def>
 
-    	<module-def name="org.bouncycastle.bcpkix">
+        <module-def name="org.bouncycastle.bcpkix">
             <maven-resource group="org.bouncycastle" artifact="bcpkix-jdk15on"/>
         </module-def>
 
-    	<module-def name="org.bouncycastle.bcprov">
+        <module-def name="org.bouncycastle.bcprov">
             <maven-resource group="org.bouncycastle" artifact="bcprov-jdk15on"/>
         </module-def>
 
@@ -114,14 +114,14 @@
         </module-def>
 
         <module-def name="org.datanucleus">
-            <maven-resource group="org.datanucleus" artifact="datanucleus-core" />
-            <maven-resource group="org.datanucleus" artifact="datanucleus-api-jdo" />
-            <maven-resource group="org.datanucleus" artifact="datanucleus-api-jpa" />
-            <maven-resource group="org.datanucleus" artifact="datanucleus-cache" />
+            <maven-resource group="org.datanucleus" artifact="datanucleus-core"/>
+            <maven-resource group="org.datanucleus" artifact="datanucleus-api-jdo"/>
+            <maven-resource group="org.datanucleus" artifact="datanucleus-api-jpa"/>
+            <maven-resource group="org.datanucleus" artifact="datanucleus-cache"/>
         </module-def>
 
         <module-def name="org.datanucleus.appengine">
-            <maven-resource group="com.google.appengine.orm" artifact="datanucleus-appengine" />
+            <maven-resource group="com.google.appengine.orm" artifact="datanucleus-appengine"/>
         </module-def>
 
         <module-def name="org.geotoolkit">
@@ -174,7 +174,7 @@
             <maven-resource group="org.apache.lucene" artifact="lucene-memory"/>
         </module-def -->
 
-        <!-- module-def name="org.hibernate.search">
+        <!-- module-def name="org.hibernate.search.engine">
              <maven-resource group="org.hibernate" artifact="hibernate-search-engine"/>
              <maven-resource group="org.hibernate" artifact="hibernate-search-infinispan"/>
              <maven-resource group="org.infinispan" artifact="infinispan-lucene-directory"/>
@@ -217,11 +217,11 @@
     <target name="all" depends="base, modules, as-integrate"/>
 
     <target name="as-integrate" depends="modules" description="Integrate capedwarf into existing AS7 instalation">
-       <echo message="jboss dir is: ${jboss.dir}" />
-       <fail unless="jboss.dir" description="Jboss AS7 must be defined" message="property jboss.dir must be set" />
+        <echo message="jboss dir is: ${jboss.dir}"/>
+        <fail unless="jboss.dir" description="Jboss AS7 must be defined" message="property jboss.dir must be set"/>
 
         <copy todir="${jboss.dir}" verbose="true">
-            <fileset dir="${output.dir}" />
+            <fileset dir="${output.dir}"/>
         </copy>
 
         <chmod file="${jboss.dir}/bin/capedwarf-bytecode.sh" perm="755"/>

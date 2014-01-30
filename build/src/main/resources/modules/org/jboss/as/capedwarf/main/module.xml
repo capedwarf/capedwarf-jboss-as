@@ -65,11 +65,13 @@
         <module name="org.jgroups"/>
         <module name="org.infinispan"/>
         <module name="org.infinispan.query"/>
-        <module name="org.hibernate.search"/>
+        <module name="org.hibernate.search.engine"/>
         <module name="org.jboss.capedwarf.shared"/>
         <module name="org.apache.httpcomponents"/>
         <module name="org.geotoolkit"/>
         <module name="com.google.guava"/>
         <module name="io.undertow.servlet"/>
+        <module name="org.wildfly.extension.undertow"/>
+        <module name="org.jboss.as.network"/>
     </dependencies>
 </module>

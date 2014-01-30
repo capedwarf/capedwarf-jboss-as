@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012, Red Hat, Inc., and individual contributors
+ * Copyright 2014, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -22,21 +22,25 @@
 
 package org.jboss.as.capedwarf.services;
 
-import org.infinispan.configuration.cache.ConfigurationBuilder;
-import org.infinispan.configuration.cache.VersioningScheme;
-import org.infinispan.transaction.LockingMode;
-import org.infinispan.util.concurrent.IsolationLevel;
+import org.wildfly.extension.undertow.Server;
+import org.wildfly.extension.undertow.UndertowService;
 
 /**
- * Datastore versions cache configuration callback.
- *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
- * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
-public class DatastoreVersionsConfigurationCallback extends AbstractConfigurationCallback {
-    protected void applyBuilder(ConfigurationBuilder builder) {
-        builder.transaction().lockingMode(LockingMode.OPTIMISTIC);
-        builder.locking().writeSkewCheck(true).isolationLevel(IsolationLevel.REPEATABLE_READ);
-        builder.versioning().enable().scheme(VersioningScheme.SIMPLE);
+public class UTInstanceInfo extends ServerInstanceInfo {
+    private Server server;
+
+    protected synchronized Server getServer() {
+        if (server == null) {
+            UndertowService ut = getUndertowServiceInjectedValue().getValue();
+            for (Server s : ut.getServers()) {
+                if (ut.getDefaultServer().equals(s.getName())) {
+                    server = s;
+                    return s;
+                }
+            }
+        }
+        return server;
     }
 }

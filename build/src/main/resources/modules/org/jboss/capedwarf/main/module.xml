@@ -51,7 +51,7 @@
         <module name="org.jboss.logmanager"/>
         <module name="org.infinispan"/>
         <module name="org.infinispan.query"/>
-        <module name="org.hibernate.search"/>
+        <module name="org.hibernate.search.engine"/>
         <module name="org.apache.lucene"/>
         <module name="org.apache.httpcomponents"/>
         <module name="org.picketlink"/>

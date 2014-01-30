@@ -69,7 +69,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier JAVASSIST = ModuleIdentifier.create("javax.mail.api");
     private static final ModuleIdentifier JGROUPS = ModuleIdentifier.create("org.jgroups");
     private static final ModuleIdentifier INFINISPAN_QUERY = ModuleIdentifier.create("org.infinispan.query");
-    private static final ModuleIdentifier HIBERNATE_SEARCH = ModuleIdentifier.create("org.hibernate.search");
+    private static final ModuleIdentifier HIBERNATE_SEARCH = ModuleIdentifier.create("org.hibernate.search.engine");
     private static final ModuleIdentifier LUCENE = ModuleIdentifier.create("org.apache.lucene");
     private static final ModuleIdentifier HTTP_COMPONENTS = ModuleIdentifier.create("org.apache.httpcomponents");
     private static final ModuleIdentifier PICKETLINK = ModuleIdentifier.create("org.picketlink");
