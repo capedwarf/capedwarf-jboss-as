@@ -576,7 +576,7 @@
                 <file name="welcome-content" path="${jboss.home.dir}/welcome-content" directory-listing="true"/>
             </handlers>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:weld:2.0" require-bean-descriptor="true" non-portable-mode="true" />
     </profile>
     <interfaces>
         <interface name="management">
