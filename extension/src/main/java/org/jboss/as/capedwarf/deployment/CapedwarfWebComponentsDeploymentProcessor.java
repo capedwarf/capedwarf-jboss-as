@@ -66,6 +66,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String ENDPOINT_STATIC_SERVLET_NAME = "EndpointsStaticServlet";
     private static final String ENDPOINT_RPC_SERVLET_NAME = "EndpointsRpcServlet";
     private static final String ENDPOINT_REST_SERVLET_NAME = "EndpointsRestServlet";
+    private static final String DEAFULT_SERVLET_NAME = "default";
     private static final String[] ADMIN_SERVLET_URL_MAPPING = {"/_ah/admin/*", "/_ah/admin/"};
     private static final String[] AUTH_SERVLET_URL_MAPPING = {"/_ah/login/*", "/_ah/login/", "/_ah/logout/*", "/_ah/logout/", "/_ah/openIDCallBack"};
     private static final String[] CHANNEL_SERVLET_URL_MAPPING = {"/_ah/channel/*", "/_ah/channel/"};
@@ -94,6 +95,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ServletMetaData ENDPOINT_STATIC_SERVLET;
     private final ServletMetaData ENDPOINT_RPC_SERVLET;
     private final ServletMetaData ENDPOINT_REST_SERVLET;
+    private final ServletMetaData DEFAULT_SERVLET;
     private final ServletMappingMetaData AUTH_SERVLET_MAPPING;
     private final ServletMappingMetaData ADMIN_SERVLET_MAPPING;
     private final ServletMappingMetaData CHANNEL_SERVLET_MAPPING;
@@ -132,6 +134,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         ENDPOINT_STATIC_SERVLET = createServlet(ENDPOINT_STATIC_SERVLET_NAME, "com.google.api.server.spi.tools.devserver.StaticServlet");
         ENDPOINT_RPC_SERVLET = createServlet(ENDPOINT_RPC_SERVLET_NAME, "com.google.api.server.spi.tools.devserver.RpcApiServlet");
         ENDPOINT_REST_SERVLET = createServlet(ENDPOINT_REST_SERVLET_NAME, "com.google.api.server.spi.tools.devserver.RestApiServlet");
+        DEFAULT_SERVLET = createServlet(DEAFULT_SERVLET_NAME, "org.jboss.capedwarf.appidentity.StaticServlet");
 
         AUTH_SERVLET_MAPPING = createServletMapping(AUTH_SERVLET_NAME, AUTH_SERVLET_URL_MAPPING);
         ADMIN_SERVLET_MAPPING = createServletMapping(ADMIN_SERVLET_NAME, ADMIN_SERVLET_URL_MAPPING);
@@ -179,6 +182,9 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
             addServletAndMapping(webMetaData, UPLOAD_SERVLET, UPLOAD_SERVLET_MAPPING);
             addServletAndMapping(webMetaData, IMAGE_SERVLET, IMAGE_SERVLET_MAPPING);
             addServletAndMapping(webMetaData, DEFERRED_TASK_SERVLET, DEFERRED_TASK_SERVLET_MAPPING);
+
+            // handle default servlet w/o mapping
+            getServlets(webMetaData).add(DEFAULT_SERVLET);
 
             if (CapedwarfEndpointsProcessor.hasApis(unit)) {
                 handleEndpoints(webMetaData);
