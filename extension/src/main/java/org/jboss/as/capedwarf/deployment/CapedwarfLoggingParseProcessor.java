@@ -42,6 +42,7 @@ import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.capedwarf.shared.compatibility.Compatibility;
 import org.jboss.logmanager.Level;
 import org.jboss.logmanager.LogContext;
 import org.jboss.logmanager.Logger;
@@ -106,6 +107,10 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
     }
 
     protected void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
+        if (getCompatibility(unit).isEnabled(Compatibility.Feature.WILDFLY_LOGGING)) {
+            return;
+        }
+
         final Module module = unit.getAttachment(Attachments.MODULE);
         if (module != null) {
             // async file marker
