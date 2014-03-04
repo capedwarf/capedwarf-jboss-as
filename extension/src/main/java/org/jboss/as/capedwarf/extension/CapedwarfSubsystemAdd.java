@@ -113,6 +113,8 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     static final CapedwarfSubsystemAdd INSTANCE = new CapedwarfSubsystemAdd();
 
+    private boolean initialized;
+
     private CapedwarfSubsystemAdd() {
     }
 
@@ -161,9 +163,8 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
      * {@inheritDoc}
      */
     @Override
-    public void performBoottime(final OperationContext context, ModelNode operation, ModelNode model,
-                                ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers)
-        throws OperationFailedException {
+    public void performBoottime(final OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers)
+    throws OperationFailedException {
 
         final ModelNode appEngineModel = CapedwarfDefinition.APPENGINE_API.resolveModelAttribute(context, model);
         final String appengineAPI = appEngineModel.isDefined() ? appEngineModel.asString() : null;
@@ -174,15 +175,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final CapedwarfProperties properties = new CapedwarfProperties(System.getProperties());
         System.setProperties(properties); // override global properties, w/o synched code ...
 
-        // register custom URLStreamHandlerFactory
-        registerURLStreamHandlerFactory();
-
-        // register custom Socket Factory
-        registerSocketFactory();
-
-        addTiffSupport();
-
-        readCapedwarfConf();
+        init();
 
         context.addStep(new AbstractDeploymentChainStep() {
             public void execute(DeploymentProcessorTarget processorTarget) {
@@ -237,6 +230,21 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
             }
         }, OperationContext.Stage.RUNTIME);
 
+    }
+
+    protected synchronized void init() throws OperationFailedException {
+        if (initialized == false) {
+            // register custom URLStreamHandlerFactory
+            registerURLStreamHandlerFactory();
+            // register custom Socket Factory
+            registerSocketFactory();
+            // handle .tif
+            addTiffSupport();
+            // read bin/capedwarf.conf
+            readCapedwarfConf();
+            // we're done
+            initialized = true;
+        }
     }
 
     protected static void registerURLStreamHandlerFactory() throws OperationFailedException {
