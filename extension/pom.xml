@@ -29,7 +29,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>wildfly-capedwarf</artifactId>
-    <name>Capedwarf - JBossAS Subsystem</name>
+    <name>Capedwarf - WildFly Subsystem</name>
     <packaging>jar</packaging>
 
     <dependencies>

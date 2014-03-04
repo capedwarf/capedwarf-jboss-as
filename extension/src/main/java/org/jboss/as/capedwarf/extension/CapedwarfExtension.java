@@ -51,13 +51,12 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUB
 
 
 /**
- * JBoss Capedwarf - bridging GAE apps with JBossAS7.
+ * JBoss Capedwarf - bridging GAE apps with WildFly.
  *
  * @author <a href="mailto:marko.luksa@gmail.com">Marko Luksa</a>
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfExtension implements Extension {
-
     /**
      * The name space used for the {@code substystem} element
      */
