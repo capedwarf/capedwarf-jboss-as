@@ -14,7 +14,7 @@ if not exist %DIRNAME%..\modules\com\google\appengine\main\appengine-api-1.0-sdk
 )
 
 if "%1" == "" (
-  %DIRNAME%standalone.bat -c standalone-capedwarf.xml
+  %DIRNAME%standalone.bat -c standalone-capedwarf-modules.xml
 ) else (
-  cmd /c "cd %1 && %DIRNAME%standalone.bat -c standalone-capedwarf.xml -DrootDeployment=%1"
+  cmd /c "cd %1 && %DIRNAME%standalone.bat -c standalone-capedwarf-modules.xml -DrootDeployment=%1"
 )

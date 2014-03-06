@@ -10,8 +10,8 @@ if ! ls ${DIRNAME}/../modules/com/google/appengine/main/appengine-api-1.0-sdk-*-
 fi
 
 if [ -z "$1" ]; then
-    ${DIRNAME}/standalone.sh -c standalone-capedwarf.xml
+    ${DIRNAME}/standalone.sh -c standalone-capedwarf-modules.xml
 else
     cd "$1"
-    ${REALPATH}/standalone.sh -c standalone-capedwarf.xml -DrootDeployment=$1
+    ${REALPATH}/standalone.sh -c standalone-capedwarf-modules.xml -DrootDeployment=$1
 fi

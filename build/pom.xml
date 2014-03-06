@@ -88,7 +88,6 @@
                                     <mainClass>org.jboss.capedwarf.bytecode.CapedwarfTransformerMojo</mainClass>
                                     <arguments>
                                         <argument>${jboss.dir}/modules/com/google/appengine/main/appengine-api-1.0-sdk-${version.com.google.appengine}.jar</argument>
-                                        <argument>${jboss.dir}/modules/com/google/appengine/main/appengine-api-labs-${version.com.google.appengine}.jar</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -167,11 +166,6 @@
         <dependency>
             <groupId>com.google.appengine</groupId>
             <artifactId>appengine-api-1.0-sdk</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.appengine</groupId>
-            <artifactId>appengine-api-labs</artifactId>
         </dependency>
 
         <dependency>
