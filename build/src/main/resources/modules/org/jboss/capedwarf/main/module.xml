@@ -32,6 +32,7 @@
 
     <dependencies>
         <module name="javax.api"/>
+        <module name="javax.annotation.api"/>
         <module name="javax.enterprise.api"/>
         <module name="javax.faces.api"/>
         <module name="javax.inject.api"/>
