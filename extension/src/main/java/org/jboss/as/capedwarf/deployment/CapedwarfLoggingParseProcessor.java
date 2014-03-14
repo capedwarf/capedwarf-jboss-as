@@ -78,6 +78,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
         excludedLoggers.add("org.jboss.as");
         excludedLoggers.add("org.jboss.modules");
         excludedLoggers.add("org.jboss.vfs");
+        excludedLoggers.add("org.apache.jasper");
         excludedLoggers.add("org.apache.lucene");
         excludedLoggers.add("org.apache.velocity");
         excludedLoggers.add("org.hibernate.search");
