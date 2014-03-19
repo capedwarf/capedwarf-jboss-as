@@ -41,6 +41,7 @@ public class CapedwarfCleanupProcessor extends CapedwarfTopDeploymentUnitProcess
         final String appId = CapedwarfDeploymentMarker.getAppId(unit);
         if (appId != null) {
             ComponentRegistry.getInstance().clearComponents(appId);
+            log.info(String.format("Cleaned component registry for app id: %s", appId));
         }
     }
 }

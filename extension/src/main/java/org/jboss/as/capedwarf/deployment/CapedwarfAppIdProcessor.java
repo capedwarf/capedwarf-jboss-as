@@ -41,14 +41,18 @@ public class CapedwarfAppIdProcessor extends CapedwarfTopDeploymentUnitProcessor
     protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final String appId = CapedwarfDeploymentMarker.getAppId(phaseContext.getDeploymentUnit());
 
-        if (appId == null || appId.length() == 0)
+        if (appId == null || appId.length() == 0) {
             throw new IllegalArgumentException("App id is null or empty!");
+        }
 
-        if (apps.add(appId) == false)
+        if (apps.add(appId) == false) {
             throw new IllegalArgumentException("App id already exists: " + appId);
+        }
 
         // put any per-app prepared components
         ModuleInfo.putModules(appId);
+
+        log.info(String.format("Processed app id: %s", appId));
     }
 
     protected void doUndeploy(DeploymentUnit unit) {

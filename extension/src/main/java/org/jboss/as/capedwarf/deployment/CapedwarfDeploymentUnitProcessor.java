@@ -42,7 +42,7 @@ public abstract class CapedwarfDeploymentUnitProcessor implements DeploymentUnit
 
     protected static final String CAPEDWARF = "capedwarf";
     protected static final ServiceName CAPEDWARF_SERVICE_NAME = ServiceName.JBOSS.append(CAPEDWARF);
-    protected Logger log = Logger.getLogger(getClass());
+    protected final Logger log = Logger.getLogger(getClass());
 
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final DeploymentUnit unit = phaseContext.getDeploymentUnit();
