@@ -33,6 +33,7 @@ import org.jboss.capedwarf.shared.config.AppEngineWebXml;
 import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
 import org.jboss.capedwarf.shared.config.BackendsXml;
 import org.jboss.capedwarf.shared.config.CapedwarfConfiguration;
+import org.jboss.capedwarf.shared.config.CronXml;
 import org.jboss.capedwarf.shared.config.IndexesXml;
 import org.jboss.capedwarf.shared.config.QueueXml;
 
@@ -50,6 +51,7 @@ final class CapedwarfAttachments {
     static final AttachmentKey<QueueXml> QUEUE_XML = AttachmentKey.create(QueueXml.class);
     static final AttachmentKey<BackendsXml> BACKENDS_XML = AttachmentKey.create(BackendsXml.class);
     static final AttachmentKey<IndexesXml> INDEXES_XML = AttachmentKey.create(IndexesXml.class);
+    static final AttachmentKey<CronXml> CRON_XML = AttachmentKey.create(CronXml.class);
     static final AttachmentKey<AttachmentList<IndexesXml>> INDEXES_LIST = AttachmentKey.createList(IndexesXml.class);
     // cache
     static final AttachmentKey<Map<CacheName, CacheConfig>> CONFIGS = AttachmentKey.create(Map.class);

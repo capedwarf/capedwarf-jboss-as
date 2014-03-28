@@ -38,6 +38,8 @@ import org.jboss.capedwarf.shared.config.BackendsXml;
 import org.jboss.capedwarf.shared.config.BackendsXmlParser;
 import org.jboss.capedwarf.shared.config.CapedwarfConfiguration;
 import org.jboss.capedwarf.shared.config.CapedwarfConfigurationParser;
+import org.jboss.capedwarf.shared.config.CronXml;
+import org.jboss.capedwarf.shared.config.CronXmlParser;
 import org.jboss.capedwarf.shared.config.IndexesXml;
 import org.jboss.capedwarf.shared.config.IndexesXmlParser;
 import org.jboss.capedwarf.shared.config.QueueXml;
@@ -114,12 +116,22 @@ public class CapedwarfXmlsParserProcessor extends CapedwarfWebDeploymentUnitProc
                 safeClose(indexesIs);
             }
 
+            // cron.xml
+            final InputStream cronIS = getInputStream(deploymentRoot, "WEB-INF/cron.xml", false);
+            try {
+                CronXml cronXml = CronXmlParser.parse(cronIS);
+                unit.putAttachment(CapedwarfAttachments.CRON_XML, cronXml);
+            } finally {
+                safeClose(cronIS);
+            }
+
             ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration(
                 unit.getAttachment(CapedwarfAttachments.APP_ENGINE_WEB_XML),
                 unit.getAttachment(CapedwarfAttachments.CAPEDWARF_WEB_XML),
                 unit.getAttachment(CapedwarfAttachments.QUEUE_XML),
                 unit.getAttachment(CapedwarfAttachments.BACKENDS_XML),
-                unit.getAttachment(CapedwarfAttachments.INDEXES_XML));
+                unit.getAttachment(CapedwarfAttachments.INDEXES_XML),
+                unit.getAttachment(CapedwarfAttachments.CRON_XML));
             unit.putAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION, applicationConfiguration);
 
             ComponentRegistry.getInstance().setComponent(new SimpleKey<>(appId, moduleId, ApplicationConfiguration.class), applicationConfiguration);
