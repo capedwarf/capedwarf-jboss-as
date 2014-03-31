@@ -59,6 +59,7 @@
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-channel"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-cluster"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-common"/>
+            <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-cron"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-datastore"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-endpoints"/>
             <maven-resource group="org.jboss.capedwarf.blue" artifact="capedwarf-environment"/>
@@ -90,6 +91,10 @@
 
         <module-def name="com.google.appengine">
             <maven-resource group="com.google.appengine" artifact="appengine-api-1.0-sdk"/>
+        </module-def>
+
+        <module-def name="com.google.appengine.tools">
+            <maven-resource group="com.google.appengine" artifact="appengine-tools-sdk"/>
         </module-def>
 
         <module-def name="com.google.appengine.endpoints">
@@ -161,6 +166,10 @@
         <module-def name="org.wildfly.mail.ra">
             <maven-resource group="org.wildfly" artifact="mail-ra-api"/>
             <maven-resource group="org.wildfly" artifact="mail-ra-impl"/>
+        </module-def>
+
+        <module-def name="org.quartz">
+            <maven-resource group="org.quartz-scheduler" artifact="quartz"/>
         </module-def>
 
         <!-- module-def name="org.apache.avro">

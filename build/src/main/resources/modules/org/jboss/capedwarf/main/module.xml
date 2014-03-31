@@ -74,5 +74,7 @@
         <module name="io.undertow.servlet"/>
         <module name="javax.websocket.api"/>
         <module name="org.antlr" slot="3"/>
+        <module name="org.quartz"/>
+        <module name="com.google.appengine.tools"/>
     </dependencies>
 </module>

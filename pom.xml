@@ -76,6 +76,7 @@
         <version.javax.jai>1.1.1</version.javax.jai>
         <version.org.geotoolkit>3.21</version.org.geotoolkit>
         <version.javassist>3.18.1-GA</version.javassist>
+        <version.org.quartz>2.2.1</version.org.quartz>
 
         <version.org.eclipse.jdt.core.compiler>3.7.2</version.org.eclipse.jdt.core.compiler>
 
@@ -543,6 +544,12 @@
                 <version>${version.antlr}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>${version.org.quartz}</version>
+            </dependency>
+
             <!-- CapeDwarf & GAE -->
 
             <dependency>
@@ -602,6 +609,12 @@
             <dependency>
                 <groupId>org.jboss.capedwarf.blue</groupId>
                 <artifactId>capedwarf-common</artifactId>
+                <version>${version.org.jboss.capedwarf}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.capedwarf.blue</groupId>
+                <artifactId>capedwarf-cron</artifactId>
                 <version>${version.org.jboss.capedwarf}</version>
             </dependency>
 
@@ -722,6 +735,12 @@
             <dependency>
                 <groupId>com.google.appengine</groupId>
                 <artifactId>appengine-api-1.0-sdk</artifactId>
+                <version>${version.com.google.appengine}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-tools-sdk</artifactId>
                 <version>${version.com.google.appengine}</version>
             </dependency>
 

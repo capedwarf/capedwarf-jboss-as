@@ -59,8 +59,8 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
 
     private static final ModuleIdentifier APPENGINE = ModuleIdentifier.create("com.google.appengine");
     private static final ModuleIdentifier CAPEDWARF = ModuleIdentifier.create("org.jboss.capedwarf");
-    private static final ModuleIdentifier INFINISPAN = ModuleIdentifier.create("org.infinispan");
 
+    private static final ModuleIdentifier INFINISPAN = ModuleIdentifier.create("org.infinispan");
     private static final ModuleIdentifier MODULES = ModuleIdentifier.create("org.jboss.modules");
     private static final ModuleIdentifier TX = ModuleIdentifier.create("javax.transaction.api");
     private static final ModuleIdentifier ACTIVATION = ModuleIdentifier.create("javax.activation.api");
@@ -90,6 +90,8 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier JACKSON_MAPPER_ASL = ModuleIdentifier.create("org.codehaus.jackson.jackson-mapper-asl");
     private static final ModuleIdentifier WEB_SOCKET = ModuleIdentifier.create("javax.websocket.api");
     private static final ModuleIdentifier ANTLR_3 = ModuleIdentifier.create("org.antlr", "3");
+    private static final ModuleIdentifier QUARTZ = ModuleIdentifier.create("org.quartz");
+    private static final ModuleIdentifier TOOLS = ModuleIdentifier.create("com.google.appengine.tools");
     // inline this module deps, if running with bundled
     private static final ModuleIdentifier[] INLINE = {
         MODULES,
@@ -120,7 +122,9 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         JACKSON_CORE_ASL,
         JACKSON_MAPPER_ASL,
         WEB_SOCKET,
-        ANTLR_3
+        ANTLR_3,
+        QUARTZ,
+        TOOLS
     };
 
     private static final FilenameFilter JARS_SDK = new FilenameFilter() {
