@@ -26,7 +26,7 @@
     <resources>
         <resource-root path="appengine-tools-sdk-1.9.1.jar">
             <filter>
-                <include path="com/google/apphosting/runtime/**"/>
+                <include path="com/google/apphosting/runtime/security"/>
                 <include path="com/google/appengine/repackaged/com/google/cron"/>
                 <include path="com/google/appengine/repackaged/org/**"/>
                 <exclude path="**"/>
