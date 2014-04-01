@@ -24,7 +24,14 @@
 
 <module xmlns="urn:jboss:module:1.1" name="com.google.appengine.tools">
     <resources>
-        <!-- Insert resources here -->
+        <resource-root path="appengine-tools-sdk-1.9.1.jar">
+            <filter>
+                <include path="com/google/apphosting/runtime/**"/>
+                <include path="com/google/appengine/repackaged/com/google/cron"/>
+                <include path="com/google/appengine/repackaged/org/**"/>
+                <exclude path="**"/>
+            </filter>
+        </resource-root>
     </resources>
 
     <dependencies>
