@@ -34,6 +34,7 @@ import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
 import org.jboss.capedwarf.shared.config.ConfigurationAware;
 import org.jboss.capedwarf.shared.reflection.MethodInvocation;
 import org.jboss.capedwarf.shared.reflection.ReflectionUtils;
+import org.jboss.capedwarf.shared.util.Utils;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceName;
 
@@ -80,12 +81,11 @@ public class CapedwarfWebContextProcessor extends CapedwarfWebDeploymentUnitProc
 
         public void setup(Map<String, Object> properties) {
             ConfigurationAware.setApplicationConfiguration(applicationConfiguration);
-
             try {
                 setup.invoke();
-            } catch (RuntimeException e) {
+            } catch (Throwable t) {
                 reset();
-                throw e;
+                throw Utils.toRuntimeException(t);
             }
         }
 

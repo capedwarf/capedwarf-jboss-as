@@ -47,7 +47,7 @@ import org.jboss.capedwarf.shared.config.QueueXmlParser;
 import org.jboss.capedwarf.shared.modules.ModuleInfo;
 import org.jboss.vfs.VirtualFile;
 
-import static org.jboss.as.capedwarf.deployment.ParseUtils.safeClose;
+import static org.jboss.capedwarf.shared.util.ParseUtils.safeClose;
 
 /**
  * Parse GAE / CD xmls.

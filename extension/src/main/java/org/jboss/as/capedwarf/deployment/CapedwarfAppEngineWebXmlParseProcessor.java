@@ -27,6 +27,7 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.module.ResourceRoot;
+import org.jboss.capedwarf.shared.util.ParseUtils;
 import org.jboss.vfs.VirtualFile;
 
 /**

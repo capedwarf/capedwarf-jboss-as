@@ -28,6 +28,11 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.vfs.VirtualFile;
 
+import static org.jboss.capedwarf.shared.util.ParseUtils.APPLICATION;
+import static org.jboss.capedwarf.shared.util.ParseUtils.MODULE;
+import static org.jboss.capedwarf.shared.util.ParseUtils.THREADSAFE;
+import static org.jboss.capedwarf.shared.util.ParseUtils.VERSION;
+
 /**
  * Parse WAR app info - id, version.
  *
@@ -35,19 +40,19 @@ import org.jboss.vfs.VirtualFile;
  */
 public class CapedwarfWebAppInfoParseProcessor extends CapedwarfAppEngineWebXmlParseProcessor {
     protected void doParseAppEngineWebXml(DeploymentPhaseContext context, DeploymentUnit unit, VirtualFile root, VirtualFile xml) throws Exception {
-        final Map<String, String> results = ParseUtils.parseTokens(xml, ParseUtils.APPLICATION, ParseUtils.VERSION, ParseUtils.THREADSAFE, ParseUtils.MODULE);
+        final Map<String, String> results = DeploymentParseUtils.parseTokens(xml, APPLICATION, VERSION, THREADSAFE, MODULE);
 
         final String appId;
         if (CapedwarfDeploymentMarker.hasModules(unit)) {
             appId = CapedwarfDeploymentMarker.getTopMarker(unit).getAppId();
         } else {
-            appId = results.get(ParseUtils.APPLICATION);
+            appId = results.get(APPLICATION);
         }
 
         CapedwarfDeploymentMarker.setAppId(unit, appId);
-        CapedwarfDeploymentMarker.setAppVersion(unit, results.get(ParseUtils.VERSION));
-        CapedwarfDeploymentMarker.setThreadsafe(unit, Boolean.parseBoolean(results.get(ParseUtils.THREADSAFE)));
-        String module = results.get(ParseUtils.MODULE);
+        CapedwarfDeploymentMarker.setAppVersion(unit, results.get(VERSION));
+        CapedwarfDeploymentMarker.setThreadsafe(unit, Boolean.parseBoolean(results.get(THREADSAFE)));
+        String module = results.get(MODULE);
         CapedwarfDeploymentMarker.setModule(unit, module);
     }
 }

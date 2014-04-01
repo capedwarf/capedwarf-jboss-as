@@ -43,6 +43,7 @@ import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.capedwarf.shared.compatibility.Compatibility;
+import org.jboss.capedwarf.shared.util.ParseUtils;
 import org.jboss.logmanager.Level;
 import org.jboss.logmanager.LogContext;
 import org.jboss.logmanager.Logger;
@@ -73,6 +74,7 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
     private static final AttachmentKey<PropertyConfigurator> PROPERTY_CONFIGURATOR_KEY = AttachmentKey.create(PropertyConfigurator.class);
 
     private final static Set<String> excludedLoggers = new HashSet<>();
+
     static {
         excludedLoggers.add("org.jboss.capedwarf");
         excludedLoggers.add("org.jboss.as");

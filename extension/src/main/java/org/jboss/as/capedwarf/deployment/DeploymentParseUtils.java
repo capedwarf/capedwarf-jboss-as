@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012, Red Hat, Inc., and individual contributors
+ * Copyright 2013, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -24,27 +24,31 @@ package org.jboss.as.capedwarf.deployment;
 
 import java.util.Map;
 
+import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
-import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.as.server.deployment.module.ResourceRoot;
 import org.jboss.capedwarf.shared.util.ParseUtils;
 import org.jboss.vfs.VirtualFile;
 
 /**
- * Parse EAR app info - id, version.
- *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfEarAppInfoParseProcessor extends CapedwarfEarDeploymentUnitProcessor {
-    protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-        final DeploymentUnit unit = phaseContext.getDeploymentUnit();
-        try {
-            VirtualFile xml = DeploymentParseUtils.getFile(unit, ParseUtils.APPENGINE_APPLICATION_XML);
-            Map<String, String> info = DeploymentParseUtils.parseTokens(xml, ParseUtils.APPLICATION);
-            String appId = info.get(ParseUtils.APPLICATION);
-            CapedwarfDeploymentMarker.setAppId(unit, appId);
-        } catch (Exception e) {
-            throw new DeploymentUnitProcessingException(e);
-        }
+final class DeploymentParseUtils {
+    private DeploymentParseUtils() {
+    }
+
+    static VirtualFile getFile(DeploymentPhaseContext context, String path) {
+        return getFile(context.getDeploymentUnit(), path);
+    }
+
+    static VirtualFile getFile(DeploymentUnit unit, String path) {
+        ResourceRoot deploymentRoot = unit.getAttachment(Attachments.DEPLOYMENT_ROOT);
+        VirtualFile root = deploymentRoot.getRoot();
+        return root.getChild(path);
+    }
+
+    static Map<String, String> parseTokens(VirtualFile xml, final String... tokens) throws Exception {
+        return ParseUtils.parseTokens(xml.openStream(), tokens);
     }
 }
