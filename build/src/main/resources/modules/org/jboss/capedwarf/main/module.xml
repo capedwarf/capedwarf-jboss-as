@@ -59,6 +59,7 @@
         <module name="org.picketlink.social"/>
         <module name="org.jboss.resteasy.resteasy-jaxrs"/>
         <module name="org.jboss.resteasy.resteasy-jackson-provider"/>
+        <module name="org.jboss.resteasy.jose-jwt"/>
         <module name="org.wildfly.mail.ra"/>
         <module name="com.google.appengine"/>
         <module name="com.google.appengine.endpoints"/>
