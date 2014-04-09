@@ -24,7 +24,7 @@
 
 <module xmlns="urn:jboss:module:1.1" name="com.google.appengine.tools">
     <resources>
-        <resource-root path="appengine-tools-sdk-1.9.1.jar">
+        <resource-root path="appengine-tools-sdk-1.9.2.jar">
             <filter>
                 <include path="com/google/apphosting/runtime/security"/>
                 <include path="com/google/appengine/repackaged/com/google/cron"/>
