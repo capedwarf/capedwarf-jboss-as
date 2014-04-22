@@ -19,7 +19,6 @@
         <extension module="org.jboss.as.naming"/>
         <extension module="org.jboss.as.remoting"/>
         <extension module="org.jboss.as.security"/>
-        <extension module="org.jboss.as.threads"/>
         <extension module="org.jboss.as.transactions"/>
         <extension module="org.jboss.as.weld"/>
         <extension module="org.wildfly.extension.io"/>
@@ -118,8 +117,8 @@
                 </drivers>
             </datasources>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:deployment-scanner:1.1">
-            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"/>
+        <subsystem xmlns="urn:jboss:domain:deployment-scanner:2.0">
+               <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee:2.0">
             <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
@@ -168,9 +167,9 @@
             <default-security-domain value="other"/>
             <default-missing-method-permissions-deny-access value="true"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:io:1.0">
-            <worker name="default" io-threads="3"/>
-            <buffer-pool name="default" buffer-size="16384" buffers-per-slice="128"/>
+        <subsystem xmlns="urn:jboss:domain:io:1.1">
+            <worker name="default" />
+            <buffer-pool name="default" />
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:infinispan:2.0">
             <cache-container name="singleton" aliases="cluster ha-partition" default-cache="default">
@@ -393,16 +392,14 @@
             </stack>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jmx:1.2">
-            <expose-resolved-model/>
-            <expose-expression-model/>
             <remoting-connector/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jpa:1.1">
             <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jsf:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:mail:1.1">
-            <mail-session jndi-name="java:jboss/mail/Default">
+        <subsystem xmlns="urn:jboss:domain:mail:2.0">
+            <mail-session name="default" jndi-name="java:jboss/mail/Default">
                 <smtp-server outbound-socket-binding-ref="mail-smtp"/>
             </mail-session>
         </subsystem>
@@ -548,7 +545,6 @@
                 </security-domain>
             </security-domains>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:threads:1.1"/>
         <subsystem xmlns="urn:jboss:domain:transactions:1.3">
             <core-environment>
                 <process-id>
@@ -558,23 +554,29 @@
             <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
             <coordinator-environment default-timeout="300"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:undertow:1.0">
+        <subsystem xmlns="urn:jboss:domain:undertow:1.1">
             <buffer-caches>
-                <buffer-cache name="default" buffer-size="1024" buffers-per-region="1024" max-regions="10"/>
+                <buffer-cache name="default" />
             </buffer-caches>
             <server name="default-server">
                 <http-listener name="default" socket-binding="http"/>
                 <ajp-listener name="ajp" socket-binding="ajp"/>
                 <host name="default-host" alias="localhost">
                     <location name="/" handler="welcome-content"/>
+                    <filter-ref name="server-header"/>
+                    <filter-ref name="x-powered-by-header"/>
                 </host>
             </server>
             <servlet-container name="default">
                 <jsp-config/>
             </servlet-container>
             <handlers>
-                <file name="welcome-content" path="${jboss.home.dir}/welcome-content" directory-listing="true"/>
+                <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
             </handlers>
+            <filters>
+                <response-header name="server-header" header-name="Server" header-value="Wildfly/8"/>
+                <response-header name="x-powered-by-header" header-name="X-Powered-By" header-value="CapeDwarf/2"/>
+            </filters>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:2.0" require-bean-descriptor="true" non-portable-mode="true" />
     </profile>

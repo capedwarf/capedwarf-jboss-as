@@ -23,7 +23,7 @@
   -->
 
 <!-- Represents the DataNucleus 3.0.x module-->
-<module xmlns="urn:jboss:module:1.1" name="org.datanucleus">
+<module xmlns="urn:jboss:module:1.3" name="org.datanucleus">
     <resources>
         <!-- Insert resources here -->
     </resources>
