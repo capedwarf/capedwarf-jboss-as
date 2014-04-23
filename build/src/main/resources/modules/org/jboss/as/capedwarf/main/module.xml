@@ -38,6 +38,7 @@
         <module name="org.jboss.as.clustering.common"/>
         <module name="org.jboss.as.clustering.infinispan"/>
         <module name="org.jboss.as.clustering.jgroups"/>
+        <module name="org.wildfly.clustering.singleton"/>
         <module name="org.jboss.as.server"/>
         <module name="org.jboss.as.ee"/>
         <module name="org.jboss.as.ejb3"/>

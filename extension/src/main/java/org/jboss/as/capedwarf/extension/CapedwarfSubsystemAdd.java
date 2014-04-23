@@ -227,6 +227,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 7, new CapedwarfWebContextProcessor()); // before web context lifecycle
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT - 3, new CapedwarfCacheProcessor()); // after module
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT - 1, new CapedwarfMuxIdProcessor()); // adjust order as needed
+                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_MODULE_JNDI_BINDINGS - 3, new CapedwarfCronProcessor()); // at install
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_MODULE_JNDI_BINDINGS - 2, new CapedwarfDependenciesProcessor()); // after logging
             }
         }, OperationContext.Stage.RUNTIME);

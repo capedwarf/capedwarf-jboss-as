@@ -213,6 +213,12 @@
 
             <dependency>
                 <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-clustering-singleton</artifactId>
+                <version>${version.jboss.wildfly}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wildfly</groupId>
                 <artifactId>wildfly-server</artifactId>
                 <version>${version.jboss.wildfly}</version>
             </dependency>
