@@ -557,9 +557,7 @@
             <coordinator-environment default-timeout="300"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:undertow:1.1">
-            <buffer-caches>
-                <buffer-cache name="default" />
-            </buffer-caches>
+            <buffer-cache name="default"/>
             <server name="default-server">
                 <http-listener name="default" socket-binding="http"/>
                 <ajp-listener name="ajp" socket-binding="ajp"/>
