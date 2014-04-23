@@ -22,10 +22,10 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.0" name="com.google.appengine">
+<module xmlns="urn:jboss:module:1.3" name="com.google.appengine">
     <resources>
         <resource-root path="appengine-api-1.0-sdk-1.9.3.jar">
-        <filter>
+            <filter>
                 <include path="com/google/**"/>
                 <include path="META-INF/**"/>
                 <exclude path="**"/>
