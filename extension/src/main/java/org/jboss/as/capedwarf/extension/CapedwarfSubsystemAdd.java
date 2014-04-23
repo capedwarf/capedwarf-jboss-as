@@ -354,7 +354,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         ServiceName cmServiceName = EmbeddedCacheManagerService.getServiceName(Constants.CAPEDWARF);
         addComponentRegistryService(serviceTarget, newControllers, Keys.CACHE_MANAGER, cmServiceName);
 
-        ServiceName mailServiceName = ServiceName.JBOSS.append("mail-session").append("java:jboss/mail/Default"); // TODO
+        ServiceName mailServiceName = ServiceName.JBOSS.append("mail-session").append("default");
         addComponentRegistryService(serviceTarget, newControllers, Keys.MAIL_SESSION, mailServiceName);
     }
 

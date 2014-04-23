@@ -400,9 +400,9 @@
             <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jsf:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:mail:1.1">
-            <mail-session jndi-name="java:jboss/mail/Default">
-                <smtp-server outbound-socket-binding-ref="mail-smtp"/>
+        <subsystem xmlns="urn:jboss:domain:mail:2.0">
+            <mail-session name="default" jndi-name="java:jboss/mail/Default">
+            <smtp-server outbound-socket-binding-ref="mail-smtp"/>
             </mail-session>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:messaging:2.0">
