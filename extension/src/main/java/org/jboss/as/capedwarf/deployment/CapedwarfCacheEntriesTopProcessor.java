@@ -27,10 +27,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.jboss.as.capedwarf.services.CacheConfig;
 import org.jboss.as.capedwarf.services.CacheConfigs;
-import org.jboss.as.capedwarf.services.CacheName;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.capedwarf.shared.config.CacheName;
 
 /**
  * Define cache configs and its classes.

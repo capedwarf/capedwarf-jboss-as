@@ -25,13 +25,13 @@ package org.jboss.as.capedwarf.deployment;
 import java.util.Map;
 
 import org.jboss.as.capedwarf.services.CacheConfig;
-import org.jboss.as.capedwarf.services.CacheName;
 import org.jboss.as.capedwarf.services.ServerInstanceInfo;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.AttachmentList;
 import org.jboss.capedwarf.shared.config.AppEngineWebXml;
 import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
 import org.jboss.capedwarf.shared.config.BackendsXml;
+import org.jboss.capedwarf.shared.config.CacheName;
 import org.jboss.capedwarf.shared.config.CapedwarfConfiguration;
 import org.jboss.capedwarf.shared.config.CronXml;
 import org.jboss.capedwarf.shared.config.IndexesXml;

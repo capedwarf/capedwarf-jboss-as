@@ -22,6 +22,8 @@
 
 package org.jboss.as.capedwarf.services;
 
+import org.jboss.capedwarf.shared.config.CacheName;
+
 /**
  * Available caches in CapeDwarf.
  *

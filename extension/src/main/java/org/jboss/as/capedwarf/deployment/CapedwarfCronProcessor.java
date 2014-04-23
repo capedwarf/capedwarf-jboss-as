@@ -22,13 +22,13 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import org.jboss.as.capedwarf.services.CacheName;
 import org.jboss.as.capedwarf.services.CronService;
 import org.jboss.as.server.Services;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.capedwarf.shared.config.CacheName;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
 import org.jboss.msc.service.ServiceController;
@@ -56,7 +56,7 @@ public class CapedwarfCronProcessor extends CapedwarfTopDeploymentUnitProcessor 
         final ServiceRegistry registry = phaseContext.getServiceRegistry();
         final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
 
-        final ServiceName factoryServiceName = SingletonServiceBuilderFactory.SERVICE_NAME.append(CAPEDWARF, CacheName.DIST.getName());
+        final ServiceName factoryServiceName = SingletonServiceBuilderFactory.SERVICE_NAME.append(CAPEDWARF, CacheName.CRON.getName());
         final ServiceController<?> factoryService = registry.getRequiredService(factoryServiceName);
 
         final SingletonServiceBuilderFactory factory = (SingletonServiceBuilderFactory) factoryService.getValue();

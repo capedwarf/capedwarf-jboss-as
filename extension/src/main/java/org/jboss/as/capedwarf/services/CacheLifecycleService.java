@@ -43,8 +43,8 @@ public class CacheLifecycleService extends AbstractConfigurationCallback impleme
     private final String appId;
     private final ConfigurationCallback callback;
 
-    private final InjectedValue<EmbeddedCacheManager> ecmiv = new InjectedValue<EmbeddedCacheManager>();
-    private final InjectedValue<Configuration> civ = new InjectedValue<Configuration>();
+    private final InjectedValue<EmbeddedCacheManager> ecmiv = new InjectedValue<>();
+    private final InjectedValue<Configuration> civ = new InjectedValue<>();
 
     private Cache cache;
 

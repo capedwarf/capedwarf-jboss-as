@@ -26,11 +26,11 @@ import java.util.Map;
 
 import org.jboss.as.capedwarf.services.CacheConfig;
 import org.jboss.as.capedwarf.services.CacheIndexing;
-import org.jboss.as.capedwarf.services.CacheName;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.capedwarf.shared.config.CacheName;
 
 /**
  * Define cache configs and its classes.

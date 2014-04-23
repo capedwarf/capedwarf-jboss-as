@@ -286,6 +286,10 @@
                         <property name="hibernate.search.default.worker.backend">jgroups</property>
                     </indexing>
                 </distributed-cache>
+                <replicated-cache name="cron" mode="SYNC">
+                    <transaction mode="NONE"/>
+                    <eviction strategy="NONE"/>
+                </replicated-cache>
                 <replicated-cache name="LuceneIndexesMetadata" mode="SYNC">
                     <transaction mode="NONE"/>
                     <eviction strategy="NONE"/>
