@@ -40,7 +40,6 @@ import org.jboss.msc.value.InjectedValue;
  */
 public class CacheLifecycleService extends AbstractConfigurationCallback implements Service<Cache> {
     private final String cacheName;
-    private final String appId;
     private final ConfigurationCallback callback;
 
     private final InjectedValue<EmbeddedCacheManager> ecmiv = new InjectedValue<>();
@@ -48,23 +47,21 @@ public class CacheLifecycleService extends AbstractConfigurationCallback impleme
 
     private Cache cache;
 
-    public CacheLifecycleService(String cacheName, String appId) {
-        this(cacheName, appId, null);
+    public CacheLifecycleService(String cacheName) {
+        this(cacheName, null);
     }
 
-    public CacheLifecycleService(String cacheName, String appId, ConfigurationCallback callback) {
+    public CacheLifecycleService(String cacheName, ConfigurationCallback callback) {
         this.cacheName = cacheName;
-        this.appId = appId;
         this.callback = callback;
     }
 
     public void start(StartContext context) throws StartException {
         final EmbeddedCacheManager cacheManager = getCacheManager();
-        final String fullCacheName = cacheName + "_" + appId; // impl detail!
 
         final ConfigurationCallback cc = (callback != null) ? callback : this;
 
-        cache = cacheManager.getCache(fullCacheName, false);
+        cache = cacheManager.getCache(cacheName, false);
         if (cache != null) {
             final ComponentStatus status = cache.getStatus();
             if (status != ComponentStatus.INITIALIZING && status != ComponentStatus.RUNNING) {
@@ -76,10 +73,10 @@ public class CacheLifecycleService extends AbstractConfigurationCallback impleme
         }
 
         final ConfigurationBuilder builder = cc.configure(civ.getValue());
-        cacheManager.defineConfiguration(fullCacheName, builder.build());
+        cacheManager.defineConfiguration(cacheName, builder.build());
 
         cc.start(cacheManager);
-        cache = cacheManager.getCache(fullCacheName, true);
+        cache = cacheManager.getCache(cacheName, true);
         cc.start(cache);
     }
 

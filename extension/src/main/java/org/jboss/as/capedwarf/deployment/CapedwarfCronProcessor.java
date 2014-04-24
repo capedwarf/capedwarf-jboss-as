@@ -56,7 +56,7 @@ public class CapedwarfCronProcessor extends CapedwarfTopDeploymentUnitProcessor 
         final ServiceRegistry registry = phaseContext.getServiceRegistry();
         final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
 
-        final ServiceName factoryServiceName = SingletonServiceBuilderFactory.SERVICE_NAME.append(CAPEDWARF, CacheName.CRON.getName());
+        final ServiceName factoryServiceName = SingletonServiceBuilderFactory.SERVICE_NAME.append(CAPEDWARF, CacheName.CRON.getFullName(appId));
         final ServiceController<?> factoryService = registry.getRequiredService(factoryServiceName);
 
         final SingletonServiceBuilderFactory factory = (SingletonServiceBuilderFactory) factoryService.getValue();

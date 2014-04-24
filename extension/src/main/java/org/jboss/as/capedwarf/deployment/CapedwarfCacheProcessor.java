@@ -97,13 +97,13 @@ public class CapedwarfCacheProcessor extends CapedwarfTopDeploymentUnitProcessor
         // versions
         createBuilder(serviceTarget, CacheName.DATASTORE_VERSIONS, appId, new DatastoreVersionsConfigurationCallback());
         // data, metadata, memcache, dist
-        for (CacheName cn : Arrays.asList(CacheName.DATA, CacheName.METADATA, CacheName.MEMCACHE, CacheName.DIST)) {
+        for (CacheName cn : Arrays.asList(CacheName.DATA, CacheName.METADATA, CacheName.MEMCACHE, CacheName.DIST, CacheName.CRON)) {
             createBuilder(serviceTarget, cn, appId, null);
         }
     }
 
     protected ServiceController<Cache> createBuilder(ServiceTarget serviceTarget, CacheName cacheName, String appId, ConfigurationCallback callback) {
-        final CacheLifecycleService cls = new CacheLifecycleService(cacheName.getName(), appId, callback);
+        final CacheLifecycleService cls = new CacheLifecycleService(cacheName.getFullName(appId), callback);
         final ServiceBuilder<Cache> builder = serviceTarget.addService(toServiceName(appId, cacheName), cls);
         if (callback instanceof IndexableConfigurationCallback) {
             IndexableConfigurationCallback icb = (IndexableConfigurationCallback) callback;
