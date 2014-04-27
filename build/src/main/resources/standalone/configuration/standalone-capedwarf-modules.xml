@@ -102,7 +102,8 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:datasources:2.0">
             <datasources>
-                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
+                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true"
+                            use-java-context="true">
                     <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
                     <driver>h2</driver>
                     <security>
@@ -139,8 +140,10 @@
             </mdb>
             <pools>
                 <bean-instance-pools>
-                    <strict-max-pool name="slsb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
-                    <strict-max-pool name="mdb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="slsb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5"
+                                     instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="mdb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5"
+                                     instance-acquisition-timeout-unit="MINUTES"/>
                 </bean-instance-pools>
             </pools>
             <caches>
@@ -153,7 +156,8 @@
             <async thread-pool-name="default"/>
             <timer-service thread-pool-name="default" default-data-store="default-file-store">
                 <data-stores>
-                    <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
+                    <file-data-store name="default-file-store" path="timer-service-data"
+                                     relative-to="jboss.server.data.dir"/>
                 </data-stores>
             </timer-service>
             <thread-pools>
@@ -167,8 +171,8 @@
             <default-missing-method-permissions-deny-access value="true"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:io:1.1">
-            <worker name="default" />
-            <buffer-pool name="default" />
+            <worker name="default"/>
+            <buffer-pool name="default"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:infinispan:2.0">
             <cache-container name="capedwarf" default-cache="default" module="org.infinispan.query"
@@ -207,7 +211,7 @@
                     <file-store preload="false" purge="false"/>
                 </replicated-cache>
                 <replicated-cache name="memcache" mode="SYNC" statistics-enabled="true">
-                <transaction mode="NON_XA" locking="PESSIMISTIC"/>
+                    <transaction mode="NON_XA" locking="PESSIMISTIC"/>
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <!-- no file-store as explicitly no persistence -->
                 </replicated-cache>
@@ -286,10 +290,6 @@
                         <property name="hibernate.search.default.worker.backend">jgroups</property>
                     </indexing>
                 </distributed-cache>
-                <replicated-cache name="cron" mode="SYNC" batching="true">
-                    <transaction mode="NONE"/>
-                    <eviction strategy="NONE"/>
-                </replicated-cache>
                 <replicated-cache name="LuceneIndexesMetadata" mode="SYNC">
                     <transaction mode="NONE"/>
                     <eviction strategy="NONE"/>
@@ -369,7 +369,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:mail:2.0">
             <mail-session name="default" jndi-name="java:jboss/mail/Default">
-            <smtp-server outbound-socket-binding-ref="mail-smtp"/>
+                <smtp-server outbound-socket-binding-ref="mail-smtp"/>
             </mail-session>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:messaging:2.0">
@@ -559,7 +559,7 @@
                 <response-header name="x-powered-by-header" header-name="X-Powered-By" header-value="CapeDwarf/2"/>
             </filters>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:weld:2.0" require-bean-descriptor="true" non-portable-mode="true" />
+        <subsystem xmlns="urn:jboss:domain:weld:2.0" require-bean-descriptor="true" non-portable-mode="true"/>
     </profile>
     <interfaces>
         <interface name="management">
@@ -577,7 +577,8 @@
             <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
         </interface>
     </interfaces>
-    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
+    <socket-binding-group name="standard-sockets" default-interface="public"
+                          port-offset="${jboss.socket.binding.port-offset:0}">
         <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>
         <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
         <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9443}"/>
@@ -588,13 +589,16 @@
         <socket-binding name="https" port="${jboss.https.port:8443}"/>
         <socket-binding name="jacorb" interface="unsecure" port="3528"/>
         <socket-binding name="jacorb-ssl" interface="unsecure" port="3529"/>
-        <socket-binding name="jgroups-mping" port="0" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45700"/>
+        <socket-binding name="jgroups-mping" port="0" multicast-address="${jboss.default.multicast.address:230.0.0.4}"
+                        multicast-port="45700"/>
         <socket-binding name="jgroups-tcp" port="7600"/>
         <socket-binding name="jgroups-tcp-fd" port="57600"/>
-        <socket-binding name="jgroups-udp" port="55200" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45688"/>
+        <socket-binding name="jgroups-udp" port="55200" multicast-address="${jboss.default.multicast.address:230.0.0.4}"
+                        multicast-port="45688"/>
         <socket-binding name="jgroups-udp-fd" port="54200"/>
         <socket-binding name="messaging" port="5445"/>
-        <socket-binding name="messaging-group" port="0" multicast-address="${jboss.messaging.group.address:231.7.7.7}" multicast-port="${jboss.messaging.group.port:9876}"/>
+        <socket-binding name="messaging-group" port="0" multicast-address="${jboss.messaging.group.address:231.7.7.7}"
+                        multicast-port="${jboss.messaging.group.port:9876}"/>
         <socket-binding name="messaging-throughput" port="5455"/>
         <socket-binding name="modcluster" port="0" multicast-address="224.0.1.105" multicast-port="23364"/>
         <socket-binding name="remoting" port="${jboss.remoting.port:4447}"/>

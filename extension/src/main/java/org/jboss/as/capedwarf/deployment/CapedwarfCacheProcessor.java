@@ -48,6 +48,7 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.capedwarf.shared.config.CacheName;
 import org.jboss.capedwarf.shared.config.IndexesXml;
+import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
@@ -79,7 +80,8 @@ public class CapedwarfCacheProcessor extends CapedwarfTopDeploymentUnitProcessor
     protected void doDeploy(DeploymentPhaseContext context) throws DeploymentUnitProcessingException {
         final DeploymentUnit unit = context.getDeploymentUnit();
         final String appId = CapedwarfDeploymentMarker.getAppId(unit);
-        final ClassLoader classLoader = unit.getAttachment(Attachments.MODULE).getClassLoader();
+        final Module module = unit.getAttachment(Attachments.MODULE);
+        final ClassLoader classLoader = module.getClassLoader();
 
         final ServiceTarget serviceTarget = context.getServiceTarget();
         // configs
@@ -97,7 +99,7 @@ public class CapedwarfCacheProcessor extends CapedwarfTopDeploymentUnitProcessor
         // versions
         createBuilder(serviceTarget, CacheName.DATASTORE_VERSIONS, appId, new DatastoreVersionsConfigurationCallback());
         // data, metadata, memcache, dist
-        for (CacheName cn : Arrays.asList(CacheName.DATA, CacheName.METADATA, CacheName.MEMCACHE, CacheName.DIST, CacheName.CRON)) {
+        for (CacheName cn : Arrays.asList(CacheName.DATA, CacheName.METADATA, CacheName.MEMCACHE, CacheName.DIST)) {
             createBuilder(serviceTarget, cn, appId, null);
         }
     }
