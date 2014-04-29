@@ -341,6 +341,7 @@
                 <protocol type="UFC"/>
                 <protocol type="MFC"/>
                 <protocol type="FRAG2"/>
+                <protocol type="FORK"/>
                 <protocol type="RSVP"/>
             </stack>
             <stack name="tcp">
@@ -356,6 +357,7 @@
                 <protocol type="pbcast.GMS"/>
                 <protocol type="MFC"/>
                 <protocol type="FRAG2"/>
+                <protocol type="FORK"/>
                 <protocol type="RSVP"/>
             </stack>
         </subsystem>
