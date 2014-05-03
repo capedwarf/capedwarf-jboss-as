@@ -81,7 +81,7 @@
         <version.org.eclipse.jdt.core.compiler>4.3.1</version.org.eclipse.jdt.core.compiler>
 
         <!-- TEMP -->
-        <version.jsf.impl>2.2.6-jbossorg-2</version.jsf.impl>
+        <version.jsf.impl>2.2.6-jbossorg-4</version.jsf.impl>
 
         <version.org.datanucleus>3.1.2</version.org.datanucleus>
         <version.org.datanucleus.appengine>2.1.1</version.org.datanucleus.appengine>
