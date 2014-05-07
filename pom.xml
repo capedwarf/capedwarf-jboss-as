@@ -98,7 +98,7 @@
         <version.org.picketlink>2.1.10.Final</version.org.picketlink>
         <version.org.picketlink.social>2.5.2.Final</version.org.picketlink.social>
         <version.org.openid4java>0.9.6</version.org.openid4java>
-        <version.net.sourceforge.nekohtml>1.9.10</version.net.sourceforge.nekohtml>
+        <version.net.sourceforge.nekohtml>1.9.20</version.net.sourceforge.nekohtml>
         <version.com.google.code.guice>2.0</version.com.google.code.guice>
         <version.rhino.js>1.7R2</version.rhino.js>
         <version.antlr>3.1</version.antlr>
