@@ -67,7 +67,8 @@
         <version.junit>4.11</version.junit>
         <version.org.apache.httpcomponents>4.2.5</version.org.apache.httpcomponents>
         <version.org.apache.lucene>3.6.2</version.org.apache.lucene>
-        <version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>1.0.0.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>
+        <version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>1.0.0.Final
+        </version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>
         <version.org.jgroups>3.4.3.Final</version.org.jgroups>
         <version.org.infinispan>6.0.2.Final</version.org.infinispan>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
@@ -80,16 +81,14 @@
 
         <version.org.eclipse.jdt.core.compiler>4.3.1</version.org.eclipse.jdt.core.compiler>
 
-        <!-- TEMP -->
-        <version.jsf.impl>2.2.6-jbossorg-4</version.jsf.impl>
-
         <version.org.datanucleus>3.1.2</version.org.datanucleus>
         <version.org.datanucleus.appengine>2.1.1</version.org.datanucleus.appengine>
         <version.org.datanucleus.cache>3.1.1</version.org.datanucleus.cache>
 
         <version.org.jboss.jandex>1.1.0.Final</version.org.jboss.jandex>
         <version.org.jboss.logging.jboss-logging>3.1.4.GA</version.org.jboss.logging.jboss-logging>
-        <version.org.jboss.logging.jboss-logging-processor>1.2.0.Final</version.org.jboss.logging.jboss-logging-processor>
+        <version.org.jboss.logging.jboss-logging-processor>1.2.0.Final
+        </version.org.jboss.logging.jboss-logging-processor>
         <version.org.jboss.logmanager.jboss-logmanager>1.5.2.Final</version.org.jboss.logmanager.jboss-logmanager>
 
         <version.org.jivesoftware.smack>3.1.0</version.org.jivesoftware.smack>
@@ -759,12 +758,6 @@
                 <groupId>com.google.appengine</groupId>
                 <artifactId>appengine-local-endpoints</artifactId>
                 <version>${version.com.google.appengine}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.faces</groupId>
-                <artifactId>jsf-impl</artifactId>
-                <version>${version.jsf.impl}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

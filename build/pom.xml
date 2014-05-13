@@ -87,7 +87,9 @@
                                     <includePluginDependencies>false</includePluginDependencies>
                                     <mainClass>org.jboss.capedwarf.bytecode.CapedwarfTransformerMojo</mainClass>
                                     <arguments>
-                                        <argument>${jboss.dir}/modules/com/google/appengine/main/appengine-api-1.0-sdk-${version.com.google.appengine}.jar</argument>
+                                        <argument>
+                                            ${jboss.dir}/modules/com/google/appengine/main/appengine-api-1.0-sdk-${version.com.google.appengine}.jar
+                                        </argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -435,20 +437,20 @@
             <artifactId>openid4java-nodeps</artifactId>
         </dependency>
 
-		<dependency>
-			<groupId>net.sourceforge.nekohtml</groupId>
-			<artifactId>nekohtml</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>net.sourceforge.nekohtml</groupId>
+            <artifactId>nekohtml</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>com.google.code.guice</groupId>
-			<artifactId>guice</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.google.code.guice</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>jivesoftware</groupId>
@@ -520,10 +522,6 @@
             <artifactId>quartz</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.sun.faces</groupId>
-            <artifactId>jsf-impl</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

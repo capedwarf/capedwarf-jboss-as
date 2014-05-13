@@ -172,10 +172,6 @@
             <maven-resource group="org.quartz-scheduler" artifact="quartz"/>
         </module-def>
 
-        <module-def name="com.sun.jsf-impl">
-            <maven-resource group="com.sun.faces" artifact="jsf-impl"/>
-        </module-def>
-
         <!-- module-def name="org.apache.avro">
             <maven-resource group="org.apache.avro" artifact="avro"/>
         </module-def>
