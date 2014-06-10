@@ -353,7 +353,7 @@
                 <transport type="UDP" socket-binding="jgroups-udp"/>
                 <protocol type="ZKPING">
                     <property name="connection">${zookeeper.connection:localhost:2181}</property>
-                    <property name="mode">${zookeeper.mode:0}</property>
+                    <property name="mode">${zookeeper.mode:1}</property>
                 </protocol>
                 <protocol type="MERGE3"/>
                 <protocol type="FD_SOCK" socket-binding="jgroups-udp-fd"/>
@@ -373,7 +373,7 @@
                 <transport type="TCP" socket-binding="jgroups-tcp"/>
                 <protocol type="ZKPING">
                     <property name="connection">${zookeeper.connection:localhost:2181}</property>
-                    <property name="mode">${zookeeper.mode:0}</property>
+                    <property name="mode">${zookeeper.mode:1}</property>
                 </protocol>
                 <protocol type="MERGE2"/>
                 <protocol type="FD_SOCK" socket-binding="jgroups-tcp-fd"/>
