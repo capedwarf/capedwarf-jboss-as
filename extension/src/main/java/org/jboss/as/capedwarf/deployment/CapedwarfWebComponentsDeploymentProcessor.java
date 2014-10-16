@@ -19,7 +19,7 @@ import org.jboss.metadata.javaee.spec.SecurityRoleMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
 import org.jboss.metadata.web.jboss.ContainerListenerMetaData;
 import org.jboss.metadata.web.jboss.ContainerListenerType;
-import org.jboss.metadata.web.jboss.JBoss70WebMetaData;
+import org.jboss.metadata.web.jboss.JBoss80WebMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.AuthConstraintMetaData;
 import org.jboss.metadata.web.spec.DispatcherType;
@@ -206,7 +206,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     }
 
     protected JBossWebMetaData createJBossWebMetaData(Type type) {
-        return (type == Type.JBOSS) ? new JBoss70WebMetaData() : null;
+        return (type == Type.JBOSS) ? new JBoss80WebMetaData() : null;
     }
 
     @Override
