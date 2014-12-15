@@ -278,6 +278,23 @@
 
         <dependency>
             <groupId>org.jboss.capedwarf.shared</groupId>
+            <artifactId>capedwarf-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-managed-runtime</artifactId>
+            <version>${version.com.google.appengine.managed}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-jetty-managed-runtime</artifactId>
+            <version>${version.com.google.appengine.managed}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.capedwarf.shared</groupId>
             <artifactId>capedwarf-integration</artifactId>
         </dependency>
 

@@ -40,6 +40,8 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.module.ModuleDependency;
 import org.jboss.as.server.deployment.module.ModuleSpecification;
+import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
+import org.jboss.capedwarf.shared.config.SessionType;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
@@ -126,7 +128,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         WEB_SOCKET,
         ANTLR_3,
         QUARTZ,
-        TOOLS
+        TOOLS,
     };
 
     private static final FilenameFilter JARS_SDK = new FilenameFilter() {
@@ -140,6 +142,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private String defaultGaeVersion;
     private Map<String, List<ResourceLoaderSpec>> capedwarfResources = new HashMap<>();
     private Map<String, List<ResourceLoaderSpec>> endpointsResources = new HashMap<>();
+    private Map<String, List<ResourceLoaderSpec>> commonResources = new HashMap<>();
 
     private String appengineAPI;
 
@@ -235,6 +238,15 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
             }
         }
 
+        ApplicationConfiguration configuration = unit.getAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION);
+        if (configuration.getAppEngineWebXml().getSessionType() != SessionType.WILDFLY) {
+            // add capedwarf common resources
+            List<ResourceLoaderSpec> resources = getCommonResources(version);
+            for (ResourceLoaderSpec rls : resources) {
+                moduleSpecification.addResourceLoader(rls);
+            }
+        }
+
         // set best guess version
         CapedwarfDeploymentMarker.setVersion(unit, version);
     }
@@ -271,6 +283,10 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
 
     protected List<ResourceLoaderSpec> getEndpointsResources(String version) throws DeploymentUnitProcessingException {
         return getResources(endpointsResources, version, "com/google/appengine/endpoints/");
+    }
+
+    protected List<ResourceLoaderSpec> getCommonResources(String version) throws DeploymentUnitProcessingException {
+        return getResources(commonResources, version, "org/jboss/capedwarf/common/");
     }
 
     protected synchronized List<ResourceLoaderSpec> getResources(Map<String, List<ResourceLoaderSpec>> map, String version, String path) throws DeploymentUnitProcessingException {
