@@ -239,7 +239,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         }
 
         ApplicationConfiguration configuration = unit.getAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION);
-        if (configuration.getAppEngineWebXml().getSessionType() != SessionType.WILDFLY) {
+        if (configuration != null && configuration.getAppEngineWebXml().getSessionType() != SessionType.WILDFLY) {
             // add capedwarf common resources
             List<ResourceLoaderSpec> resources = getCommonResources(version);
             for (ResourceLoaderSpec rls : resources) {
