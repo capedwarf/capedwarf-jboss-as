@@ -46,7 +46,7 @@
         <module-def name="org.jboss.as.product" slot="capedwarf"/>
 
         <module-def name="org.jboss.capedwarf.shared">
-            <maven-resource group="org.jboss.capedwarf.shared" artifact="capedwarf-shared"/>
+            <maven-resource group="org.jboss.capedwarf.shared" artifact="capedwarf-integration"/>
         </module-def>
 
         <module-def name="org.jboss.capedwarf">
