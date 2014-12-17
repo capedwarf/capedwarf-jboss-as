@@ -22,38 +22,37 @@
 
 package org.jboss.as.capedwarf.deployment;
 
-import java.lang.reflect.Method;
-
+import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
+import org.jboss.as.capedwarf.services.WarmupService;
 import org.jboss.as.server.deployment.Attachments;
+import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.capedwarf.shared.config.AppEngineWebXml;
 import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
 import org.jboss.modules.Module;
+import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceTarget;
 
 /**
  * Boot war modules.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfBootProcessor extends CapedwarfWebDeploymentProcessor {
-    @Override
-    protected void doDeploy(DeploymentUnit unit) throws DeploymentUnitProcessingException {
+public class CapedwarfBootProcessor extends CapedwarfWebDeploymentUnitProcessor {
+    protected void doDeploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
+        DeploymentUnit unit = phaseContext.getDeploymentUnit();
         ApplicationConfiguration configuration = unit.getAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION);
         AppEngineWebXml appEngineWebXml = configuration.getAppEngineWebXml();
         if (appEngineWebXml.isWarmupRequests()) {
             final Module module = unit.getAttachment(Attachments.MODULE);
-            final ClassLoader cl = module.getClassLoader();
-            final ClassLoader previous = SecurityActions.setTCCL(cl);
-            try {
-                Class<?> siClass = cl.loadClass("org.jboss.capedwarf.tasks.ServletInvoker");
-                Method invoke = siClass.getMethod("invoke", String.class, String.class);
-                invoke.invoke(null, module.getIdentifier().toString(), "/_ah/warmup");
-            } catch (Exception e) {
-                throw new DeploymentUnitProcessingException(e);
-            } finally {
-                SecurityActions.setTCCL(previous);
-            }
+            ServiceTarget target = phaseContext.getServiceTarget();
+            ServiceName serviceName = CAPEDWARF_SERVICE_NAME.append("warmup").append(appEngineWebXml.getApplication());
+            ServiceBuilder<Void> builder = target.addService(serviceName, new WarmupService(module));
+            builder.addDependency(ServletExecutorConsumerService.NAME);
+            builder.setInitialMode(ServiceController.Mode.ACTIVE).install();
         }
     }
 }
