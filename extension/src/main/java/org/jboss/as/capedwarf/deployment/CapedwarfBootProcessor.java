@@ -22,11 +22,14 @@
 
 package org.jboss.as.capedwarf.deployment;
 
+import java.lang.reflect.Method;
+
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.capedwarf.shared.config.AppEngineWebXml;
 import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
+import org.jboss.modules.Module;
 
 /**
  * Boot war modules.
@@ -39,11 +42,17 @@ public class CapedwarfBootProcessor extends CapedwarfWebDeploymentProcessor {
         ApplicationConfiguration configuration = unit.getAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION);
         AppEngineWebXml appEngineWebXml = configuration.getAppEngineWebXml();
         if (appEngineWebXml.isWarmupRequests()) {
-            final ClassLoader cl = unit.getAttachment(Attachments.MODULE).getClassLoader();
+            final Module module = unit.getAttachment(Attachments.MODULE);
+            final ClassLoader cl = module.getClassLoader();
+            final ClassLoader previous = SecurityActions.setTCCL(cl);
             try {
-                cl.loadClass("org.jboss.capedwarf.common.servlet.Warmup").newInstance();
+                Class<?> siClass = cl.loadClass("org.jboss.capedwarf.tasks.ServletInvoker");
+                Method invoke = siClass.getMethod("invoke", String.class, String.class);
+                invoke.invoke(null, module.getIdentifier().toString(), "/_ah/warmup");
             } catch (Exception e) {
                 throw new DeploymentUnitProcessingException(e);
+            } finally {
+                SecurityActions.setTCCL(previous);
             }
         }
     }
