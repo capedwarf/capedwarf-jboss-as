@@ -67,6 +67,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String ENDPOINT_RPC_SERVLET_NAME = "EndpointsRpcServlet";
     private static final String ENDPOINT_REST_SERVLET_NAME = "EndpointsRestServlet";
     private static final String DEAFULT_SERVLET_NAME = "default";
+    private static final String WARMUP_SERVLET_NAME = "_ah_warmup";
     private static final String[] ADMIN_SERVLET_URL_MAPPING = {"/_ah/admin/*", "/_ah/admin/"};
     private static final String[] AUTH_SERVLET_URL_MAPPING = {"/_ah/login/*", "/_ah/login/", "/_ah/logout/*", "/_ah/logout/", "/_ah/openIDCallBack"};
     private static final String[] CHANNEL_SERVLET_URL_MAPPING = {"/_ah/channel/*", "/_ah/channel/"};
@@ -76,6 +77,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private static final String[] ENDPOINTS_RPC_URL_MAPPING = {"/_ah/api/rpc"};
     private static final String[] ENDPOINTS_REST_URL_MAPPING = {"/_ah/api/*"};
     private static final String[] DEFERRED_TASK_SERVLET_URL_MAPPING = {"/_ah/queue/__deferred__"};
+    private static final String[] WARMUP_SERVLET_URL_MAPPING = {"/_ah/warmup"};
+
     private static final String CAPEDWARF_TGT = "CAPEDWARF";
 
     private final ListenerMetaData GAE_LISTENER;
@@ -96,6 +99,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ServletMetaData ENDPOINT_RPC_SERVLET;
     private final ServletMetaData ENDPOINT_REST_SERVLET;
     private final ServletMetaData DEFAULT_SERVLET;
+    private final ServletMetaData WARMUP_SERVLET;
     private final ServletMappingMetaData AUTH_SERVLET_MAPPING;
     private final ServletMappingMetaData ADMIN_SERVLET_MAPPING;
     private final ServletMappingMetaData CHANNEL_SERVLET_MAPPING;
@@ -105,6 +109,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ServletMappingMetaData ENDPOINT_STATIC_SERVLET_MAPPING;
     private final ServletMappingMetaData ENDPOINT_RPC_SERVLET_MAPPING;
     private final ServletMappingMetaData ENDPOINT_REST_SERVLET_MAPPING;
+    private final ServletMappingMetaData WARMUP_SERVLET_MAPPING;
     private final ResourceReferenceMetaData INFINISPAN_REF;
     private final SecurityConstraintMetaData ADMIN_SERVLET_CONSTRAINT;
     private final LoginConfigMetaData ADMIN_SERVLET_CONFIG;
@@ -135,6 +140,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         ENDPOINT_RPC_SERVLET = createServlet(ENDPOINT_RPC_SERVLET_NAME, "com.google.api.server.spi.tools.devserver.RpcApiServlet");
         ENDPOINT_REST_SERVLET = createServlet(ENDPOINT_REST_SERVLET_NAME, "com.google.api.server.spi.tools.devserver.RestApiServlet");
         DEFAULT_SERVLET = createServlet(DEAFULT_SERVLET_NAME, "org.jboss.capedwarf.appidentity.StaticServlet");
+        WARMUP_SERVLET = createServlet(WARMUP_SERVLET_NAME, "com.google.apphosting.utils.servlet.WarmupServlet");
 
         AUTH_SERVLET_MAPPING = createServletMapping(AUTH_SERVLET_NAME, AUTH_SERVLET_URL_MAPPING);
         ADMIN_SERVLET_MAPPING = createServletMapping(ADMIN_SERVLET_NAME, ADMIN_SERVLET_URL_MAPPING);
@@ -145,6 +151,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         ENDPOINT_STATIC_SERVLET_MAPPING = createServletMapping(ENDPOINT_STATIC_SERVLET_NAME, ENDPOINTS_STATIC_URL_MAPPING);
         ENDPOINT_RPC_SERVLET_MAPPING = createServletMapping(ENDPOINT_RPC_SERVLET_NAME, ENDPOINTS_RPC_URL_MAPPING);
         ENDPOINT_REST_SERVLET_MAPPING = createServletMapping(ENDPOINT_REST_SERVLET_NAME, ENDPOINTS_REST_URL_MAPPING);
+        WARMUP_SERVLET_MAPPING = createServletMapping(WARMUP_SERVLET_NAME, WARMUP_SERVLET_URL_MAPPING);
 
         INFINISPAN_REF = createInfinispanRef();
 
@@ -176,6 +183,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
             getFilters(webMetaData).add(GAE_FILTER);
 
+            addWarmupServlet(webMetaData);
+
             addServletAndMapping(webMetaData, AUTH_SERVLET, AUTH_SERVLET_MAPPING);
             addServletAndMapping(webMetaData, ADMIN_SERVLET, ADMIN_SERVLET_MAPPING);
             addServletAndMapping(webMetaData, CHANNEL_SERVLET, CHANNEL_SERVLET_MAPPING);
@@ -202,6 +211,19 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
                     webMetaData.setLoginConfig(ADMIN_SERVLET_CONFIG);
                 }
             }
+        }
+    }
+
+    private void addWarmupServlet(WebMetaData webMetaData) {
+        boolean hasWarmup = false;
+        for (ServletMetaData smd : getServlets(webMetaData)) {
+            if (WARMUP_SERVLET_NAME.equals(smd.getServletName())) {
+                hasWarmup = true;
+                break;
+            }
+        }
+        if (hasWarmup == false) {
+            addServletAndMapping(webMetaData, WARMUP_SERVLET, WARMUP_SERVLET_MAPPING);
         }
     }
 
