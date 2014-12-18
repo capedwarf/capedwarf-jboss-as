@@ -25,6 +25,7 @@ package org.jboss.as.capedwarf.deployment;
 import org.jboss.as.capedwarf.services.ServletExecutorConsumerService;
 import org.jboss.as.capedwarf.services.WarmupService;
 import org.jboss.as.server.deployment.Attachments;
+import org.jboss.as.server.deployment.DeploymentCompleteServiceProcessor;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -52,6 +53,7 @@ public class CapedwarfBootProcessor extends CapedwarfWebDeploymentUnitProcessor 
             ServiceName serviceName = CAPEDWARF_SERVICE_NAME.append("warmup").append(appEngineWebXml.getApplication());
             ServiceBuilder<Void> builder = target.addService(serviceName, new WarmupService(module));
             builder.addDependency(ServletExecutorConsumerService.NAME);
+            builder.addDependency(DeploymentCompleteServiceProcessor.serviceName(unit.getServiceName()));
             builder.setInitialMode(ServiceController.Mode.ACTIVE).install();
         }
     }
