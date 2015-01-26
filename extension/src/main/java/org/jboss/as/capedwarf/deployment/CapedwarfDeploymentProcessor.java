@@ -61,6 +61,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
 
     private static final ModuleIdentifier APPENGINE = ModuleIdentifier.create("com.google.appengine");
     private static final ModuleIdentifier CAPEDWARF = ModuleIdentifier.create("org.jboss.capedwarf");
+    private static final ModuleIdentifier CAPEDWARF_COMMON = ModuleIdentifier.create("org.jboss.capedwarf.common");
 
     private static final ModuleIdentifier INFINISPAN = ModuleIdentifier.create("org.infinispan");
     private static final ModuleIdentifier MODULES = ModuleIdentifier.create("org.jboss.modules");
@@ -192,10 +193,21 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
                 // add a legacy transformer, modifying GAE service factories
                 moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.LegacyFactoriesTransformer");
             }
+
             // add CapeDwarf resources directly as libs
             for (ResourceLoaderSpec rls : getCapedwarfResources(version)) {
                 moduleSpecification.addResourceLoader(rls);
             }
+
+            // inline capedwarf common
+            if (getSessionType(unit) != SessionType.WILDFLY) {
+                // add capedwarf common resources
+                List<ResourceLoaderSpec> resources = getCommonResources(version);
+                for (ResourceLoaderSpec rls : resources) {
+                    moduleSpecification.addResourceLoader(rls);
+                }
+            }
+
             // add other needed dependencies
             for (ModuleIdentifier mi : INLINE) {
                 moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, mi));
@@ -227,6 +239,10 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
             } else {
                 version = gaeDependency.getIdentifier().getSlot();
             }
+
+            if (getSessionType(unit) != SessionType.WILDFLY) {
+                moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, CAPEDWARF_COMMON));
+            }
         }
 
         // check Endpoints
@@ -238,17 +254,17 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
             }
         }
 
-        ApplicationConfiguration configuration = unit.getAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION);
-        if (configuration != null && configuration.getAppEngineWebXml().getSessionType() != SessionType.WILDFLY) {
-            // add capedwarf common resources
-            List<ResourceLoaderSpec> resources = getCommonResources(version);
-            for (ResourceLoaderSpec rls : resources) {
-                moduleSpecification.addResourceLoader(rls);
-            }
-        }
-
         // set best guess version
         CapedwarfDeploymentMarker.setVersion(unit, version);
+    }
+
+    protected SessionType getSessionType(DeploymentUnit unit) {
+        ApplicationConfiguration configuration = unit.getAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION);
+        if (configuration == null) {
+            return SessionType.WILDFLY;
+        } else {
+            return configuration.getAppEngineWebXml().getSessionType();
+        }
     }
 
     protected String getVersion(VirtualFile gae) {

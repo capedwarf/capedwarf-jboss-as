@@ -67,6 +67,7 @@
         <module name="org.datanucleus" optional="true"/>
         <module name="org.jboss.maven.plugins.transformer" optional="true"/>
         <module name="org.jboss.capedwarf.shared"/>
+        <module name="org.jboss.capedwarf.common"/>
         <module name="org.jboss.marshalling"/>
         <module name="org.jboss.marshalling.river" services="import"/>
         <module name="org.codehaus.jackson.jackson-core-asl"/>
