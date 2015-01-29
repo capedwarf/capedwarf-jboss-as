@@ -112,8 +112,9 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ServletMappingMetaData WARMUP_SERVLET_MAPPING;
     private final ResourceReferenceMetaData INFINISPAN_REF;
     private final SecurityConstraintMetaData ADMIN_SERVLET_CONSTRAINT;
-    private final LoginConfigMetaData ADMIN_SERVLET_CONFIG;
     private final SecurityRoleMetaData ADMIN_SERVLET_ROLE;
+    private final LoginConfigMetaData SERVLET_LOGIN_CONFIG;
+    private final SecurityRoleMetaData USER_SERVLET_ROLE;
 
     private final String adminTGT;
 
@@ -156,8 +157,10 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         INFINISPAN_REF = createInfinispanRef();
 
         ADMIN_SERVLET_CONSTRAINT = createAdminServletSecurityConstraint();
-        ADMIN_SERVLET_CONFIG = createAdminServletLogin();
-        ADMIN_SERVLET_ROLE = createAdminServletSecurityRole();
+        ADMIN_SERVLET_ROLE = createServletSecurityRole("admin");
+
+        SERVLET_LOGIN_CONFIG = createCapedwarfLogin();
+        USER_SERVLET_ROLE = createServletSecurityRole("user");
     }
 
     protected boolean isCapedwarfAuth() {
@@ -203,13 +206,26 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
             addResourceReference(webMetaData);
 
+            List<SecurityConstraintMetaData> securityConstraints = getSecurityConstraints(webMetaData);
+            final boolean hasSecurityConstraints = (securityConstraints.size() > 0); // check this before admin check
+
             if (adminTGT != null) {
-                getSecurityConstraints(webMetaData).add(ADMIN_SERVLET_CONSTRAINT);
-                getSecurityRoles(webMetaData).add(ADMIN_SERVLET_ROLE);
+                securityConstraints.add(ADMIN_SERVLET_CONSTRAINT);
+                addSecurityRole(webMetaData, ADMIN_SERVLET_ROLE);
                 LoginConfigMetaData lcmd = webMetaData.getLoginConfig();
                 if (lcmd == null) {
-                    webMetaData.setLoginConfig(ADMIN_SERVLET_CONFIG);
+                    webMetaData.setLoginConfig(SERVLET_LOGIN_CONFIG);
                 }
+            }
+
+            if (hasSecurityConstraints) {
+                LoginConfigMetaData lcmd = webMetaData.getLoginConfig();
+                if (lcmd == null) {
+                    webMetaData.setLoginConfig(SERVLET_LOGIN_CONFIG);
+                }
+
+                addSecurityRole(webMetaData, USER_SERVLET_ROLE);
+                addSecurityRole(webMetaData, ADMIN_SERVLET_ROLE);
             }
         }
     }
@@ -467,9 +483,9 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         return securityConstraints;
     }
 
-    private SecurityRoleMetaData createAdminServletSecurityRole() {
+    private SecurityRoleMetaData createServletSecurityRole(String name) {
         SecurityRoleMetaData roleMetaData = new SecurityRoleMetaData();
-        roleMetaData.setName("admin");
+        roleMetaData.setName(name);
         return roleMetaData;
     }
 
@@ -482,7 +498,17 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         return securityRoles;
     }
 
-    private LoginConfigMetaData createAdminServletLogin() {
+    private void addSecurityRole(WebMetaData webMetaData, SecurityRoleMetaData securityRoleMetaData) {
+        SecurityRolesMetaData securityRoles = getSecurityRoles(webMetaData);
+        for (SecurityRoleMetaData srmd : securityRoles) {
+            if (srmd.getName().equals(securityRoleMetaData.getName())) {
+                return;
+            }
+        }
+        securityRoles.add(securityRoleMetaData);
+    }
+
+    private LoginConfigMetaData createCapedwarfLogin() {
         LoginConfigMetaData configMetaData = new LoginConfigMetaData();
         configMetaData.setAuthMethod(isCapedwarfAuth() ? "CAPEDWARF" : "CAPEDWARF,BASIC");
         configMetaData.setRealmName("ApplicationRealm");
