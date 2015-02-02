@@ -10,6 +10,7 @@ import org.jboss.as.capedwarf.services.UTInstanceInfo;
 import org.jboss.as.ee.structure.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
+import org.jboss.capedwarf.shared.config.CapedwarfConfiguration;
 import org.jboss.metadata.ear.spec.EarMetaData;
 import org.jboss.metadata.ear.spec.ModuleMetaData;
 import org.jboss.metadata.javaee.spec.EnvironmentRefsGroupMetaData;
@@ -110,7 +111,6 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     private final ServletMappingMetaData ENDPOINT_REST_SERVLET_MAPPING;
     private final ServletMappingMetaData WARMUP_SERVLET_MAPPING;
     private final ResourceReferenceMetaData INFINISPAN_REF;
-    private final SecurityConstraintMetaData ADMIN_SERVLET_CONSTRAINT;
     private final SecurityRoleMetaData ADMIN_SERVLET_ROLE;
     private final LoginConfigMetaData SERVLET_LOGIN_CONFIG;
     private final SecurityRoleMetaData USER_SERVLET_ROLE;
@@ -155,10 +155,8 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
 
         INFINISPAN_REF = createInfinispanRef();
 
-        ADMIN_SERVLET_CONSTRAINT = createAdminServletSecurityConstraint();
-        ADMIN_SERVLET_ROLE = createServletSecurityRole("admin");
-
         SERVLET_LOGIN_CONFIG = createCapedwarfLogin();
+        ADMIN_SERVLET_ROLE = createServletSecurityRole("admin");
         USER_SERVLET_ROLE = createServletSecurityRole("user");
     }
 
@@ -166,7 +164,9 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
     protected void doDeploy(DeploymentUnit unit, WebMetaData webMetaData, Type type) {
         if (type == Type.SPEC) {
             ApplicationConfiguration configuration = unit.getAttachment(CapedwarfAttachments.APPLICATION_CONFIGURATION);
-            String authMechanism = configuration.getCapedwarfConfiguration().getAuthenticationMechanism();
+            CapedwarfConfiguration cdConfig = configuration.getCapedwarfConfiguration();
+
+            String authMechanism = cdConfig.getAuthenticationMechanism();
             addContextParamsTo(webMetaData, create("__AUTH__", authMechanism));
 
             getListeners(webMetaData).add(0, GAE_LISTENER);
@@ -206,8 +206,10 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
             List<SecurityConstraintMetaData> securityConstraints = getSecurityConstraints(webMetaData);
             final boolean hasSecurityConstraints = (securityConstraints.size() > 0); // check this before admin check
 
-            if (adminTGT != null) {
-                securityConstraints.add(ADMIN_SERVLET_CONSTRAINT);
+            String tgType = cdConfig.getTransportGuarantee();
+            String tgt = (tgType != null) ? tgType : adminTGT; // try per config, fallback to global
+            if (tgt != null) {
+                securityConstraints.add(createAdminServletSecurityConstraint(tgt));
                 addSecurityRole(webMetaData, ADMIN_SERVLET_ROLE);
                 LoginConfigMetaData lcmd = webMetaData.getLoginConfig();
                 if (lcmd == null) {
@@ -449,7 +451,7 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         references.add(INFINISPAN_REF);
     }
 
-    private SecurityConstraintMetaData createAdminServletSecurityConstraint() {
+    private SecurityConstraintMetaData createAdminServletSecurityConstraint(String tgt) {
         SecurityConstraintMetaData scMetaData = new SecurityConstraintMetaData();
         scMetaData.setDisplayName("CapeDwarf admin console.");
         WebResourceCollectionsMetaData resourceCollections = new WebResourceCollectionsMetaData();
@@ -462,11 +464,9 @@ public class CapedwarfWebComponentsDeploymentProcessor extends CapedwarfWebModif
         authConstraint.setRoleNames(Arrays.asList("admin"));
         scMetaData.setAuthConstraint(authConstraint);
 
-        if (adminTGT != null) {
-            UserDataConstraintMetaData userDataConstraint = new UserDataConstraintMetaData();
-            userDataConstraint.setTransportGuarantee(TransportGuaranteeType.valueOf(adminTGT));
-            scMetaData.setUserDataConstraint(userDataConstraint);
-        }
+        UserDataConstraintMetaData userDataConstraint = new UserDataConstraintMetaData();
+        userDataConstraint.setTransportGuarantee(TransportGuaranteeType.valueOf(tgt));
+        scMetaData.setUserDataConstraint(userDataConstraint);
 
         return scMetaData;
     }
