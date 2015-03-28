@@ -28,13 +28,14 @@
     <dependencies>
         <module name="javax.api"/>
         <module name="javax.transaction.api"/>
-        <module name="org.jboss.logging"/>
-        <module name="org.infinispan"/>
-        <module name="org.infinispan.commons"/>
-        <module name="org.slf4j"/>
-        <module name="org.hibernate"/>
+        <module name="org.apache.lucene" />
+        <module name="org.hibernate.hql" optional="true"/>
         <module name="org.hibernate.search.engine"/>
-        <module name="org.hibernate.hql"/>
-        <module name="org.apache.lucene"/>
+        <module name="org.hibernate.search.infinispan-storage"/>
+        <module name="org.infinispan" services="import"/>
+        <module name="org.infinispan.commons"/>
+        <module name="org.infinispan.lucene.directory" services="import" optional="true"/>
+        <module name="org.infinispan.query.dsl"/>
+        <module name="org.jboss.logging"/>
     </dependencies>
 </module>

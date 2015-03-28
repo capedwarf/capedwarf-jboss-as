@@ -22,15 +22,17 @@
 
 package org.jboss.as.capedwarf.services;
 
-import org.hibernate.search.Environment;
-import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.cfg.EntityMapping;
 import org.hibernate.search.cfg.SearchMapping;
+import org.infinispan.Cache;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.IndexingConfigurationBuilder;
 import org.infinispan.configuration.cache.StoreAsBinaryConfigurationBuilder;
 import org.jboss.msc.value.InjectedValue;
-import org.jgroups.JChannel;
+import org.jgroups.Channel;
+import org.wildfly.clustering.jgroups.ChannelFactory;
 
 /**
  * Indexable configuration callback.
@@ -39,14 +41,13 @@ import org.jgroups.JChannel;
  * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
 public abstract class IndexableConfigurationCallback extends AbstractConfigurationCallback {
-    private static final int INDEXING_CACHES = 6;
-
     protected final CacheConfig config;
     protected final String appId;
     protected final ClassLoader classLoader;
 
-    private final InjectedValue<JChannel> channel = new InjectedValue<>();
-    private final InjectedValue<MuxIdGenerator> generator = new InjectedValue<>();
+    private final InjectedValue<ChannelFactory> factory = new InjectedValue<>();
+
+    private Channel channel;
 
     protected IndexableConfigurationCallback(CacheConfig config, String appId, ClassLoader classLoader) {
         this.config = config;
@@ -68,11 +69,8 @@ public abstract class IndexableConfigurationCallback extends AbstractConfigurati
         }
         indexing.setProperty(Environment.MODEL_MAPPING, mapping);
 
-        indexing.setProperty(JGroupsChannelProvider.CHANNEL_INJECT, channel.getValue());
-        indexing.setProperty(JGroupsChannelProvider.CLASSLOADER, classLoader);
-
-        short muxId = (short) ((INDEXING_CACHES / 2) * generator.getValue().getMuxId(appId) * ci.getPrefix() + ci.getOffset());
-        indexing.setProperty(JGroupsChannelProvider.MUX_ID, muxId);
+        indexing.setProperty(DispatchMessageSender.CHANNEL_INJECT, createChannel());
+        indexing.setProperty(DispatchMessageSender.CLASSLOADER, classLoader);
 
         // do we store as binary - e.g. Modules
         final StoreAsBinaryConfigurationBuilder storeAsBinaryConfigurationBuilder = builder.storeAsBinary();
@@ -81,15 +79,32 @@ public abstract class IndexableConfigurationCallback extends AbstractConfigurati
         return mapping;
     }
 
+    protected Channel createChannel() {
+        try {
+            channel = factory.getValue().createChannel(String.format("%s_%s", config.getName(), appId));
+            channel.connect(null); // it should be fork channel, hence no explict cluster name
+            return channel;
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public void stop(Cache cache) {
+        try {
+            if (channel != null) {
+                channel.close();
+            }
+        } finally {
+            super.stop(cache);
+        }
+    }
+
     protected String getIndexName(String className) {
         return config.getName() + "_" + appId + "__" + className;
     }
 
-    public InjectedValue<JChannel> getChannel() {
-        return channel;
-    }
-
-    public InjectedValue<MuxIdGenerator> getGenerator() {
-        return generator;
+    public InjectedValue<ChannelFactory> getFactory() {
+        return factory;
     }
 }

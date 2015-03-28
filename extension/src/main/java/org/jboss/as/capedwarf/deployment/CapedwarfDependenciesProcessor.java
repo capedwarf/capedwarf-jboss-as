@@ -84,7 +84,6 @@ public class CapedwarfDependenciesProcessor extends CapedwarfTopDeploymentUnitPr
         Set<ServiceName> set = new HashSet<>();
         set.addAll(STATIC_DEPENDECIES);
         set.addAll(CapedwarfCacheProcessor.getDependencies(appId));
-        set.add(CapedwarfMuxIdProcessor.getDependency(appId));
         set.addAll(CapedwarfInstanceInfoProcessor.getDependencies(appId));
         return Collections.unmodifiableSet(set);
     }

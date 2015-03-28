@@ -32,7 +32,7 @@
 
     <groupId>org.jboss.capedwarf</groupId>
     <artifactId>capedwarf-as-parent</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
 
     <name>Capedwarf - Parent Aggregator</name>
     <description>Capedwarf - Parent Aggregator</description>
@@ -54,24 +54,24 @@
     </scm>
 
     <properties>
-        <version.jboss.wildfly>8.2.0.Final</version.jboss.wildfly>
+        <version.jboss.wildfly>9.0.0.Beta2</version.jboss.wildfly>
+        <version.jboss.wildfly.core>1.0.0.Beta2</version.jboss.wildfly.core>
         <version.jboss.wildfly.mailra>1.0.0.Alpha3</version.jboss.wildfly.mailra>
-        <version.org.jboss.capedwarf.shared>2.0.0-SNAPSHOT</version.org.jboss.capedwarf.shared>
-        <version.org.jboss.capedwarf>2.0.0-SNAPSHOT</version.org.jboss.capedwarf>
+        <version.org.jboss.capedwarf.shared>3.0.0-SNAPSHOT</version.org.jboss.capedwarf.shared>
+        <version.org.jboss.capedwarf>3.0.0-SNAPSHOT</version.org.jboss.capedwarf>
         <version.com.google.appengine>1.9.18</version.com.google.appengine>
         <version.com.google.appengine.managed>1.9.17</version.com.google.appengine.managed>
-        <version.com.google.guava>15.0</version.com.google.guava>
+        <version.com.google.guava>18.0</version.com.google.guava>
         <version.javax.jdo.api>3.0</version.javax.jdo.api>
-        <version.org.hibernate.search>4.5.1.Final</version.org.hibernate.search>
-        <version.org.hibernate.hql-parser>1.0.0.Alpha6</version.org.hibernate.hql-parser>
+        <version.org.hibernate.search>5.1.1.Final</version.org.hibernate.search>
+        <version.org.hibernate.hql>1.1.0.Final</version.org.hibernate.hql>
         <version.org.bouncycastle>1.50</version.org.bouncycastle>
         <version.junit>4.11</version.junit>
-        <version.org.apache.httpcomponents>4.2.5</version.org.apache.httpcomponents>
-        <version.org.apache.lucene>3.6.2</version.org.apache.lucene>
-        <version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>1.0.0.Final
-        </version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>
-        <version.org.jgroups>3.4.5.Final</version.org.jgroups>
-        <version.org.infinispan>6.0.2.Final</version.org.infinispan>
+        <version.org.apache.httpcomponents>4.3.6</version.org.apache.httpcomponents>
+        <version.org.apache.lucene>4.10.4</version.org.apache.lucene>
+        <version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>1.0.0.Final</version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>
+        <version.org.jgroups>3.6.2.Final</version.org.jgroups>
+        <version.org.infinispan>7.2.0.Beta1</version.org.infinispan>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
         <version.org.codehaus.exec>1.2.1</version.org.codehaus.exec>
         <version.org.jboss.maven.transformer>1.0.0.Beta5</version.org.jboss.maven.transformer>
@@ -86,16 +86,14 @@
         <version.org.datanucleus.appengine>2.1.1</version.org.datanucleus.appengine>
         <version.org.datanucleus.cache>3.1.1</version.org.datanucleus.cache>
 
-        <version.org.jboss.jandex>1.2.1.Final</version.org.jboss.jandex>
-        <version.org.jboss.logging.jboss-logging>3.1.4.GA</version.org.jboss.logging.jboss-logging>
-        <version.org.jboss.logging.jboss-logging-processor>1.2.0.Final
-        </version.org.jboss.logging.jboss-logging-processor>
-        <version.org.jboss.logmanager.jboss-logmanager>1.5.2.Final</version.org.jboss.logmanager.jboss-logmanager>
+        <version.org.jboss.jandex>1.2.2.Final</version.org.jboss.jandex>
+        <version.org.jboss.logging.jboss-logging>3.2.1.Final</version.org.jboss.logging.jboss-logging>
+        <version.org.jboss.logging.jboss-logging-processor>1.2.0.Final</version.org.jboss.logging.jboss-logging-processor>
+        <version.org.jboss.logmanager.jboss-logmanager>2.0.0.Beta1</version.org.jboss.logmanager.jboss-logmanager>
 
         <version.org.jivesoftware.smack>3.1.0</version.org.jivesoftware.smack>
-        <version.org.picketbox>4.0.20.Final</version.org.picketbox>
+        <version.org.picketbox>4.9.0.Beta2</version.org.picketbox>
         <version.org.picketbox.picketbox-commons>1.0.0.final</version.org.picketbox.picketbox-commons>
-        <version.org.picketlink>2.1.10.Final</version.org.picketlink>
         <version.org.picketlink.social>2.5.2.Final</version.org.picketlink.social>
         <version.org.openid4java>0.9.6</version.org.openid4java>
         <version.net.sourceforge.nekohtml>1.9.20</version.net.sourceforge.nekohtml>
@@ -199,15 +197,21 @@
                 <version>${version.com.google.appengine.managed}</version>
             </dependency>
 
+            <!-- WildFly -->
+
+            <!-- Core -->
+
             <dependency>
-                <groupId>org.wildfly</groupId>
-                <artifactId>wildfly-clustering-infinispan</artifactId>
-                <version>${version.jboss.wildfly}</version>
+                <groupId>org.wildfly.core</groupId>
+                <artifactId>wildfly-controller</artifactId>
+                <version>${version.jboss.wildfly.core}</version>
             </dependency>
+
+            <!-- Full -->
 
             <dependency>
                 <groupId>org.wildfly</groupId>
-                <artifactId>wildfly-controller</artifactId>
+                <artifactId>wildfly-clustering-infinispan-extension</artifactId>
                 <version>${version.jboss.wildfly}</version>
             </dependency>
 
@@ -218,9 +222,9 @@
             </dependency>
 
             <dependency>
-                <groupId>org.wildfly</groupId>
+                <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-logging</artifactId>
-                <version>${version.jboss.wildfly}</version>
+                <version>${version.jboss.wildfly.core}</version>
             </dependency>
 
             <dependency>
@@ -236,16 +240,16 @@
             </dependency>
 
             <dependency>
-                <groupId>org.wildfly</groupId>
+                <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-server</artifactId>
-                <version>${version.jboss.wildfly}</version>
+                <version>${version.jboss.wildfly.core}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.wildfly</groupId>
+                <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-subsystem-test</artifactId>
                 <type>pom</type>
-                <version>${version.jboss.wildfly}</version>
+                <version>${version.jboss.wildfly.core}</version>
             </dependency>
 
             <dependency>
@@ -255,9 +259,9 @@
             </dependency>
 
             <dependency>
-                <groupId>org.wildfly</groupId>
+                <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-threads</artifactId>
-                <version>${version.jboss.wildfly}</version>
+                <version>${version.jboss.wildfly.core}</version>
             </dependency>
 
             <dependency>
@@ -344,7 +348,7 @@
 
             <dependency>
                 <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers</artifactId>
+                <artifactId>lucene-analyzers-common</artifactId>
                 <version>${version.org.apache.lucene}</version>
             </dependency>
 
@@ -424,6 +428,18 @@
 
             <dependency>
                 <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-backend-jgroups</artifactId>
+                <version>${version.org.hibernate.search}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-serialization-avro</artifactId>
+                <version>${version.org.hibernate.search}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-infinispan</artifactId>
                 <version>${version.org.hibernate.search}</version>
             </dependency>
@@ -431,7 +447,13 @@
             <dependency>
                 <groupId>org.hibernate.hql</groupId>
                 <artifactId>hibernate-hql-parser</artifactId>
-                <version>${version.org.hibernate.hql-parser}</version>
+                <version>${version.org.hibernate.hql}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate.hql</groupId>
+                <artifactId>hibernate-hql-lucene</artifactId>
+                <version>${version.org.hibernate.hql}</version>
             </dependency>
 
             <dependency>
@@ -462,6 +484,12 @@
             <dependency>
                 <groupId>org.infinispan</groupId>
                 <artifactId>infinispan-query</artifactId>
+                <version>${version.org.infinispan}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.infinispan</groupId>
+                <artifactId>infinispan-objectfilter</artifactId>
                 <version>${version.org.infinispan}</version>
             </dependency>
 
@@ -535,18 +563,6 @@
                 <groupId>org.picketbox</groupId>
                 <artifactId>picketbox-commons</artifactId>
                 <version>${version.org.picketbox.picketbox-commons}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.picketlink</groupId>
-                <artifactId>picketlink-core</artifactId>
-                <version>${version.org.picketlink}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging-api</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>

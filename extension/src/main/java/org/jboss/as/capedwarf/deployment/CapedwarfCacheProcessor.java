@@ -38,10 +38,6 @@ import org.jboss.as.capedwarf.services.ConfigurationCallback;
 import org.jboss.as.capedwarf.services.DatastoreConfigurationCallback;
 import org.jboss.as.capedwarf.services.DatastoreVersionsConfigurationCallback;
 import org.jboss.as.capedwarf.services.IndexableConfigurationCallback;
-import org.jboss.as.capedwarf.services.MuxIdGenerator;
-import org.jboss.as.clustering.infinispan.subsystem.CacheConfigurationService;
-import org.jboss.as.clustering.infinispan.subsystem.EmbeddedCacheManagerService;
-import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -53,7 +49,10 @@ import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
-import org.jgroups.JChannel;
+import org.wildfly.clustering.infinispan.spi.service.CacheContainerServiceName;
+import org.wildfly.clustering.infinispan.spi.service.CacheServiceName;
+import org.wildfly.clustering.jgroups.ChannelFactory;
+import org.wildfly.clustering.jgroups.spi.service.ChannelServiceName;
 
 /**
  * Handle CapeDwarf caches.
@@ -63,7 +62,7 @@ import org.jgroups.JChannel;
  */
 public class CapedwarfCacheProcessor extends CapedwarfTopDeploymentUnitProcessor {
     private static final ServiceName CLS_SERVICE_NAME = CAPEDWARF_SERVICE_NAME.append("cache-lifecycle");
-    private static final ServiceName CACHE_CONTAINER = EmbeddedCacheManagerService.getServiceName(CAPEDWARF);
+    private static final ServiceName CACHE_CONTAINER = CacheContainerServiceName.CACHE_CONTAINER.getServiceName(CAPEDWARF);
 
     private static ServiceName toServiceName(String appId, CacheName cn) {
         return CLS_SERVICE_NAME.append(cn.getName()).append(appId);
@@ -109,11 +108,10 @@ public class CapedwarfCacheProcessor extends CapedwarfTopDeploymentUnitProcessor
         final ServiceBuilder<Cache> builder = serviceTarget.addService(toServiceName(appId, cacheName), cls);
         if (callback instanceof IndexableConfigurationCallback) {
             IndexableConfigurationCallback icb = (IndexableConfigurationCallback) callback;
-            builder.addDependency(ChannelService.getServiceName(CAPEDWARF), JChannel.class, icb.getChannel());
-            builder.addDependency(CapedwarfMuxIdProcessor.toServiceName(appId), MuxIdGenerator.class, icb.getGenerator());
+            builder.addDependency(ChannelServiceName.FACTORY.getServiceName(CAPEDWARF), ChannelFactory.class, icb.getFactory());
         }
         builder.addDependency(CACHE_CONTAINER, EmbeddedCacheManager.class, cls.getEcmiv());
-        builder.addDependency(CacheConfigurationService.getServiceName(CAPEDWARF, cacheName.getName()), Configuration.class, cls.getCiv());
+        builder.addDependency(CacheServiceName.CONFIGURATION.getServiceName(CAPEDWARF, cacheName.getName()), Configuration.class, cls.getCiv());
         builder.setInitialMode(ServiceController.Mode.ACTIVE);
         return builder.install();
     }

@@ -29,8 +29,8 @@ import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.infinispan.Cache;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.query.Search;
@@ -87,8 +87,8 @@ class IndexingConsumer implements MessageListener {
                 return;
             }
 
-            final SearchFactoryImplementor factory = (SearchFactoryImplementor) Search.getSearchManager(cache).getSearchFactory();
-            final IndexManager indexManager = factory.getAllIndexesManager().getIndexManager(indexName);
+            final SearchIntegrator factory = Search.getSearchManager(cache).getSearchFactory();
+            final IndexManager indexManager = factory.getIndexManager(indexName);
             if (indexManager == null) {
                 log.warnf("Message received for undefined index: %s.", indexName);
                 return;

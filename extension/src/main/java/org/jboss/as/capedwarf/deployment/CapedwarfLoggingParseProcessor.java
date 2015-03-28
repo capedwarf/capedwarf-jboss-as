@@ -34,7 +34,6 @@ import java.util.logging.Handler;
 
 import org.jboss.as.capedwarf.utils.Constants;
 import org.jboss.as.logging.CommonAttributes;
-import org.jboss.as.logging.LoggingExtension;
 import org.jboss.as.logging.deployments.LoggingConfigDeploymentProcessor;
 import org.jboss.as.logging.logmanager.WildFlyLogContextSelector;
 import org.jboss.as.logging.stdio.LogContextStdioContextSelector;
@@ -98,8 +97,8 @@ public class CapedwarfLoggingParseProcessor extends CapedwarfAppEngineWebXmlPars
     protected synchronized WildFlyLogContextSelector getContextSelector() {
         if (contextSelector == null) {
             try {
-                Class<LoggingExtension> cle = LoggingExtension.class;
-                Field cs = cle.getDeclaredField("CONTEXT_SELECTOR");
+                Class<LogContext> cle = LogContext.class;
+                Field cs = cle.getDeclaredField("logContextSelector");
                 cs.setAccessible(true);
                 contextSelector = (WildFlyLogContextSelector) cs.get(null);
             } catch (Exception e) {

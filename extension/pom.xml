@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.jboss.capedwarf</groupId>
         <artifactId>capedwarf-as-parent</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>wildfly-capedwarf</artifactId>
     <name>Capedwarf - WildFly Subsystem</name>
@@ -38,7 +38,7 @@
             <artifactId>capedwarf-integration</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wildfly</groupId>
+            <groupId>org.wildfly.core</groupId>
             <artifactId>wildfly-controller</artifactId>
         </dependency>
         <dependency>
@@ -50,11 +50,11 @@
             <artifactId>wildfly-jpa</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wildfly</groupId>
+            <groupId>org.wildfly.core</groupId>
             <artifactId>wildfly-logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wildfly</groupId>
+            <groupId>org.wildfly.core</groupId>
             <artifactId>wildfly-server</artifactId>
         </dependency>
         <dependency>
@@ -70,7 +70,7 @@
             <artifactId>wildfly-undertow</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wildfly</groupId>
+            <groupId>org.wildfly.core</groupId>
             <artifactId>wildfly-threads</artifactId>
         </dependency>
         <dependency>
@@ -78,7 +78,7 @@
             <artifactId>wildfly-weld</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wildfly</groupId>
+            <groupId>org.wildfly.core</groupId>
             <artifactId>wildfly-subsystem-test</artifactId>
             <type>pom</type>
             <scope>test</scope>
@@ -91,7 +91,7 @@
 
         <dependency>
             <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-clustering-infinispan</artifactId>
+            <artifactId>wildfly-clustering-infinispan-extension</artifactId>
         </dependency>
 
         <dependency>
@@ -107,6 +107,11 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-engine</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-backend-jgroups</artifactId>
         </dependency>
 
         <dependency>

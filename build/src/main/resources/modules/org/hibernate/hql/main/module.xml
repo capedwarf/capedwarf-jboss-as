@@ -29,5 +29,7 @@
 
     <dependencies>
         <module name="javax.api"/>
+        <module name="org.antlr" slot="3" />
+        <module name="org.jboss.logging"/>
     </dependencies>
 </module>

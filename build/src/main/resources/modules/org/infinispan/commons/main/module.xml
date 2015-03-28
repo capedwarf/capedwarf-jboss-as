@@ -32,6 +32,5 @@
         <module name="org.jboss.marshalling"/>
         <module name="org.jboss.marshalling.river"/>
         <module name="sun.jdk"/>
-        <module name="org.infinispan.query" services="import" optional="true"/>
     </dependencies>
 </module>

@@ -62,8 +62,6 @@ import org.jboss.as.capedwarf.services.SimpleThreadsHandler;
 import org.jboss.as.capedwarf.services.ThreadsHandler;
 import org.jboss.as.capedwarf.utils.CapedwarfProperties;
 import org.jboss.as.capedwarf.utils.Constants;
-import org.jboss.as.clustering.infinispan.subsystem.EmbeddedCacheManagerService;
-import org.jboss.as.clustering.jgroups.subsystem.ChannelService;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -101,6 +99,8 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.vfs.TempDir;
 import org.jboss.vfs.VFSUtils;
+import org.wildfly.clustering.infinispan.spi.service.CacheContainerServiceName;
+import org.wildfly.clustering.jgroups.spi.service.ChannelServiceName;
 
 /**
  * Handler responsible for adding the subsystem resource to the model
@@ -226,7 +226,6 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 6, new CapedwarfInstanceInfoProcessor()); // web context processor
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.POST_MODULE, Phase.POST_MODULE_SAR_SERVICE_COMPONENT + 7, new CapedwarfWebContextProcessor()); // before web context lifecycle
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT - 3, new CapedwarfCacheProcessor()); // after module
-                processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT - 1, new CapedwarfMuxIdProcessor()); // adjust order as needed
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.INSTALL, Phase.INSTALL_MODULE_JNDI_BINDINGS - 2, new CapedwarfDependenciesProcessor()); // after logging
                 processorTarget.addDeploymentProcessor(Constants.CAPEDWARF, Phase.CLEANUP, Phase.CLEANUP_ANNOTATION_INDEX + 1, new CapedwarfBootProcessor()); // after logging
             }
@@ -343,7 +342,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         ServiceName mlServiceName = Services.JBOSS_SERVICE_MODULE_LOADER;
         addComponentRegistryService(serviceTarget, newControllers, Keys.MODULE_LOADER, mlServiceName);
 
-        ServiceName chServiceName = ChannelService.getServiceName(Constants.CAPEDWARF);
+        ServiceName chServiceName = ChannelServiceName.CHANNEL.getServiceName(Constants.CAPEDWARF);
         addComponentRegistryService(serviceTarget, newControllers, Keys.CHANNEL, chServiceName);
 
         ServiceName tmServiceName = TxnServices.JBOSS_TXN_TRANSACTION_MANAGER;
@@ -352,7 +351,7 @@ class CapedwarfSubsystemAdd extends AbstractBoottimeAddStepHandler {
         ServiceName utServiceName = TxnServices.JBOSS_TXN_USER_TRANSACTION;
         addComponentRegistryService(serviceTarget, newControllers, Keys.USER_TX, utServiceName);
 
-        ServiceName cmServiceName = EmbeddedCacheManagerService.getServiceName(Constants.CAPEDWARF);
+        ServiceName cmServiceName = CacheContainerServiceName.CACHE_CONTAINER.getServiceName(Constants.CAPEDWARF);
         addComponentRegistryService(serviceTarget, newControllers, Keys.CACHE_MANAGER, cmServiceName);
 
         ServiceName mailServiceName = ServiceName.JBOSS.append("mail-session").append("default");
