@@ -237,15 +237,7 @@
                     <eviction strategy="LIRS" max-entries="100000"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
-                        <!-- Remove jndiname, backend
-                        <property name="hibernate.search.default.indexmanager" value="org.infinispan.query.indexmanager.InfinispanIndexManager" />
-                        -->
-                        <property name="hibernate.search.default.exclusive_index_use">false</property>
-                        <property name="hibernate.search.default.directory_provider">infinispan</property>
-                        <property name="hibernate.search.infinispan.cachemanager_jndiname">
-                            java:jboss/infinispan/container/capedwarf
-                        </property>
-                        <property name="hibernate.search.default.worker.backend">jgroups</property>
+                        <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
                     </indexing>
                 </distributed-cache>
                 <distributed-cache name="datastore_versions" mode="SYNC">
@@ -279,13 +271,8 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
-                        <property name="hibernate.search.default.block_waiting_ack">false</property>
-                        <property name="hibernate.search.default.exclusive_index_use">false</property>
-                        <property name="hibernate.search.default.directory_provider">infinispan</property>
-                        <property name="hibernate.search.infinispan.cachemanager_jndiname">
-                            java:jboss/infinispan/container/capedwarf
-                        </property>
-                        <property name="hibernate.search.default.worker.backend">jgroups</property>
+                        <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
+                        <property name="default.worker.execution">async</property>
                     </indexing>
                 </distributed-cache>
                 <distributed-cache name="search" mode="ASYNC">
@@ -293,13 +280,8 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
-                        <property name="hibernate.search.default.block_waiting_ack">false</property>
-                        <property name="hibernate.search.default.exclusive_index_use">false</property>
-                        <property name="hibernate.search.default.directory_provider">infinispan</property>
-                        <property name="hibernate.search.infinispan.cachemanager_jndiname">
-                            java:jboss/infinispan/container/capedwarf
-                        </property>
-                        <property name="hibernate.search.default.worker.backend">jgroups</property>
+                        <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
+                        <property name="default.worker.execution">async</property>
                     </indexing>
                 </distributed-cache>
                 <distributed-cache name="prospective_search" mode="ASYNC">
@@ -307,13 +289,8 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
-                        <property name="hibernate.search.default.block_waiting_ack">false</property>
-                        <property name="hibernate.search.default.exclusive_index_use">false</property>
-                        <property name="hibernate.search.default.directory_provider">infinispan</property>
-                        <property name="hibernate.search.infinispan.cachemanager_jndiname">
-                            java:jboss/infinispan/container/capedwarf
-                        </property>
-                        <property name="hibernate.search.default.worker.backend">jgroups</property>
+                        <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
+                        <property name="default.worker.execution">async</property>
                     </indexing>
                 </distributed-cache>
                 <distributed-cache name="logs" mode="ASYNC">
@@ -321,13 +298,8 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
-                        <property name="hibernate.search.default.block_waiting_ack">false</property>
-                        <property name="hibernate.search.default.exclusive_index_use">false</property>
-                        <property name="hibernate.search.default.directory_provider">infinispan</property>
-                        <property name="hibernate.search.infinispan.cachemanager_jndiname">
-                            java:jboss/infinispan/container/capedwarf
-                        </property>
-                        <property name="hibernate.search.default.worker.backend">jgroups</property>
+                        <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
+                        <property name="default.worker.execution">async</property>
                     </indexing>
                 </distributed-cache>
                 <distributed-cache name="channel" mode="ASYNC">
@@ -335,13 +307,8 @@
                     <eviction strategy="LIRS" max-entries="10000"/>
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
-                        <property name="hibernate.search.default.block_waiting_ack">false</property>
-                        <property name="hibernate.search.default.exclusive_index_use">false</property>
-                        <property name="hibernate.search.default.directory_provider">infinispan</property>
-                        <property name="hibernate.search.infinispan.cachemanager_jndiname">
-                            java:jboss/infinispan/container/capedwarf
-                        </property>
-                        <property name="hibernate.search.default.worker.backend">jgroups</property>
+                        <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
+                        <property name="default.worker.execution">async</property>
                     </indexing>
                 </distributed-cache>
                 <replicated-cache name="LuceneIndexesMetadata" mode="SYNC">
