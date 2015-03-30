@@ -193,10 +193,6 @@
              <maven-resource group="org.hibernate" artifact="hibernate-search-serialization-avro"/>
         </module-def>
 
-        <module-def name="org.hibernate.search.backend-jgroups">
-             <maven-resource group="org.hibernate" artifact="hibernate-search-backend-jgroups"/>
-        </module-def>
-
         <module-def name="org.hibernate.hql">
             <maven-resource group="org.hibernate.hql" artifact="hibernate-hql-parser"/>
             <maven-resource group="org.hibernate.hql" artifact="hibernate-hql-lucene"/>
@@ -234,6 +230,10 @@
 
         <!-- module-def name="org.jboss.as.clustering.infinispan">
             <maven-resource group="org.wildfly" artifact="wildfly-clustering-infinispan"/>
+        </module-def -->
+
+        <!-- module-def name="org.hibernate.search.backend-jgroups">
+             <maven-resource group="org.hibernate" artifact="hibernate-search-backend-jgroups"/>
         </module-def -->
 
     </target>

@@ -37,7 +37,6 @@ import org.jboss.as.capedwarf.services.CacheLifecycleService;
 import org.jboss.as.capedwarf.services.ConfigurationCallback;
 import org.jboss.as.capedwarf.services.DatastoreConfigurationCallback;
 import org.jboss.as.capedwarf.services.DatastoreVersionsConfigurationCallback;
-import org.jboss.as.capedwarf.services.IndexableConfigurationCallback;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -51,8 +50,6 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.wildfly.clustering.infinispan.spi.service.CacheContainerServiceName;
 import org.wildfly.clustering.infinispan.spi.service.CacheServiceName;
-import org.wildfly.clustering.jgroups.ChannelFactory;
-import org.wildfly.clustering.jgroups.spi.service.ChannelServiceName;
 
 /**
  * Handle CapeDwarf caches.
@@ -106,10 +103,6 @@ public class CapedwarfCacheProcessor extends CapedwarfTopDeploymentUnitProcessor
     protected ServiceController<Cache> createBuilder(ServiceTarget serviceTarget, CacheName cacheName, String appId, ConfigurationCallback callback) {
         final CacheLifecycleService cls = new CacheLifecycleService(cacheName.getFullName(appId), callback);
         final ServiceBuilder<Cache> builder = serviceTarget.addService(toServiceName(appId, cacheName), cls);
-        if (callback instanceof IndexableConfigurationCallback) {
-            IndexableConfigurationCallback icb = (IndexableConfigurationCallback) callback;
-            builder.addDependency(ChannelServiceName.FACTORY.getServiceName(CAPEDWARF), ChannelFactory.class, icb.getFactory());
-        }
         builder.addDependency(CACHE_CONTAINER, EmbeddedCacheManager.class, cls.getEcmiv());
         builder.addDependency(CacheServiceName.CONFIGURATION.getServiceName(CAPEDWARF, cacheName.getName()), Configuration.class, cls.getCiv());
         builder.setInitialMode(ServiceController.Mode.ACTIVE);
