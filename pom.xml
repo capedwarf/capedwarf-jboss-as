@@ -54,9 +54,9 @@
     </scm>
 
     <properties>
-        <version.jboss.wildfly>9.0.0.Beta2</version.jboss.wildfly>
-        <version.jboss.wildfly.core>1.0.0.Beta2</version.jboss.wildfly.core>
-        <version.jboss.wildfly.mailra>1.0.0.Alpha3</version.jboss.wildfly.mailra>
+        <version.org.wildfly>9.0.0.Beta2</version.org.wildfly>
+        <version.org.wildfly.core>1.0.0.Beta2</version.org.wildfly.core>
+        <version.org.wildfly.mailra>1.0.0.Alpha3</version.org.wildfly.mailra>
         <version.org.jboss.capedwarf.shared>3.0.0-SNAPSHOT</version.org.jboss.capedwarf.shared>
         <version.org.jboss.capedwarf>3.0.0-SNAPSHOT</version.org.jboss.capedwarf>
         <version.com.google.appengine>1.9.18</version.com.google.appengine>
@@ -204,7 +204,7 @@
             <dependency>
                 <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-controller</artifactId>
-                <version>${version.jboss.wildfly.core}</version>
+                <version>${version.org.wildfly.core}</version>
             </dependency>
 
             <!-- Full -->
@@ -212,62 +212,62 @@
             <dependency>
                 <groupId>org.wildfly</groupId>
                 <artifactId>wildfly-clustering-infinispan-extension</artifactId>
-                <version>${version.jboss.wildfly}</version>
+                <version>${version.org.wildfly}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wildfly</groupId>
                 <artifactId>wildfly-ee</artifactId>
-                <version>${version.jboss.wildfly}</version>
+                <version>${version.org.wildfly}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-logging</artifactId>
-                <version>${version.jboss.wildfly.core}</version>
+                <version>${version.org.wildfly.core}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wildfly</groupId>
                 <artifactId>wildfly-naming</artifactId>
-                <version>${version.jboss.wildfly}</version>
+                <version>${version.org.wildfly}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wildfly</groupId>
                 <artifactId>wildfly-clustering-singleton</artifactId>
-                <version>${version.jboss.wildfly}</version>
+                <version>${version.org.wildfly}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-server</artifactId>
-                <version>${version.jboss.wildfly.core}</version>
+                <version>${version.org.wildfly.core}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-subsystem-test</artifactId>
                 <type>pom</type>
-                <version>${version.jboss.wildfly.core}</version>
+                <version>${version.org.wildfly.core}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wildfly</groupId>
                 <artifactId>wildfly-undertow</artifactId>
-                <version>${version.jboss.wildfly}</version>
+                <version>${version.org.wildfly}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-threads</artifactId>
-                <version>${version.jboss.wildfly.core}</version>
+                <version>${version.org.wildfly.core}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wildfly</groupId>
                 <artifactId>wildfly-weld</artifactId>
-                <version>${version.jboss.wildfly}</version>
+                <version>${version.org.wildfly}</version>
             </dependency>
 
             <dependency>
@@ -502,25 +502,25 @@
             <dependency>
                 <groupId>org.wildfly</groupId>
                 <artifactId>wildfly-jaxrs</artifactId>
-                <version>${version.jboss.wildfly}</version>
+                <version>${version.org.wildfly}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wildfly</groupId>
                 <artifactId>wildfly-jpa</artifactId>
-                <version>${version.jboss.wildfly}</version>
+                <version>${version.org.wildfly}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wildfly</groupId>
                 <artifactId>mail-ra-api</artifactId>
-                <version>${version.jboss.wildfly.mailra}</version>
+                <version>${version.org.wildfly.mailra}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wildfly</groupId>
                 <artifactId>mail-ra-impl</artifactId>
-                <version>${version.jboss.wildfly.mailra}</version>
+                <version>${version.org.wildfly.mailra}</version>
             </dependency>
 
             <dependency>
