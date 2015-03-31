@@ -272,7 +272,6 @@
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
                         <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
-                        <property name="default.worker.execution">async</property>
                     </indexing>
                 </distributed-cache>
                 <distributed-cache name="search" mode="ASYNC">
@@ -281,7 +280,6 @@
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
                         <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
-                        <property name="default.worker.execution">async</property>
                     </indexing>
                 </distributed-cache>
                 <distributed-cache name="prospective_search" mode="ASYNC">
@@ -290,7 +288,6 @@
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
                         <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
-                        <property name="default.worker.execution">async</property>
                     </indexing>
                 </distributed-cache>
                 <distributed-cache name="logs" mode="ASYNC">
@@ -299,7 +296,6 @@
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
                         <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
-                        <property name="default.worker.execution">async</property>
                     </indexing>
                 </distributed-cache>
                 <distributed-cache name="channel" mode="ASYNC">
@@ -308,7 +304,6 @@
                     <file-store preload="false" purge="false"/>
                     <indexing index="LOCAL">
                         <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
-                        <property name="default.worker.execution">async</property>
                     </indexing>
                 </distributed-cache>
                 <replicated-cache name="LuceneIndexesMetadata" mode="SYNC">
