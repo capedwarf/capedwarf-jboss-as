@@ -198,6 +198,15 @@
             <maven-resource group="org.hibernate.hql" artifact="hibernate-hql-lucene"/>
         </module-def>
 
+        <module-def name="org.apache.lucene">
+            <maven-resource group="org.apache.lucene" artifact="lucene-analyzers-common"/>
+            <maven-resource group="org.apache.lucene" artifact="lucene-core"/>
+            <maven-resource group="org.apache.lucene" artifact="lucene-facet"/>
+            <maven-resource group="org.apache.lucene" artifact="lucene-memory"/>
+            <maven-resource group="org.apache.lucene" artifact="lucene-queries"/>
+            <maven-resource group="org.apache.lucene" artifact="lucene-queryparser"/>
+        </module-def>
+
         <!-- module-def name="com.google.guava">
             <maven-resource group="com.google.guava" artifact="guava"/>
         </module-def -->
@@ -216,12 +225,6 @@
 
         <!-- module-def name="org.apache.avro">
             <maven-resource group="org.apache.avro" artifact="avro"/>
-        </module-def>
-
-        <module-def name="org.apache.lucene">
-            <maven-resource group="org.apache.lucene" artifact="lucene-core"/>
-            <maven-resource group="org.apache.lucene" artifact="lucene-analyzers-common"/>
-            <maven-resource group="org.apache.lucene" artifact="lucene-memory"/>
         </module-def -->
 
         <!-- module-def name="org.jgroups">
