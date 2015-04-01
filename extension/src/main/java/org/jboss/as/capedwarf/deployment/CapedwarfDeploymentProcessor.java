@@ -77,6 +77,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier LUCENE = ModuleIdentifier.create("org.apache.lucene");
     private static final ModuleIdentifier HTTP_COMPONENTS = ModuleIdentifier.create("org.apache.httpcomponents");
     private static final ModuleIdentifier PICKETLINK_SOCIAL = ModuleIdentifier.create("org.picketlink.social");
+    private static final ModuleIdentifier JAXRS_API = ModuleIdentifier.create("javax.ws.rs.api");
     private static final ModuleIdentifier RESTEASY_JAXRS = ModuleIdentifier.create("org.jboss.resteasy.resteasy-jaxrs");
     private static final ModuleIdentifier RESTEASY_JACKSON_PROVIDER = ModuleIdentifier.create("org.jboss.resteasy.resteasy-jackson-provider");
     private static final ModuleIdentifier RESTEASY_JOSE_JWT = ModuleIdentifier.create("org.jboss.resteasy.jose-jwt");
@@ -109,6 +110,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         LUCENE,
         HTTP_COMPONENTS,
         PICKETLINK_SOCIAL,
+        JAXRS_API,
         RESTEASY_JAXRS,
         RESTEASY_JACKSON_PROVIDER,
         RESTEASY_JOSE_JWT,
