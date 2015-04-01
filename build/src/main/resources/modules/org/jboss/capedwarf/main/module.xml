@@ -49,6 +49,7 @@
         <module name="org.jboss.common-core"/>
         <module name="org.jboss.logmanager"/>
         <module name="org.infinispan"/>
+        <module name="org.infinispan.commons"/>
         <module name="org.infinispan.query" services="import"/>
         <module name="org.hibernate.search.engine"/>
         <module name="org.apache.lucene"/>

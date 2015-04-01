@@ -71,6 +71,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier MAIL_RA = ModuleIdentifier.create("org.wildfly.mail.ra");
     private static final ModuleIdentifier JAVASSIST = ModuleIdentifier.create("javax.mail.api");
     private static final ModuleIdentifier JGROUPS = ModuleIdentifier.create("org.jgroups");
+    private static final ModuleIdentifier INFINISPAN_COMMONS = ModuleIdentifier.create("org.infinispan.commons");
     private static final ModuleIdentifier INFINISPAN_QUERY = ModuleIdentifier.create("org.infinispan.query");
     private static final ModuleIdentifier HIBERNATE_SEARCH = ModuleIdentifier.create("org.hibernate.search.engine");
     private static final ModuleIdentifier LUCENE = ModuleIdentifier.create("org.apache.lucene");
@@ -102,6 +103,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         MAIL_RA,
         JAVASSIST,
         JGROUPS,
+        INFINISPAN_COMMONS,
         INFINISPAN_QUERY,
         HIBERNATE_SEARCH,
         LUCENE,
