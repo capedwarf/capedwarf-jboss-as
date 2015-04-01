@@ -191,6 +191,7 @@
             </session-bean>
             <mdb>
                 <resource-adapter-ref resource-adapter-name="${ejb.resource-adapter-name:hornetq-ra.rar}"/>
+                <resource-adapter-ref resource-adapter-name="org.wildfly.mail.ra:main"/>
                 <bean-instance-pool-ref pool-name="mdb-strict-max-pool"/>
             </mdb>
             <pools>
@@ -522,7 +523,13 @@
             <endpoint worker="default"/>
             <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:resource-adapters:3.0"/>
+        <subsystem xmlns="urn:jboss:domain:resource-adapters:3.0">
+            <resource-adapters>
+                <resource-adapter id="org.wildfly.mail.ra:main">
+                    <module slot="main" id="org.wildfly.mail.ra"/>
+                </resource-adapter>
+            </resource-adapters>
+        </subsystem>
         <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
         <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
         <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
