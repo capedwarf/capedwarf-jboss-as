@@ -47,51 +47,61 @@ public class CacheLifecycleService extends AbstractConfigurationCallback impleme
 
     private Cache cache;
 
-    public CacheLifecycleService(String cacheName) {
-        this(cacheName, null);
-    }
-
     public CacheLifecycleService(String cacheName, ConfigurationCallback callback) {
         this.cacheName = cacheName;
         this.callback = callback;
     }
 
+    public ClassLoader getClassLoader() {
+        return callback.getClassLoader();
+    }
+
     public void start(StartContext context) throws StartException {
-        final EmbeddedCacheManager cacheManager = getCacheManager();
+        final ClassLoader previous = SecurityActions.setTCCL(getClassLoader());
+        try {
+            final EmbeddedCacheManager cacheManager = getCacheManager();
 
-        final ConfigurationCallback cc = (callback != null) ? callback : this;
+            final ConfigurationCallback cc = (callback != null) ? callback : this;
 
-        cache = cacheManager.getCache(cacheName, false);
-        if (cache != null) {
-            final ComponentStatus status = cache.getStatus();
-            if (status != ComponentStatus.INITIALIZING && status != ComponentStatus.RUNNING) {
-                cc.start(cacheManager);
-                cache.start(); // re-start stopped cache
-                cc.start(cache);
+            cache = cacheManager.getCache(cacheName, false);
+            if (cache != null) {
+                final ComponentStatus status = cache.getStatus();
+                if (status != ComponentStatus.INITIALIZING && status != ComponentStatus.RUNNING) {
+                    cc.start(cacheManager);
+                    cache.start(); // re-start stopped cache
+                    cc.start(cache);
+                }
+                return;
             }
-            return;
+
+            final ConfigurationBuilder builder = cc.configure(civ.getValue());
+            cacheManager.defineConfiguration(cacheName, builder.build());
+
+            cc.start(cacheManager);
+            cache = cacheManager.getCache(cacheName, true);
+            cc.start(cache);
+        } finally {
+            SecurityActions.setTCCL(previous);
         }
-
-        final ConfigurationBuilder builder = cc.configure(civ.getValue());
-        cacheManager.defineConfiguration(cacheName, builder.build());
-
-        cc.start(cacheManager);
-        cache = cacheManager.getCache(cacheName, true);
-        cc.start(cache);
     }
 
     public void stop(StopContext context) {
         synchronized (getCacheManager()) {
-            final Cache tmp = cache;
-            cache = null;
-            if (tmp != null) {
-                final ConfigurationCallback cc = (callback != null) ? callback : this;
-                try {
-                    cc.stop(tmp);
-                } finally {
-                    tmp.stop();
-                    cc.stop(getCacheManager());
+            final ClassLoader previous = SecurityActions.setTCCL(getClassLoader());
+            try {
+                final Cache tmp = cache;
+                cache = null;
+                if (tmp != null) {
+                    final ConfigurationCallback cc = (callback != null) ? callback : this;
+                    try {
+                        cc.stop(tmp);
+                    } finally {
+                        tmp.stop();
+                        cc.stop(getCacheManager());
+                    }
                 }
+            } finally {
+                SecurityActions.setTCCL(previous);
             }
         }
     }

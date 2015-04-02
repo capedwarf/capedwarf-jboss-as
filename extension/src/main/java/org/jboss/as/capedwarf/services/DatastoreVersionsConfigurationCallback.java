@@ -33,7 +33,11 @@ import org.infinispan.util.concurrent.IsolationLevel;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
-public class DatastoreVersionsConfigurationCallback extends AbstractConfigurationCallback {
+public class DatastoreVersionsConfigurationCallback extends ClassLoaderConfigurationCallback {
+    public DatastoreVersionsConfigurationCallback(ClassLoader classLoader) {
+        super(classLoader);
+    }
+
     protected void applyBuilder(ConfigurationBuilder builder) {
         builder.transaction().lockingMode(LockingMode.OPTIMISTIC);
         builder.locking().writeSkewCheck(true).isolationLevel(IsolationLevel.REPEATABLE_READ);

@@ -46,6 +46,10 @@ public abstract class IndexableConfigurationCallback extends AbstractConfigurati
         this.classLoader = classLoader;
     }
 
+    public ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
     protected SearchMapping applyIndexing(ConfigurationBuilder builder) {
         final CacheIndexing ci = config.getIndexing();
         if (ci == null)

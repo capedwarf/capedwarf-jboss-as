@@ -42,6 +42,13 @@ public interface ConfigurationCallback {
     ConfigurationBuilder configure(final Configuration configuration);
 
     /**
+     * Get classloader.
+     *
+     * @return the classloader
+     */
+    ClassLoader getClassLoader();
+
+    /**
      * Before starting the cache.
      *
      * @param manager the manager

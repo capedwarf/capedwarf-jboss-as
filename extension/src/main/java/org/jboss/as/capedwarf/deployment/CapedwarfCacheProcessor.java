@@ -34,6 +34,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
 import org.jboss.as.capedwarf.services.BasicConfigurationCallback;
 import org.jboss.as.capedwarf.services.CacheConfig;
 import org.jboss.as.capedwarf.services.CacheLifecycleService;
+import org.jboss.as.capedwarf.services.ClassLoaderConfigurationCallback;
 import org.jboss.as.capedwarf.services.ConfigurationCallback;
 import org.jboss.as.capedwarf.services.DatastoreConfigurationCallback;
 import org.jboss.as.capedwarf.services.DatastoreVersionsConfigurationCallback;
@@ -93,10 +94,10 @@ public class CapedwarfCacheProcessor extends CapedwarfTopDeploymentUnitProcessor
             createBuilder(serviceTarget, cn, appId, callback);
         }
         // versions
-        createBuilder(serviceTarget, CacheName.DATASTORE_VERSIONS, appId, new DatastoreVersionsConfigurationCallback());
+        createBuilder(serviceTarget, CacheName.DATASTORE_VERSIONS, appId, new DatastoreVersionsConfigurationCallback(classLoader));
         // data, metadata, memcache, dist
         for (CacheName cn : Arrays.asList(CacheName.DATA, CacheName.METADATA, CacheName.MEMCACHE, CacheName.DIST)) {
-            createBuilder(serviceTarget, cn, appId, null);
+            createBuilder(serviceTarget, cn, appId, new ClassLoaderConfigurationCallback(classLoader));
         }
     }
 
