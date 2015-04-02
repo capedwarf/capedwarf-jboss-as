@@ -105,7 +105,6 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         JAVASSIST,
         JGROUPS,
         INFINISPAN_COMMONS,
-        INFINISPAN_QUERY,
         HIBERNATE_SEARCH,
         LUCENE,
         HTTP_COMPONENTS,
@@ -168,8 +167,9 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         final ModuleSpecification moduleSpecification = unit.getAttachment(Attachments.MODULE_SPECIFICATION);
         // CapeDwarf Shared module
         moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, CAPEDWARF_SHARED));
-        // always add Infinispan
+        // always add Infinispan stuff (we use TCCL and it needs Ispn classes from app's CL)
         moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, INFINISPAN));
+        moduleSpecification.addSystemDependency(LibUtils.createModuleDependency(loader, INFINISPAN_QUERY));
         // Always add External transformer
         moduleSpecification.addClassFileTransformer("org.jboss.capedwarf.bytecode.ExternalTransformer");
         // Always add BlackList transformer
