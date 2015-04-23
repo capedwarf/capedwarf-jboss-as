@@ -162,7 +162,7 @@
             <maven-resource group="org.quartz-scheduler" artifact="quartz"/>
         </module-def>
 
-        <!-- Fix Infinispan Query usage -->
+        <!-- Fix Infinispan Query usage
 
         <module-def name="org.infinispan">
             <maven-resource group="org.infinispan" artifact="infinispan-core"/>
@@ -181,9 +181,13 @@
             <maven-resource group="org.infinispan" artifact="infinispan-lucene-directory"/>
         </module-def>
 
+        -->
+
         <module-def name="org.hibernate.search.engine">
              <maven-resource group="org.hibernate" artifact="hibernate-search-engine"/>
         </module-def>
+
+        <!--
 
         <module-def name="org.hibernate.search.infinispan-storage">
              <maven-resource group="org.hibernate" artifact="hibernate-search-infinispan"/>
@@ -206,6 +210,8 @@
             <maven-resource group="org.apache.lucene" artifact="lucene-queries"/>
             <maven-resource group="org.apache.lucene" artifact="lucene-queryparser"/>
         </module-def>
+
+        -->
 
         <!-- module-def name="com.google.guava">
             <maven-resource group="com.google.guava" artifact="guava"/>
