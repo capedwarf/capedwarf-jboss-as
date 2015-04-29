@@ -181,13 +181,9 @@
             <maven-resource group="org.infinispan" artifact="infinispan-lucene-directory"/>
         </module-def>
 
-        -->
-
         <module-def name="org.hibernate.search.engine">
              <maven-resource group="org.hibernate" artifact="hibernate-search-engine"/>
         </module-def>
-
-        <!--
 
         <module-def name="org.hibernate.search.infinispan-storage">
              <maven-resource group="org.hibernate" artifact="hibernate-search-infinispan"/>

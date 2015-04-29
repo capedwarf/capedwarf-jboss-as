@@ -10,7 +10,6 @@
         <extension module="org.jboss.as.ee"/>
         <extension module="org.jboss.as.ejb3"/>
         <extension module="org.jboss.as.jaxrs"/>
-        <extension module="org.jboss.as.jdr"/>
         <extension module="org.jboss.as.jmx"/>
         <extension module="org.jboss.as.jpa"/>
         <extension module="org.jboss.as.jsf"/>
@@ -33,7 +32,6 @@
         <extension module="org.wildfly.extension.request-controller"/>
         <extension module="org.wildfly.extension.security.manager"/>
         <extension module="org.wildfly.extension.undertow"/>
-        <extension module="org.wildfly.iiop-openjdk"/>
     </extensions>
     <management>
         <security-realms>
@@ -323,11 +321,6 @@
                 </replicated-cache>
             </cache-container>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:iiop-openjdk:1.0">
-            <orb socket-binding="iiop" ssl-socket-binding="iiop-ssl">
-                <initializers transactions="spec" security="identity"/>
-            </orb>
-        </subsystem>
         <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
         <subsystem xmlns="urn:jboss:domain:jca:3.0">
             <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
@@ -348,7 +341,6 @@
             </default-workmanager>
             <cached-connection-manager/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
         <subsystem xmlns="urn:jboss:domain:jgroups:3.0">
             <channels default="ee">
                 <channel name="ee"/>

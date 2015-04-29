@@ -63,7 +63,7 @@
         <version.com.google.appengine.managed>1.9.17</version.com.google.appengine.managed>
         <version.com.google.guava>18.0</version.com.google.guava>
         <version.javax.jdo.api>3.0</version.javax.jdo.api>
-        <version.org.hibernate.search>5.1.2-SNAPSHOT</version.org.hibernate.search>
+        <version.org.hibernate.search>5.1.2.Final</version.org.hibernate.search>
         <version.org.hibernate.hql>1.1.0.Final</version.org.hibernate.hql>
         <version.org.bouncycastle>1.50</version.org.bouncycastle>
         <version.junit>4.11</version.junit>
