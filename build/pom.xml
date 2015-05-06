@@ -87,9 +87,8 @@
                                     <includePluginDependencies>false</includePluginDependencies>
                                     <mainClass>org.jboss.capedwarf.bytecode.CapedwarfTransformerMojo</mainClass>
                                     <arguments>
-                                        <argument>
-                                            ${jboss.dir}/modules/com/google/appengine/main/appengine-api-1.0-sdk-${version.com.google.appengine}.jar
-                                        </argument>
+                                        <argument>${jboss.dir}/modules/com/google/appengine/main/appengine-api-1.0-sdk-${version.com.google.appengine}.jar</argument>
+                                        <!-- argument>${jboss.dir}/modules/org/infinispan/query/main/infinispan-query-${version.org.infinispan}.jar</argument -->
                                     </arguments>
                                 </configuration>
                             </execution>
