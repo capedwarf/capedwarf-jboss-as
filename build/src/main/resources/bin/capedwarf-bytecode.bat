@@ -76,7 +76,7 @@ rem set "JAVA_OPTS=%JAVA_OPTS% -Djboss.server.config.user.dir=..\standalone\conf
     -jar "%JBOSS_HOME%\jboss-modules.jar" ^
     -mp "%JBOSS_MODULEPATH%" ^
      org.jboss.capedwarf ^
-     "%JBOSS_MODULEPATH%\com\google\appengine\main\appengine-api-1.0-sdk-1.9.20.jar" ^
+     "%JBOSS_MODULEPATH%\com\google\appengine\main\appengine-api-1.0-sdk-1.9.21.jar" ^
      %*
 
 :END
