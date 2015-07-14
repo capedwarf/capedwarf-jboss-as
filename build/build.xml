@@ -84,7 +84,6 @@
         <module-def name="org.jboss.capedwarf.common">
             <maven-resource group="org.jboss.capedwarf.shared" artifact="capedwarf-common"/>
             <maven-resource group="com.google.appengine" artifact="appengine-managed-runtime"/>
-            <maven-resource group="com.google.appengine" artifact="appengine-jetty-managed-runtime"/>
         </module-def>
 
         <module-def name="org.jboss.as.capedwarf">
