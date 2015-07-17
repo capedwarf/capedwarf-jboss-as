@@ -50,7 +50,7 @@ public class CapedwarfBootProcessor extends CapedwarfWebDeploymentUnitProcessor 
         if (appEngineWebXml.isWarmupRequests()) {
             final Module module = unit.getAttachment(Attachments.MODULE);
             ServiceTarget target = phaseContext.getServiceTarget();
-            ServiceName serviceName = CAPEDWARF_SERVICE_NAME.append("warmup").append(appEngineWebXml.getApplication());
+            ServiceName serviceName = CAPEDWARF_SERVICE_NAME.append("warmup").append(appEngineWebXml.getApplication()).append(appEngineWebXml.getModule());
             ServiceBuilder<Void> builder = target.addService(serviceName, new WarmupService(module));
             builder.addDependency(ServletExecutorConsumerService.NAME);
             builder.addDependency(DeploymentCompleteServiceProcessor.serviceName(unit.getServiceName()));
