@@ -57,8 +57,10 @@ public abstract class CapedwarfPersistenceProcessor extends CapedwarfWebDeployme
             modifyPersistenceInfo(unit, deploymentRoot, ResourceType.DEPLOYMENT_ROOT);
 
             final List<ResourceRoot> resourceRoots = unit.getAttachment(Attachments.RESOURCE_ROOTS);
-            for (ResourceRoot rr : resourceRoots) {
-                modifyPersistenceInfo(unit, rr, ResourceType.RESOURCE_ROOT);
+            if (resourceRoots != null) {
+                for (ResourceRoot rr : resourceRoots) {
+                    modifyPersistenceInfo(unit, rr, ResourceType.RESOURCE_ROOT);
+                }
             }
         } catch (IOException e) {
             throw new DeploymentUnitProcessingException(e);

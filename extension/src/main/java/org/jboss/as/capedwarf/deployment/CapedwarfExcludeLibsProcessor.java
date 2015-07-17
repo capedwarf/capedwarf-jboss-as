@@ -57,12 +57,14 @@ public abstract class CapedwarfExcludeLibsProcessor extends CapedwarfDeploymentU
         final DeploymentUnit unit = phaseContext.getDeploymentUnit();
         if (exclude(unit)) {
             final List<ResourceRoot> resourceRoots = unit.getAttachment(Attachments.RESOURCE_ROOTS);
-            final Iterator<ResourceRoot> rrIter = resourceRoots.iterator();
-            while (rrIter.hasNext()) {
-                ResourceRoot rr = rrIter.next();
-                if (rr.getRootName().contains(exclusion())) {
-                    rrIter.remove();
-                    log.info(String.format("Removed library (potential conflict) '%s' from '%s'", rr.getRootName(), unit.getName()));
+            if (resourceRoots != null) {
+                final Iterator<ResourceRoot> rrIter = resourceRoots.iterator();
+                while (rrIter.hasNext()) {
+                    ResourceRoot rr = rrIter.next();
+                    if (rr.getRootName().contains(exclusion())) {
+                        rrIter.remove();
+                        log.info(String.format("Removed library (potential conflict) '%s' from '%s'", rr.getRootName(), unit.getName()));
+                    }
                 }
             }
         }
