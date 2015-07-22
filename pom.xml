@@ -264,6 +264,12 @@
                 <groupId>org.jboss.maven.plugins</groupId>
                 <artifactId>maven-transformer-plugin</artifactId>
                 <version>${version.org.jboss.maven.transformer}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- External Dependencies -->
