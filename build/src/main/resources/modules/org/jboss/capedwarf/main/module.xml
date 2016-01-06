@@ -73,6 +73,7 @@
         <module name="org.jboss.marshalling.river" services="import"/>
         <module name="org.codehaus.jackson.jackson-core-asl"/>
         <module name="org.codehaus.jackson.jackson-mapper-asl"/>
+        <module name="com.fasterxml.jackson.core.jackson-annotations"/>
         <module name="io.undertow.core"/>
         <module name="io.undertow.servlet"/>
         <module name="javax.websocket.api"/>

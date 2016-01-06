@@ -93,6 +93,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier MARSHALLING_RIVER = ModuleIdentifier.create("org.jboss.marshalling.river");
     private static final ModuleIdentifier JACKSON_CORE_ASL = ModuleIdentifier.create("org.codehaus.jackson.jackson-core-asl");
     private static final ModuleIdentifier JACKSON_MAPPER_ASL = ModuleIdentifier.create("org.codehaus.jackson.jackson-mapper-asl");
+    private static final ModuleIdentifier FASTER_JACKSON_ANNOTATIONS = ModuleIdentifier.create("com.fasterxml.jackson.core.jackson-annotations");
     private static final ModuleIdentifier WEB_SOCKET = ModuleIdentifier.create("javax.websocket.api");
     private static final ModuleIdentifier ANTLR_3 = ModuleIdentifier.create("org.antlr", "3");
     private static final ModuleIdentifier QUARTZ = ModuleIdentifier.create("org.quartz");
@@ -128,6 +129,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         MARSHALLING_RIVER,
         JACKSON_CORE_ASL,
         JACKSON_MAPPER_ASL,
+        FASTER_JACKSON_ANNOTATIONS,
         WEB_SOCKET,
         ANTLR_3,
         QUARTZ,
