@@ -55,7 +55,7 @@
 
     <properties>
         <version.jboss.wildfly>8.2.1.Final</version.jboss.wildfly>
-        <version.jboss.wildfly.mailra>1.0.0.Alpha3</version.jboss.wildfly.mailra>
+        <version.jboss.wildfly.mailra>1.0.0.Final</version.jboss.wildfly.mailra>
         <version.org.jboss.capedwarf.shared>2.0.0-SNAPSHOT</version.org.jboss.capedwarf.shared>
         <version.org.jboss.capedwarf>2.0.0-SNAPSHOT</version.org.jboss.capedwarf>
         <version.com.google.appengine>1.9.30</version.com.google.appengine>
