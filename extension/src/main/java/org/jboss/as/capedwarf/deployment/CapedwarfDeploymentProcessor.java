@@ -75,6 +75,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
     private static final ModuleIdentifier HIBERNATE_SEARCH = ModuleIdentifier.create("org.hibernate.search.engine");
     private static final ModuleIdentifier LUCENE = ModuleIdentifier.create("org.apache.lucene");
     private static final ModuleIdentifier HTTP_COMPONENTS = ModuleIdentifier.create("org.apache.httpcomponents");
+    private static final ModuleIdentifier CODEC = ModuleIdentifier.create("org.apache.commons.codec");
     private static final ModuleIdentifier PICKETLINK = ModuleIdentifier.create("org.picketlink");
     private static final ModuleIdentifier PICKETLINK_SOCIAL = ModuleIdentifier.create("org.picketlink.social");
     private static final ModuleIdentifier JAVAX_WS_RS_API = ModuleIdentifier.create("javax.ws.rs.api");
@@ -111,6 +112,7 @@ public class CapedwarfDeploymentProcessor extends CapedwarfDeploymentUnitProcess
         HIBERNATE_SEARCH,
         LUCENE,
         HTTP_COMPONENTS,
+        CODEC,
         PICKETLINK,
         PICKETLINK_SOCIAL,
         JAVAX_WS_RS_API,
