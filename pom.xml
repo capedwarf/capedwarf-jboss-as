@@ -66,7 +66,7 @@
         <version.org.hibernate.hql-parser>1.0.0.Alpha6</version.org.hibernate.hql-parser>
         <version.org.bouncycastle>1.50</version.org.bouncycastle>
         <version.junit>4.11</version.junit>
-        <version.org.apache.httpcomponents>4.2.5</version.org.apache.httpcomponents>
+        <version.org.apache.httpcomponents>4.5.1</version.org.apache.httpcomponents>
         <version.org.apache.lucene>3.6.2</version.org.apache.lucene>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>1.0.0.Final
         </version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>
